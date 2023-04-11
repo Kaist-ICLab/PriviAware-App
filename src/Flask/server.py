@@ -67,6 +67,7 @@ def dataQuery():
     client.close()
     return { "result": "data" }
 
+# fetch member data from PrivacyViz-Member MongoDB for login check
 @app.route("/login", methods=['POST'])
 def login():
     print("[Flask server.py] POST path /login")
@@ -79,6 +80,7 @@ def login():
             return { "result": True }
     return { "result": False }
 
+# create entry in PrivacyViz-Member MongoDB
 @app.route("/createuser", methods=['POST'])
 def createUser():
     print("[Flask server.py] POST path /createuser")
@@ -90,7 +92,7 @@ def createUser():
 
 
 
-# test server connection
+# test Flask server connection
 @app.route("/test", methods=['GET'])
 def testConnection():
     print("[Flask server.py] GET path /test")

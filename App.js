@@ -15,6 +15,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 import LoginPage from './src/Component/LoginPage';
 import RegisterPage from './src/Component/RegisterPage';
+import OverviewPage from './src/Component/OverviewPage';
 
 const dataQueryFunc = async () => {
   console.log("[RN App.js] dataQueryFunc started");
@@ -128,6 +129,7 @@ function App() {
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Login" component={LoginPage} />
           <Stack.Screen name="Register" component={RegisterPage} />
+          <Stack.Screen name="Overview" component={OverviewPage} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
