@@ -23,6 +23,22 @@ MEMBER_MONGODB_URI = os.getenv("MEMBER_MONGODB_URI")
 MEMBER_MONGODB_DB_NAME = os.getenv("MEMBER_MONGODB_DB_NAME")
 MEMBER_MONGODB_COLLECTION = os.getenv("MEMBER_MONGODB_COLLECTION")
 
+DATATYPE = [
+    { "name": "bluetooth" },
+    { "name": "wifi" },
+    { "name": "battery" },
+    { "name": "data_traffic" },
+    { "name": "device_event" },
+    { "name": "message" },
+    { "name": "call_log" },
+    { "name": "installed_app" },
+    { "name": "location" },
+    { "name": "fitness" },
+    { "name": "physical_activity" },
+    { "name": "physical_activity_transition" },
+    { "name": "survey" }
+]
+
 # delete data from MongoDB which matches the condition
 @app.route("/deletedata", methods=['POST'])
 def dataDeletion():
@@ -75,6 +91,7 @@ def login():
     db = client[MEMBER_MONGODB_DB_NAME]
     datum = db[MEMBER_MONGODB_COLLECTION]
     user = datum.find_one({"email": request.json["email"]})
+    client.close()
     if(user):
         if(bcrypt.check_password_hash(user["password"], request.json["password"])):
             return { "result": True }
@@ -87,12 +104,41 @@ def createUser():
     client = MongoClient(MEMBER_MONGODB_URI)
     db = client[MEMBER_MONGODB_DB_NAME]
     datum = db[MEMBER_MONGODB_COLLECTION]
-    datum.insert_one({"email": request.json["email"], "password": bcrypt.generate_password_hash(request.json["password"])})
+    initStatus = {}
+    for dt in DATATYPE:
+        initStatus[dt['name']] = "on"
+    datum.insert_one({"email": request.json["email"], "password": bcrypt.generate_password_hash(request.json["password"]), "status": initStatus})
+    client.close()
     return { "result": True }
 
+# fetch status data from PrivacyViz-Member MongoDB for a specific user
+@app.route("/status", methods=['POST'])
+def getStatus():
+    print("[Flask server.py] POST path /status")
+    client = MongoClient(MEMBER_MONGODB_URI)
+    db = client[MEMBER_MONGODB_DB_NAME]
+    datum = db[MEMBER_MONGODB_COLLECTION]
+    user = datum.find_one({"email": request.json["email"]})
+    client.close()
+    if(user):
+        return user["status"]
+    return {}
+
+# update status data from PrivacyViz-Member MongoDB for a specific user
+@app.route("/setstatus", methods=['POST'])
+def setStatus():
+    print("[Flask server.py] POST path /setstatus")
+    client = MongoClient(MEMBER_MONGODB_URI)
+    db = client[MEMBER_MONGODB_DB_NAME]
+    datum = db[MEMBER_MONGODB_COLLECTION]
+    user = datum.find_one_and_update({ "email": request.json["email"] }, { '$set': request.json["newStatus"] })
+    client.close()
+    if(user):
+        return { "result": True }
+    return {"result": False }
 
 
-# test Flask server connection
+# test Flask server + PrivacyViz-Member MongoDB connection
 @app.route("/test", methods=['GET'])
 def testConnection():
     print("[Flask server.py] GET path /test")

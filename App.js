@@ -16,6 +16,7 @@ import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 import LoginPage from './src/Component/LoginPage';
 import RegisterPage from './src/Component/RegisterPage';
 import OverviewPage from './src/Component/OverviewPage';
+import SettingPage from './src/Component/SettingPage';
 
 const dataQueryFunc = async () => {
   console.log("[RN App.js] dataQueryFunc started");
@@ -130,6 +131,7 @@ function App() {
           <Stack.Screen name="Login" component={LoginPage} />
           <Stack.Screen name="Register" component={RegisterPage} />
           <Stack.Screen name="Overview" component={OverviewPage} />
+          <Stack.Screen name="Setting" component={SettingPage} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaView>
