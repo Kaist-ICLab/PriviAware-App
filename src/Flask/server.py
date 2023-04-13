@@ -105,9 +105,13 @@ def createUser():
     db = client[MEMBER_MONGODB_DB_NAME]
     datum = db[MEMBER_MONGODB_COLLECTION]
     initStatus = {}
+    initTimeFiltering = {}
+    initLocationFiltering = {}
     for dt in DATATYPE:
         initStatus[dt['name']] = "on"
-    datum.insert_one({"email": request.json["email"], "password": bcrypt.generate_password_hash(request.json["password"]), "status": initStatus})
+        initTimeFiltering[dt['name']] = {}
+        initLocationFiltering[dt['name']] = {}
+    datum.insert_one({"email": request.json["email"], "password": bcrypt.generate_password_hash(request.json["password"]), "status": initStatus, "timeFiltering": initTimeFiltering, "locationFiltering": initLocationFiltering})
     client.close()
     return { "result": True }
 
@@ -137,6 +141,18 @@ def setStatus():
         return { "result": True }
     return {"result": False }
 
+# fetch filtering setting data from PrivacyViz-Member MongoDB for a specific user
+@app.route("/getfiltering", methods=['POST'])
+def getFiltering():
+    print("[Flask server.py] POST path /getfiltering")
+    client = MongoClient(MEMBER_MONGODB_URI)
+    db = client[MEMBER_MONGODB_DB_NAME]
+    datum = db[MEMBER_MONGODB_COLLECTION]
+    user = datum.find_one({ "email": request.json["email"] })
+    client.close()
+    if(user):
+        return { "timeFiltering": user["timeFiltering"], "locationFiltering": user["locationFiltering"]}
+    return { "timeFiltering": [], "locationFiltering": [] }
 
 # test Flask server + PrivacyViz-Member MongoDB connection
 @app.route("/test", methods=['GET'])
