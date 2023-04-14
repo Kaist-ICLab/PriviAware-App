@@ -162,11 +162,12 @@ def testConnection():
     db = client[MEMBER_MONGODB_DB_NAME]
     datum = db[MEMBER_MONGODB_COLLECTION]
     res = list(datum.find({"email": "emily@kse.kaist.ac.kr"}))
-    if(len(res) > 0):
+    client.close()
+    if(res):
         print("[Flask server.py] First entry of fetched data: " + str(res[0]))
     else:
         print("[Flask server.py] No data is founded")
-    client.close()
+        return { "result": "ConnSucess but nothing found" }
     print(bcrypt.check_password_hash(res[0]["password"], "pw1234"))
     return { "result": "ConnSuccess" }
 

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, Alert, Switch, TextInput } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, Alert, Switch } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import MapView, { LatLng, Region } from 'react-native-maps';
+import { FakeMarker } from 'react-native-map-coordinate-picker';
 
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 
@@ -29,7 +31,7 @@ export default function SettingPage({ route }) {
 
     useEffect(() => {
         const fetchFilteringSetting = async () => {
-            if(route.params.status === "time"){
+            if (route.params.status === "time") {
                 const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/getfiltering", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
@@ -75,7 +77,7 @@ export default function SettingPage({ route }) {
             setLocationToggleStatus(false);
             setTimeToggleStatus(false);
             setShowTimeSetting(false);
-            updateToDB({ ["status." + dt.name]: "off", ["timeFiltering." + dt.name]: {}  });
+            updateToDB({ ["status." + dt.name]: "off", ["timeFiltering." + dt.name]: {} });
         }
     };
 
@@ -84,7 +86,7 @@ export default function SettingPage({ route }) {
             setStatus("on");
             setToggleStatus(true);
             setShowTimeSetting(false);
-            updateToDB({ ["status." + dt.name]: "on", ["timeFiltering." + dt.name]: {}  });
+            updateToDB({ ["status." + dt.name]: "on", ["timeFiltering." + dt.name]: {} });
         }
         else {
             // return if locatioin filtering is on
@@ -122,7 +124,7 @@ export default function SettingPage({ route }) {
             AlertBox("Error", "Please enter both starting time and ending time");
             setShowTimeSetting(false);
             setTimeToggleStatus(false);
-            if(status === "time"){
+            if (status === "time") {
                 setStatus("on");
                 updateToDB({ ["status." + dt.name]: "on", ["timeFiltering." + dt.name]: {} });
                 return;
@@ -134,7 +136,7 @@ export default function SettingPage({ route }) {
             AlertBox("Error", "Starting time cannot be earlier than ending time");
             setShowTimeSetting(false);
             setTimeToggleStatus(false);
-            if(status === "time"){
+            if (status === "time") {
                 setStatus("on");
                 updateToDB({ ["status." + dt.name]: "on", ["timeFiltering." + dt.name]: {} });
                 return;
@@ -253,15 +255,41 @@ export default function SettingPage({ route }) {
                     <></>
                 }
             </View>
-            <View style={{ marginHorizontal: 15, marginTop: 10, flexDirection: "row", justifyContent: "space-between" }}>
-                <Text style={{ color: "#000000", fontSize: 15, alignSelf: "center" }}>Location</Text>
-                <Switch
-                    style={{ alignSelf: "center" }}
-                    trackColor={{ true: "#128300", false: "#3D3D3D" }}
-                    thumbColor={"#F5F5F5"}
-                    onValueChange={handleLocationToggleStatus}
-                    value={locationToggleStatus}
-                />
+            <View>
+                <View style={{ marginHorizontal: 15, marginTop: 10, flexDirection: "row", justifyContent: "space-between" }}>
+                    <Text style={{ color: "#000000", fontSize: 15, alignSelf: "center" }}>Location</Text>
+                    <Switch
+                        style={{ alignSelf: "center" }}
+                        trackColor={{ true: "#128300", false: "#3D3D3D" }}
+                        thumbColor={"#F5F5F5"}
+                        onValueChange={handleLocationToggleStatus}
+                        value={locationToggleStatus}
+                    />
+                </View>
+                <View style={{ marginHorizontal: 15, marginTop: 5 }}>
+                    <MapView
+                        style={{ height: 200, width: "100%" }}
+                        initialRegion={{
+                            latitude: 36.374228,
+                            longitude: 127.365861,
+                            latitudeDelta: 0.0122,
+                            longitudeDelta: 0.0122,
+                        }}
+                    />
+                    <View style={{ flexDirection: "row", marginTop: 5, justifyContent: "space-around", alignItems: "center" }}>
+                        <View>
+                            <Text style={{ fontSize: 15, color: "#000000", alignSelf: "center" }}>Do not collect when I'm within</Text>
+                            <View style={{ flexDirection: "row", alignSelf: "center" }}>
+                                <View style={{ backgroundColor: "#D9D9D9", height: 25, width: 50, justifyContent: "center", marginRight: 10 }}>
+                                </View>
+                                <Text style={{ fontSize: 15, color: "#000000", alignSelf: "center" }}>m from this point</Text>
+                            </View>
+                        </View>
+                        <TouchableOpacity style={{ paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20, backgroundColor: "#128300" }}>
+                            <Text style={{ color: "#FFFFFF" }}>Apply</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </View>
             <View style={{ marginTop: 10, marginBottom: 20, alignSelf: "center" }}>
                 <TouchableOpacity style={{ paddingHorizontal: 40, paddingVertical: 10, borderRadius: 20, backgroundColor: "#F3F2F2" }} onPress={back}>
