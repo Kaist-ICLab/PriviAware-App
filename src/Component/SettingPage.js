@@ -3,7 +3,7 @@ import { SafeAreaView, View, Text, TouchableOpacity, Alert, Switch, TextInput, K
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import MapView, { LatLng, Region } from 'react-native-maps';
+import MapView from 'react-native-maps';
 import { FakeMarker } from 'react-native-map-coordinate-picker';
 
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
@@ -20,8 +20,10 @@ export default function SettingPage({ route }) {
     const [showTimePicker1, setShowTimePicker1] = useState(false);
     const [timePicker2, setTimePicker2] = useState();
     const [showTimePicker2, setShowTimePicker2] = useState(false);
-    const [radius, setRadius] = useState();
     const [showLocationSetting, setShowLocationSetting] = useState(route.params.status === "location");
+    const [dragging, setDragging] = useState(false);
+    const [pickedLocation, setPickedLocation] = useState({ latitude: 36.374228, longitude: 127.365861 });
+    const [radius, setRadius] = useState();
 
     const AlertBox = (title, msg) => {
         Alert.alert(title, msg, [
@@ -53,6 +55,7 @@ export default function SettingPage({ route }) {
                 const data = await res.json();
                 console.log("[RN SettingPage.js] Received: " + JSON.stringify(data));
                 setRadius(data["locationFiltering"][route.params.dt.name]["radius"]);
+                setPickedLocation({ latitude: data["locationFiltering"][route.params.dt.name]["latitude"], longitude: data["locationFiltering"][route.params.dt.name]["longitude"] });
             }
         };
         fetchFilteringSetting();
@@ -179,6 +182,16 @@ export default function SettingPage({ route }) {
         setLocationToggleStatus(!locationToggleStatus);
     };
 
+    const handleOnPanDrag = () => {
+        setDragging(true);
+    };
+
+    const handleRegionChange = (region) => {
+        setDragging(false);
+        const { latitude, longitude } = region;
+        setPickedLocation({ latitude, longitude });
+    };
+
     const handleRadius = (value) => {
         setRadius(value);
     };
@@ -186,7 +199,7 @@ export default function SettingPage({ route }) {
     const applyLocationSetting = () => {
         Keyboard.dismiss();
         // reject all impossible cases
-        if (!radius) {
+        if (!radius || !pickedLocation) {
             AlertBox("Error", "Please enter the distance");
             setShowLocationSetting(false);
             setLocationToggleStatus(false);
@@ -213,7 +226,7 @@ export default function SettingPage({ route }) {
         }
         setStatus("location");
         setToggleStatus(true);
-        updateToDB({ ["status." + dt.name]: "location", ["locationFiltering." + dt.name + ".radius"]: radius });
+        updateToDB({ ["status." + dt.name]: "location", ["locationFiltering." + dt.name + ".radius"]: radius, ["locationFiltering." + dt.name + ".longitude"]: pickedLocation.longitude, ["locationFiltering." + dt.name + ".latitude"]: pickedLocation.latitude });
     };
 
     const back = () => {
@@ -319,13 +332,16 @@ export default function SettingPage({ route }) {
                         <View style={{ marginHorizontal: 15, marginTop: 5 }}>
                             <MapView
                                 style={{ height: 200, width: "100%" }}
-                                initialRegion={{
-                                    latitude: 36.374228,
-                                    longitude: 127.365861,
+                                region={{
+                                    latitude: pickedLocation.latitude,
+                                    longitude: pickedLocation.longitude,
                                     latitudeDelta: 0.0122,
                                     longitudeDelta: 0.0122,
                                 }}
+                                onPanDrag={handleOnPanDrag}
+                                onRegionChangeComplete={handleRegionChange}
                             />
+                            <FakeMarker dragging={dragging}></FakeMarker>
                             <View style={{ flexDirection: "row", marginTop: 5, justifyContent: "space-around", alignItems: "center" }}>
                                 <View>
                                     <Text style={{ fontSize: 15, color: "#000000", alignSelf: "center" }}>Do not collect when I'm within</Text>
