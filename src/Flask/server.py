@@ -171,5 +171,12 @@ def testConnection():
     print(bcrypt.check_password_hash(res[0]["password"], "pw1234"))
     return { "result": "ConnSuccess" }
 
+# test the background running function in RN
+@app.route("/testbackground", methods=['POST'])
+def testBackground():
+    print("[Flask server.py] POST path /testbackground")
+    print(request.json["body"])
+    return { "result": True }
+
 if __name__ == "__main__":
     app.run(debug=True, host=SERVER_IP_ADDR, port=SERVER_PORT)

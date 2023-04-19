@@ -5,13 +5,14 @@
  * @format
  */
 
-import React from 'react';
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View, Button } from 'react-native';
+import React, { useEffect } from 'react';
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, useColorScheme, View, Button, PermissionsAndroid, Alert } from 'react-native';
 import { Colors, DebugInstructions, Header, LearnMoreLinks, ReloadInstructions, } from 'react-native/Libraries/NewAppScreen';
 import DeviceInfo from 'react-native-device-info';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import BackgroundTimer from 'react-native-background-timer';
+import Geolocation from 'react-native-geolocation-service';
 
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 import LoginPage from './src/Component/LoginPage';
@@ -43,7 +44,8 @@ const dataDeleteFunc = async () => {
   });
   const data = await res.json();
   console.log("[RN App.js] Received: " + JSON.stringify(data));
-}
+};
+
 
 const Section = ({ children, title }) => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -71,7 +73,50 @@ const Section = ({ children, title }) => {
   );
 };
 
+
 function App() {
+  const AlertBox = (title, msg) => {
+    Alert.alert(title, msg, [
+        {
+            text: "OK", style: "cancel"
+        }
+    ]);
+};
+
+  const requestLocationPermission = async () => {
+    try {
+      const perm = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION);
+      if(perm) return true;
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION
+      );
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    } catch (err) {
+      console.warn(err);
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const getInitGPSPermission = async () => {
+      const res = await requestLocationPermission();
+      if (res) {
+        BackgroundTimer.runBackgroundTimer(async () => {
+          Geolocation.getCurrentPosition(async (pos) => {
+            const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/testbackground", {
+              method: "POST",
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ body: pos.coords })
+            });
+          });
+        }, 30000);
+      } else {
+        AlertBox("Warning", "Functions in this application require your location data. Some of the functions might not be accessble if you do not provide location data to this application.\n*You can always update this permission in Setting.")
+      }
+    };
+    getInitGPSPermission();
+  }, []);
+
   const Stack = createStackNavigator();
 
   const isDarkMode = useColorScheme() === 'dark';
