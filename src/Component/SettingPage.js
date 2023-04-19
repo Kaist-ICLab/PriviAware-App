@@ -12,7 +12,7 @@ export default function SettingPage({ route }) {
     const { dt, email } = route.params;
     const navigation = useNavigation();
     const [status, setStatus] = useState(route.params.status);
-    const [toggleStatus, setToggleStatus] = useState((route.params.status === "off" ? false : true));
+    const [toggleStatus, setToggleStatus] = useState(route.params.status !== "off");
     const [timeToggleStatus, setTimeToggleStatus] = useState(route.params.status === "time");
     const [locationToggleStatus, setLocationToggleStatus] = useState(route.params.status === "location");
     const [showTimeSetting, setShowTimeSetting] = useState(route.params.status === "time");
@@ -23,6 +23,7 @@ export default function SettingPage({ route }) {
     const [showLocationSetting, setShowLocationSetting] = useState(route.params.status === "location");
     const [dragging, setDragging] = useState(false);
     const [pickedLocation, setPickedLocation] = useState({ latitude: 36.374228, longitude: 127.365861 });
+    const [pickedLocationDelta, setPickedLocationDelta] = useState({ latitudeDelta: 0.0122, longitudeDelta: 0.0122 });
     const [radius, setRadius] = useState();
 
     const AlertBox = (title, msg) => {
@@ -56,6 +57,7 @@ export default function SettingPage({ route }) {
                 console.log("[RN SettingPage.js] Received: " + JSON.stringify(data));
                 setRadius(data["locationFiltering"][route.params.dt.name]["radius"]);
                 setPickedLocation({ latitude: data["locationFiltering"][route.params.dt.name]["latitude"], longitude: data["locationFiltering"][route.params.dt.name]["longitude"] });
+                setPickedLocationDelta({ latitudeDelta: data["locationFiltering"][route.params.dt.name]["latitudeDelta"], longitudeDelta: data["locationFiltering"][route.params.dt.name]["longitudeDelta"] });
             }
         };
         fetchFilteringSetting();
@@ -188,8 +190,9 @@ export default function SettingPage({ route }) {
 
     const handleRegionChange = (region) => {
         setDragging(false);
-        const { latitude, longitude } = region;
+        const { latitude, longitude, latitudeDelta, longitudeDelta } = region;
         setPickedLocation({ latitude, longitude });
+        setPickedLocationDelta({ latitudeDelta, longitudeDelta });
     };
 
     const handleRadius = (value) => {
@@ -199,7 +202,7 @@ export default function SettingPage({ route }) {
     const applyLocationSetting = () => {
         Keyboard.dismiss();
         // reject all impossible cases
-        if (!radius || !pickedLocation) {
+        if (!radius || !pickedLocation || !pickedLocationDelta) {
             AlertBox("Error", "Please enter the distance");
             setShowLocationSetting(false);
             setLocationToggleStatus(false);
@@ -226,7 +229,7 @@ export default function SettingPage({ route }) {
         }
         setStatus("location");
         setToggleStatus(true);
-        updateToDB({ ["status." + dt.name]: "location", ["locationFiltering." + dt.name + ".radius"]: radius, ["locationFiltering." + dt.name + ".longitude"]: pickedLocation.longitude, ["locationFiltering." + dt.name + ".latitude"]: pickedLocation.latitude });
+        updateToDB({ ["status." + dt.name]: "location", ["locationFiltering." + dt.name + ".radius"]: radius, ["locationFiltering." + dt.name + ".longitude"]: pickedLocation.longitude, ["locationFiltering." + dt.name + ".latitude"]: pickedLocation.latitude, ["locationFiltering." + dt.name + ".latitudeDelta"]: pickedLocationDelta.latitudeDelta, ["locationFiltering." + dt.name + ".longitudeDelta"]: pickedLocationDelta.longitudeDelta });
     };
 
     const back = () => {
@@ -335,8 +338,8 @@ export default function SettingPage({ route }) {
                                 region={{
                                     latitude: pickedLocation.latitude,
                                     longitude: pickedLocation.longitude,
-                                    latitudeDelta: 0.0122,
-                                    longitudeDelta: 0.0122,
+                                    latitudeDelta: pickedLocationDelta.latitudeDelta,
+                                    longitudeDelta: pickedLocationDelta.longitudeDelta,
                                 }}
                                 onPanDrag={handleOnPanDrag}
                                 onRegionChangeComplete={handleRegionChange}

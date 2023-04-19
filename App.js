@@ -11,6 +11,7 @@ import { Colors, DebugInstructions, Header, LearnMoreLinks, ReloadInstructions, 
 import DeviceInfo from 'react-native-device-info';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import BackgroundTimer from 'react-native-background-timer';
 
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 import LoginPage from './src/Component/LoginPage';
