@@ -49,8 +49,8 @@ export default function RegisterPage() {
     };
 
     const submit = async () => {
-        if (!email || !password1 || !password2) {
-            AlertBox("Error", "Please fill in every field");
+        if (!emailValidity || !password1 || !password2) {
+            AlertBox("Error", "Please fill in every field correctly");
             return;
         }
         console.log("[RN LoginPage.js] Email: " + email + " Password1: " + password1 + " Password2: " + password2);
