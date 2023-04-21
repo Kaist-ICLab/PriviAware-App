@@ -112,6 +112,10 @@ def createUser():
         initStatus[dt['name']] = "on"
         initTimeFiltering[dt['name']] = {}
         initLocationFiltering[dt['name']] = {}
+    duplicant = datum.find_one({"email": request.json["email"]})
+    if(duplicant):
+        client.close()
+        return { "result": False }
     datum.insert_one({"email": request.json["email"], "password": bcrypt.generate_password_hash(request.json["password"]), "status": initStatus, "timeFiltering": initTimeFiltering, "locationFiltering": initLocationFiltering})
     client.close()
     return { "result": True }

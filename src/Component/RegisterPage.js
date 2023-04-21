@@ -64,7 +64,7 @@ export default function RegisterPage() {
         if(data.result){
             AlertBox("Success", "Account created!");
             navigation.navigate("Login");
-        } else AlertBox("Error", "Account creation failed");
+        } else AlertBox("Error", "Email is registered");
     };
 
     return (
