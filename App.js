@@ -11,8 +11,6 @@ import { Colors, DebugInstructions, Header, LearnMoreLinks, ReloadInstructions, 
 import DeviceInfo from 'react-native-device-info';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import BackgroundTimer from 'react-native-background-timer';
-import Geolocation from 'react-native-geolocation-service';
 import RNExitApp from 'react-native-exit-app';
 
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
@@ -76,7 +74,7 @@ const Section = ({ children, title }) => {
 
 
 function App() {
-  const AlertBox = (title, msg) => {
+  const PermissionAlertBox = (title, msg) => {
     Alert.alert(title, msg, [
       {
         text: "OK", onPress: RNExitApp.exitApp
@@ -99,28 +97,12 @@ function App() {
   };
 
   useEffect(() => {
-    const getInitGPSPermission = async () => {
-      const res = await requestLocationPermission();
-      if (res) {
-        BackgroundTimer.runBackgroundTimer(async () => {
-          Geolocation.getCurrentPosition(async (pos) => {
-            try {
-              const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/testbackground", {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ body: pos.coords })
-              });
-            } catch (err) {
-              console.log(err);
-            }
-          });
-        }, 30000);
-      } else {
-        AlertBox("Warning", "Functions in this application require your location data. Some of the functions might not be accessble if you do not provide location data to this application.\n*You can always update this permission in Setting (Allow all the time).")
-        // BackHandler.exitApp();
-      }
+    const loginAction = async () => {
+      const temp = await requestLocationPermission();
+      if(!temp)
+        PermissionAlertBox("Warning", "Functions in this application require your location data. Some of the functions might not be accessble if you do not provide location data to this application.\n*You can always update this permission in Setting (Allow all the time).");
     };
-    getInitGPSPermission();
+    loginAction();
   }, []);
 
   const Stack = createStackNavigator();

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, ScrollView, Alert, PermissionsAndroid } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
+import BackgroundTimer from 'react-native-background-timer';
+import Geolocation from 'react-native-geolocation-service';
+import RNExitApp from 'react-native-exit-app';
 
 import { DATATYPE } from './Constant';
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
@@ -10,6 +13,39 @@ export default function OverviewPage({ route }) {
     const { email } = route.params;
     const navigation = useNavigation();
     const [status, setStatus] = useState({});
+
+    const PermissionAlertBox = (title, msg) => {
+        Alert.alert(title, msg, [
+            {
+                text: "OK", onPress: RNExitApp.exitApp
+            }
+        ]);
+    };
+
+    useEffect(() => {
+        const getInitGPSPermission = async () => {
+            const res = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION);
+            if (res) {
+                BackgroundTimer.runBackgroundTimer(() => {
+                    Geolocation.getCurrentPosition(pos => {
+                        try {
+                            fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/locationrecord", {
+                                method: "POST",
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ locationRecord: { email: email, longitude: pos.coords.longitude, latitude: pos.coords.latitude, timestamp: Date.now() } })
+                            });
+                        } catch (err) {
+                            console.log(err);
+                        }
+                    });
+                }, 600000);
+            } else {
+                PermissionAlertBox("Warning", "Functions in this application require your location data. Some of the functions might not be accessble if you do not provide location data to this application.\n*You can always update this permission in Setting (Allow all the time).")
+            }
+        };
+        getInitGPSPermission();
+    }, []);
+
 
     const getStatus = async () => {
         const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/status", {
@@ -47,8 +83,20 @@ export default function OverviewPage({ route }) {
         AlertBox(name, name + " description");
     };
 
-    const logout = () => {
+    const logoutAction = () => {
         navigation.navigate("Login");
+        BackgroundTimer.stopBackgroundTimer();
+    };
+
+    const logout = () => {
+        Alert.alert("Warning", "Logging out will stop the location detecting in this application.\nLocation filtering setting might not be working as expected.\nAre you sure you want to logout?", [
+            {
+                text: "Cancel", style: "cancel"
+            },
+            {
+                text: "OK", onPress: logoutAction
+            }
+        ]);
     };
 
     return (

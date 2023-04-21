@@ -22,6 +22,7 @@ ABC_MONGODB_COLLECTION = os.getenv("ABC_MONGODB_COLLECTION")
 MEMBER_MONGODB_URI = os.getenv("MEMBER_MONGODB_URI")
 MEMBER_MONGODB_DB_NAME = os.getenv("MEMBER_MONGODB_DB_NAME")
 MEMBER_MONGODB_COLLECTION = os.getenv("MEMBER_MONGODB_COLLECTION")
+LOCATION_MONGODB_COLLECTION = os.getenv("LOCATION_MONGODB_COLLECTION")
 
 DATATYPE = [
     { "name": "bluetooth" },
@@ -153,6 +154,17 @@ def getFiltering():
     if(user):
         return { "timeFiltering": user["timeFiltering"], "locationFiltering": user["locationFiltering"]}
     return { "timeFiltering": [], "locationFiltering": [] }
+
+# save location record in PrivacyViz-Member MongoDB
+@app.route("/locationrecord", methods=['POST'])
+def saveLocationRecord():
+    print("[Flask server.py] POST path /locationrecord")
+    client = MongoClient(MEMBER_MONGODB_URI)
+    db = client[MEMBER_MONGODB_DB_NAME]
+    datum = db[LOCATION_MONGODB_COLLECTION]
+    datum.insert_one(request.json["locationRecord"])
+    client.close()
+    return { "result": True }
 
 # test Flask server + PrivacyViz-Member MongoDB connection
 @app.route("/test", methods=['GET'])
