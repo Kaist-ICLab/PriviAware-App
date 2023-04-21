@@ -49,8 +49,12 @@ export default function RegisterPage() {
     };
 
     const submit = async () => {
-        console.log("[RN LoginPage.js] Email: " + email + " Password1: " +  password1 + " Password2: " + password2);
-        if(password1 !== password2) {
+        if (!email || !password1 || !password2) {
+            AlertBox("Error", "Please fill in every field");
+            return;
+        }
+        console.log("[RN LoginPage.js] Email: " + email + " Password1: " + password1 + " Password2: " + password2);
+        if (password1 !== password2) {
             AlertBox("Error", "Passwords do not match");
             return;
         }
@@ -61,7 +65,7 @@ export default function RegisterPage() {
         });
         const data = await res.json();
         console.log("[RN App.js] Received: " + JSON.stringify(data));
-        if(data.result){
+        if (data.result) {
             AlertBox("Success", "Account created!");
             navigation.navigate("Login");
         } else AlertBox("Error", "Email is registered");
@@ -107,7 +111,7 @@ export default function RegisterPage() {
                             onChangeText={(value) => handlePassword2(value)}
                         />
                         <TouchableOpacity onPress={handleShowPW2}>
-                            {showPW2?
+                            {showPW2 ?
                                 <Entypo name="eye-with-line" size={20}></Entypo>
                                 :
                                 <Entypo name="eye" size={20}></Entypo>
