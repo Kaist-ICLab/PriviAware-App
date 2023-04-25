@@ -18,15 +18,17 @@ end_timestamp = time.time()*1000
 start_timestamp = end_timestamp - day*2
 query = {
         "$and": [{
-            "subject.email": 'emily@kse.kaist.ac.kr'
+            "subject.email": 'emily@kse.kaist.ac.kr',
+            "datumType": "BLUETOOTH"
         },  
-        {"timestamp": {"$gt": start_timestamp}}, 
+        {"timestamp": {"$gt": 1680274800000}}, 
         {"timestamp": {"$lt": end_timestamp}}
             ]
         }
 
-all_data = list(collection.find(query))
+all_data = collection.find_one(query)
 print('extracted')
-df = pd.json_normalize(all_data)
-print('normalized')
-df.to_csv('test.csv')
+print(all_data)
+# df = pd.json_normalize(all_data)
+# print('normalized')
+# df.to_csv('test.csv')

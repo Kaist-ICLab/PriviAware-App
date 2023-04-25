@@ -1,11 +1,13 @@
 import os
 import time
+import datetime
 from flask import Flask
 from flask import request
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -39,6 +41,63 @@ DATATYPE = [
     { "name": "physical_activity_transition" },
     { "name": "survey" }
 ]
+TIMEZONE_OFFSET = 9
+
+
+def tryScheduler():
+    print("[Flask server.py] running scheduler at " + time.ctime())
+    memberClient = MongoClient(MEMBER_MONGODB_URI)
+    memberDB = memberClient[MEMBER_MONGODB_DB_NAME]
+    memberDatum = memberDB[MEMBER_MONGODB_COLLECTION]
+    locationDatum = memberDB[LOCATION_MONGODB_COLLECTION]
+    ABCClient = MongoClient(ABC_MONGODB_URI)
+    ABCDB = ABCClient[ABC_MONGODB_DB_NAME]
+    ABCDatum = ABCDB[ABC_MONGODB_COLLECTION]
+    user = list(memberDatum.find({}))
+    # for each user
+    for u in user:
+        # for each datatype's status
+        for s in u["status"]:
+            # handle time filtering
+            if u["status"][s] == "time":
+                print("[Flask server.py] Handling time filtering for", s)
+                initTime = 1680274800000    # only handle data after 01/04/2023
+                currentTime = int(time.time() * 1000)
+                startingTime = datetime.datetime.strptime(u["timeFiltering"][s]["startingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                endingTime = datetime.datetime.strptime(u["timeFiltering"][s]["endingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                for t in range(initTime, currentTime, 24 * 60 * 60 * 1000):
+                    startTS = t + (startingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
+                    endTS = t + (endingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + endingTime.minute * 60 * 1000
+                    query = {
+                        "$and": [
+                            {
+                                "subject.email": u["email"],
+                                "datumType": s.upper()
+                            },  
+                            {
+                                "timestamp": {"$gt": startTS}
+                            },
+                            {
+                                "timestamp": {"$lt": endTS}
+                            }
+                        ]
+                    }
+                    waitingForDelete = list(ABCDatum.find(query))
+                    print(len(waitingForDelete))
+            # handle location filtering
+            if u["status"][s] == "location":
+                print("[Flask server.py] Handling location filtering for", s)
+                loc = list(locationDatum.find({"email": u["email"]}))
+                print(len(loc))
+    memberClient.close()
+    ABCClient.close()
+    return
+
+# tryScheduler()
+
+scheduler = BackgroundScheduler(daemon = True, timezone="Asia/Seoul")
+scheduler.add_job(tryScheduler, 'cron', hour=18, minute=14)
+scheduler.start()
 
 # delete data from MongoDB which matches the condition
 @app.route("/deletedata", methods=['POST'])
@@ -174,17 +233,28 @@ def saveLocationRecord():
 @app.route("/test", methods=['GET'])
 def testConnection():
     print("[Flask server.py] GET path /test")
-    client = MongoClient(MEMBER_MONGODB_URI)
-    db = client[MEMBER_MONGODB_DB_NAME]
-    datum = db[MEMBER_MONGODB_COLLECTION]
-    res = list(datum.find({"email": "emily@kse.kaist.ac.kr"}))
+    client = MongoClient(ABC_MONGODB_URI)
+    db = client[ABC_MONGODB_DB_NAME]
+    datum = db[ABC_MONGODB_COLLECTION]
+    query = {
+        "$and": [
+            {
+                "subject.email": 'emily@kse.kaist.ac.kr',
+                "datumType": "BLUETOOTH"
+            },  
+            {
+                "timestamp": {"$gt": 1680274800000} # Data after 01/04/2023
+            }
+        ]
+    }
+    res = datum.find_one(query)
+    print(res)
     client.close()
     if(res):
-        print("[Flask server.py] First entry of fetched data: " + str(res[0]))
+        print("[Flask server.py] First entry of fetched data: " + str(res))
     else:
         print("[Flask server.py] No data is founded")
         return { "result": "ConnSucess but nothing found" }
-    print(bcrypt.check_password_hash(res[0]["password"], "pw1234"))
     return { "result": "ConnSuccess" }
 
 # test the background running function in RN
