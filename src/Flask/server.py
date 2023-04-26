@@ -1,6 +1,7 @@
 import os
 import time
 import datetime
+import math
 from flask import Flask
 from flask import request
 from flask_bcrypt import Bcrypt
@@ -42,7 +43,22 @@ DATATYPE = [
     { "name": "survey" }
 ]
 TIMEZONE_OFFSET = 9
+INTERVAL_BETWEEN_LOCATION_RECORDS = 11 * 60 * 1000
 
+# return the distance between 2 points in km
+def calDistance(lat1, lon1, lat2, lon2):
+    # Radius of the Earth in km
+    radius = 6371
+    # Convert latitude and longitude to radians
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = math.sin(dlat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2
+    c = 2 * math.asin(math.sqrt(a))
+    # Distance in km
+    distance = radius * c
+    return distance
 
 def tryScheduler():
     print("[Flask server.py] running scheduler at " + time.ctime())
@@ -65,6 +81,7 @@ def tryScheduler():
                 currentTime = int(time.time() * 1000)
                 startingTime = datetime.datetime.strptime(u["timeFiltering"][s]["startingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
                 endingTime = datetime.datetime.strptime(u["timeFiltering"][s]["endingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                # loop for each day to delete data on ABCLogger DB
                 for t in range(initTime, currentTime, 24 * 60 * 60 * 1000):
                     startTS = t + (startingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
                     endTS = t + (endingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + endingTime.minute * 60 * 1000
@@ -87,8 +104,53 @@ def tryScheduler():
             # handle location filtering
             if u["status"][s] == "location":
                 print("[Flask server.py] Handling location filtering for", s)
-                loc = list(locationDatum.find({"email": u["email"]}))
-                print(len(loc))
+                targetLat = u["locationFiltering"][s]["latitude"]
+                targetLong = u["locationFiltering"][s]["longitude"]
+                targetRadius = int(u["locationFiltering"][s]["radius"]) / 1000
+                print("Targeting on", targetLat, targetLong, "for data type", s)
+                locationRecord = list(locationDatum.find({"email": u["email"]}))
+                # get the time ranges for deletion
+                tsArray = []
+                for i, loc in enumerate(locationRecord):
+                    tsArrayObj = {"startTS": 0, "endTS": 0}
+                    # within deletion region
+                    if(calDistance(loc["latitude"], loc["longitude"], targetLat, targetLong) <= targetRadius):
+                        # first entry
+                        if i == 0:
+                            tsArrayObj["startTS"] = loc["timestamp"]
+                            tsArray.append(tsArrayObj)
+                        # all other non-continuous entries
+                        if i > 0 and loc["timestamp"] - locationRecord[i - 1]["timestamp"] >= INTERVAL_BETWEEN_LOCATION_RECORDS:
+                            tsArray[len(tsArray) - 1]["endTS"] = locationRecord[i - 1]["timestamp"]
+                            tsArrayObj["startTS"] = loc["timestamp"]
+                            tsArray.append(tsArrayObj)
+                    # outside of deletion region
+                    else:
+                        if len(tsArray) > 0 and i > 0:
+                            tsArray[len(tsArray) - 1]["endTS"] = locationRecord[i - 1]["timestamp"]
+                            tsArrayObj["startTS"] = loc["timestamp"]
+                            tsArray.append(tsArrayObj)
+                # set the last ts of tsArray as last entry in Location Member DB
+                if len(tsArray) > 0:
+                    tsArray[len(tsArray) - 1]["endTS"] = locationRecord[len(locationRecord) - 1]["timestamp"]
+                # delete the data within the ts on ABCLogger DB
+                for ts in tsArray:
+                    query = {
+                        "$and": [
+                            {
+                                "subject.email": u["email"],
+                                "datumType": s.upper()
+                            },  
+                            {
+                                "timestamp": {"$gt": ts["startTS"]}
+                            },
+                            {
+                                "timestamp": {"$lt": ts["endTS"]}
+                            }
+                        ]
+                    }
+                    waitingForDelete = list(ABCDatum.find(query))
+                    print(len(waitingForDelete))
     memberClient.close()
     ABCClient.close()
     return
@@ -96,7 +158,7 @@ def tryScheduler():
 # tryScheduler()
 
 scheduler = BackgroundScheduler(daemon = True, timezone="Asia/Seoul")
-scheduler.add_job(tryScheduler, 'cron', hour=18, minute=14)
+scheduler.add_job(tryScheduler, 'cron', hour=2, minute=12)
 scheduler.start()
 
 # delete data from MongoDB which matches the condition
@@ -233,25 +295,25 @@ def saveLocationRecord():
 @app.route("/test", methods=['GET'])
 def testConnection():
     print("[Flask server.py] GET path /test")
-    client = MongoClient(ABC_MONGODB_URI)
-    db = client[ABC_MONGODB_DB_NAME]
-    datum = db[ABC_MONGODB_COLLECTION]
-    query = {
-        "$and": [
-            {
-                "subject.email": 'emily@kse.kaist.ac.kr',
-                "datumType": "BLUETOOTH"
-            },  
-            {
-                "timestamp": {"$gt": 1680274800000} # Data after 01/04/2023
-            }
-        ]
-    }
-    res = datum.find_one(query)
-    print(res)
+    client = MongoClient(MEMBER_MONGODB_URI)
+    db = client[MEMBER_MONGODB_DB_NAME]
+    datum = db[LOCATION_MONGODB_COLLECTION]
+    # query = {
+    #     "$and": [
+    #         {
+    #             "subject.email": 'emily@kse.kaist.ac.kr',
+    #             "datumType": "BLUETOOTH"
+    #         },  
+    #         {
+    #             "timestamp": {"$gt": 1680274800000} # Data after 01/04/2023
+    #         }
+    #     ]
+    # }
+    res = list(datum.find({}))
+    print(res[len(res) - 1])
     client.close()
     if(res):
-        print("[Flask server.py] First entry of fetched data: " + str(res))
+        print("[Flask server.py] First entry of fetched data: " + str(res[0]))
     else:
         print("[Flask server.py] No data is founded")
         return { "result": "ConnSucess but nothing found" }
