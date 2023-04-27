@@ -1,30 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { SafeAreaView, View, Text, TouchableOpacity, Alert, Switch, TextInput, KeyboardAvoidingView, Keyboard } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import MapView from 'react-native-maps';
 import { FakeMarker } from 'react-native-map-coordinate-picker';
+import { Slider } from '@miblanchard/react-native-slider';
+import { Picker } from '@react-native-picker/picker';
 
+import { DATATYPE } from './Constant';
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 
 export default function SettingPage({ route }) {
     const { dt, email } = route.params;
     const navigation = useNavigation();
     const [status, setStatus] = useState(route.params.status);
+    // toggle related
     const [toggleStatus, setToggleStatus] = useState(route.params.status !== "off");
     const [timeToggleStatus, setTimeToggleStatus] = useState(route.params.status === "time");
     const [locationToggleStatus, setLocationToggleStatus] = useState(route.params.status === "location");
+    // time setting related
     const [showTimeSetting, setShowTimeSetting] = useState(route.params.status === "time");
     const [timePicker1, setTimePicker1] = useState();
     const [showTimePicker1, setShowTimePicker1] = useState(false);
     const [timePicker2, setTimePicker2] = useState();
     const [showTimePicker2, setShowTimePicker2] = useState(false);
+    // location setting related
     const [showLocationSetting, setShowLocationSetting] = useState(route.params.status === "location");
     const [dragging, setDragging] = useState(false);
     const [pickedLocation, setPickedLocation] = useState({ latitude: 36.374228, longitude: 127.365861 });
     const [pickedLocationDelta, setPickedLocationDelta] = useState({ latitudeDelta: 0.0122, longitudeDelta: 0.0122 });
     const [radius, setRadius] = useState();
+    // data visualisation related
+    const [timeRange, setTimeRange] = useState([0, 24 * 60 * 60 * 1000 - 1]);
+    const [date, setDate] = useState();
+    const [allDate, setAllDate] = useState([]);
+    const [dataType, setDataType] = useState();
 
     const AlertBox = (title, msg) => {
         Alert.alert(title, msg, [
@@ -32,6 +43,11 @@ export default function SettingPage({ route }) {
                 text: "OK", style: "cancel"
             }
         ]);
+    };
+
+    const timestampToHoursConverter = (ts) => {
+        const date = new Date(ts);
+        return String(date.getUTCHours()).padStart(2, '0') + ":" + String(date.getUTCMinutes()).padStart(2, '0');
     };
 
     useEffect(() => {
@@ -62,6 +78,18 @@ export default function SettingPage({ route }) {
         };
         fetchFilteringSetting();
     }, [route.params.status, route.params.email, route.params.dt]);
+
+    useEffect(() => {
+        const dates = [];
+        const current = Date.now();
+        const since = new Date(2023, 3, 1).getTime();
+        for (let i = since; i < current; i = i + 24 * 60 * 60 * 1000) {
+            const dateTemp = new Date(i);
+            dates.push({ label: String(dateTemp.getDate()).padStart(2, '0') + "-" + String(dateTemp.getMonth() + 1).padStart(2, '0') + "-" + String(dateTemp.getFullYear()), value: i });
+        }
+        setAllDate(dates);
+        console.log(dt.field);
+    }, [route.params.dt]);
 
     const updateToDB = async (newStatus) => {
         const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/setstatus", {
@@ -232,6 +260,14 @@ export default function SettingPage({ route }) {
         updateToDB({ ["status." + dt.name]: "location", ["locationFiltering." + dt.name + ".radius"]: radius, ["locationFiltering." + dt.name + ".longitude"]: pickedLocation.longitude, ["locationFiltering." + dt.name + ".latitude"]: pickedLocation.latitude, ["locationFiltering." + dt.name + ".latitudeDelta"]: pickedLocationDelta.latitudeDelta, ["locationFiltering." + dt.name + ".longitudeDelta"]: pickedLocationDelta.longitudeDelta });
     };
 
+    const handleTimeRangeOnChange = (value) => {
+        setTimeRange(value);
+    };
+
+    const handleTimeRangeSubmitChange = () => {
+        console.log("slider commit changes");
+    };
+
     const back = () => {
         navigation.navigate("Overview", { email: email });
     };
@@ -255,8 +291,51 @@ export default function SettingPage({ route }) {
                         />
                     </View>
                 </View>
-                <View style={{ backgroundColor: "#D9D9D9", height: 120, marginHorizontal: 15, justifyContent: "center" }}>
-                    <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>Graph</Text>
+                <View style={{ marginHorizontal: 15 }}>
+                    <View style={{ marginTop: 10 }}>
+                        <Text style={{ color: "#000000", alignSelf: "center" }}>
+                            Selecting time from {timestampToHoursConverter(timeRange[0])} to {timestampToHoursConverter(timeRange[1])}
+                        </Text>
+                        <Slider
+                            minimumValue={0}
+                            maximumValue={24 * 60 * 60 * 1000 - 1}
+                            step={60 * 1000}
+                            thumbTintColor={"#797B02"}
+                            minimumTrackTintColor={"#797B02"}
+                            value={timeRange}
+                            onValueChange={(value) => handleTimeRangeOnChange(value)}
+                            onSlidingComplete={handleTimeRangeSubmitChange}
+                        />
+                    </View>
+                    <View style={{ marginBottom: 10 }}>
+                        <View style={{ flexDirection: "row", marginBottom: 5 }}>
+                            <Text style={{ alignSelf: "flex-start", flex: 3, alignSelf: "center", fontSize: 15, color: "#000000" }}>Date</Text>
+                            <View style={{ height: 30, width: "80%", borderWidth: 1, borderRadius: 10, justifyContent: "center", flex: 7 }}>
+                                <Picker
+                                    style={{ width: "100%" }}
+                                    selectedValue={date}
+                                    onValueChange={(value) => setDate(value)}
+                                >
+                                    {allDate.map(d => <Picker.Item key={d.value} label={d.label} value={d.value} />)}
+                                </Picker>
+                            </View>
+                        </View>
+                        <View style={{ flexDirection: "row" }}>
+                            <Text style={{ alignSelf: "flex-start", flex: 3, alignSelf: "center", fontSize: 15, color: "#000000" }}>Data Type</Text>
+                            <View style={{ height: 30, width: "80%", borderWidth: 1, borderRadius: 10, justifyContent: "center", flex: 7 }}>
+                                <Picker
+                                    style={{ width: "100%" }}
+                                    selectedValue={dataType}
+                                    onValueChange={(value) => setDataType(value)}
+                                >
+                                    {route.params.dt.field.map((dt, i) => <Picker.Item key={i} label={dt} value={dt}/>)}
+                                </Picker>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={{ backgroundColor: "#D9D9D9", height: 120, justifyContent: "center" }}>
+                        <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>Graph</Text>
+                    </View>
                 </View>
                 <Text style={{ marginHorizontal: 15, marginTop: 50, color: "#000000", fontSize: 18 }}>Filtering</Text>
                 <View style={{ marginHorizontal: 15, marginTop: 10 }}>
