@@ -8,7 +8,6 @@ import { FakeMarker } from 'react-native-map-coordinate-picker';
 import { Slider } from '@miblanchard/react-native-slider';
 import { Picker } from '@react-native-picker/picker';
 
-import { DATATYPE } from './Constant';
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 
 export default function SettingPage({ route }) {
@@ -33,9 +32,10 @@ export default function SettingPage({ route }) {
     const [radius, setRadius] = useState();
     // data visualisation related
     const [timeRange, setTimeRange] = useState([0, 24 * 60 * 60 * 1000 - 1]);
+    const [timeRangeDisplay, setTimeRangeDisplay] = useState([0, 24 * 60 * 60 * 1000 - 1]);
     const [date, setDate] = useState();
     const [allDate, setAllDate] = useState([]);
-    const [dataType, setDataType] = useState();
+    const [dataField, setDataField] = useState();
 
     const AlertBox = (title, msg) => {
         Alert.alert(title, msg, [
@@ -88,8 +88,23 @@ export default function SettingPage({ route }) {
             dates.push({ label: String(dateTemp.getDate()).padStart(2, '0') + "-" + String(dateTemp.getMonth() + 1).padStart(2, '0') + "-" + String(dateTemp.getFullYear()), value: i });
         }
         setAllDate(dates);
-        console.log(dt.field);
     }, [route.params.dt]);
+
+    useEffect(() => {
+        const fetchDataFromDB = async () => {
+            if (route.params.email && route.params.dt.name && date && timeRange) {
+                console.log("[RN SettingPage.js] Fetch data from DB with param user:", route.params.email, "datatype:", route.params.dt.name, "date:", date, "timeRange[0]:", timeRange[0], "timeRange[1]:", timeRange[1]);
+                const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/data", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: route.params.email, dataType: route.params.dt.name, date: date, timeRange: timeRange })
+                });
+                const data = await res.json();
+                console.log("[RN SettingPage.js] Received: " + data.res.length);
+            }
+        };
+        fetchDataFromDB();
+    }, [route.params.email, route.params.dt.name, date, timeRange])
 
     const updateToDB = async (newStatus) => {
         const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/setstatus", {
@@ -98,7 +113,7 @@ export default function SettingPage({ route }) {
             body: JSON.stringify({ email: email, newStatus: newStatus })
         });
         const data = await res.json();
-        console.log("[RN SettingPage.js] Received: " + JSON.stringify(data));
+        console.log("[RN SettingPage.js] Received: " + JSON.stringify(data[0]));
         if (!data.result) AlertBox("Error", "Error in updating setting");
     };
 
@@ -261,11 +276,15 @@ export default function SettingPage({ route }) {
     };
 
     const handleTimeRangeOnChange = (value) => {
+        setTimeRangeDisplay(value);
+    };
+
+    const handleTimeRangeSubmitChange = (value) => {
         setTimeRange(value);
     };
 
-    const handleTimeRangeSubmitChange = () => {
-        console.log("slider commit changes");
+    const handleDate = (value) => {
+        setDate(value);
     };
 
     const back = () => {
@@ -294,7 +313,7 @@ export default function SettingPage({ route }) {
                 <View style={{ marginHorizontal: 15 }}>
                     <View style={{ marginTop: 10 }}>
                         <Text style={{ color: "#000000", alignSelf: "center" }}>
-                            Selecting time from {timestampToHoursConverter(timeRange[0])} to {timestampToHoursConverter(timeRange[1])}
+                            Selecting time from {timestampToHoursConverter(timeRangeDisplay[0])} to {timestampToHoursConverter(timeRangeDisplay[1])}
                         </Text>
                         <Slider
                             minimumValue={0}
@@ -302,9 +321,9 @@ export default function SettingPage({ route }) {
                             step={60 * 1000}
                             thumbTintColor={"#797B02"}
                             minimumTrackTintColor={"#797B02"}
-                            value={timeRange}
+                            value={timeRangeDisplay}
                             onValueChange={(value) => handleTimeRangeOnChange(value)}
-                            onSlidingComplete={handleTimeRangeSubmitChange}
+                            onSlidingComplete={(value) => handleTimeRangeSubmitChange(value)}
                         />
                     </View>
                     <View style={{ marginBottom: 10 }}>
@@ -314,7 +333,7 @@ export default function SettingPage({ route }) {
                                 <Picker
                                     style={{ width: "100%" }}
                                     selectedValue={date}
-                                    onValueChange={(value) => setDate(value)}
+                                    onValueChange={(value) => handleDate(value)}
                                 >
                                     {allDate.map(d => <Picker.Item key={d.value} label={d.label} value={d.value} />)}
                                 </Picker>
@@ -325,10 +344,10 @@ export default function SettingPage({ route }) {
                             <View style={{ height: 30, width: "80%", borderWidth: 1, borderRadius: 10, justifyContent: "center", flex: 7 }}>
                                 <Picker
                                     style={{ width: "100%" }}
-                                    selectedValue={dataType}
-                                    onValueChange={(value) => setDataType(value)}
+                                    selectedValue={dataField}
+                                    onValueChange={(value) => setDataField(value)}
                                 >
-                                    {route.params.dt.field.map((dt, i) => <Picker.Item key={i} label={dt} value={dt}/>)}
+                                    {route.params.dt.field.map((dt, i) => <Picker.Item key={i} label={dt} value={dt} />)}
                                 </Picker>
                             </View>
                         </View>

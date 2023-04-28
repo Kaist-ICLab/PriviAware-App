@@ -2,6 +2,8 @@ import os
 import time
 import datetime
 import math
+import json
+import bson.json_util as json_util
 from flask import Flask
 from flask import request
 from flask_bcrypt import Bcrypt
@@ -60,6 +62,34 @@ def calDistance(lat1, lon1, lat2, lon2):
     distance = radius * c
     return distance
 
+# return ts array for time when user exists in target region
+def getTSfromLocation(locationRecord, targetLat, targetLong, targetRadius):
+    targetRadius = int(targetRadius) / 1000
+    tsArray = []
+    for i, loc in enumerate(locationRecord):
+        tsArrayObj = {"startTS": 0, "endTS": 0}
+        # within deletion region
+        if(calDistance(loc["latitude"], loc["longitude"], targetLat, targetLong) <= targetRadius):
+            # first entry
+            if i == 0:
+                tsArrayObj["startTS"] = loc["timestamp"]
+                tsArray.append(tsArrayObj)
+            # all other non-continuous entries
+            if i > 0 and loc["timestamp"] - locationRecord[i - 1]["timestamp"] >= INTERVAL_BETWEEN_LOCATION_RECORDS:
+                tsArray[len(tsArray) - 1]["endTS"] = locationRecord[i - 1]["timestamp"]
+                tsArrayObj["startTS"] = loc["timestamp"]
+                tsArray.append(tsArrayObj)
+        # outside of deletion region
+        else:
+            if len(tsArray) > 0 and i > 0:
+                tsArray[len(tsArray) - 1]["endTS"] = locationRecord[i - 1]["timestamp"]
+                tsArrayObj["startTS"] = loc["timestamp"]
+                tsArray.append(tsArrayObj)
+    # set the last ts of tsArray as last entry in Location Member DB
+    if len(tsArray) > 0:
+        tsArray[len(tsArray) - 1]["endTS"] = locationRecord[len(locationRecord) - 1]["timestamp"]
+    return tsArray
+
 def tryScheduler():
     print("[Flask server.py] running scheduler at " + time.ctime())
     memberClient = MongoClient(MEMBER_MONGODB_URI)
@@ -83,8 +113,14 @@ def tryScheduler():
                 endingTime = datetime.datetime.strptime(u["timeFiltering"][s]["endingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
                 # loop for each day to delete data on ABCLogger DB
                 for t in range(initTime, currentTime, 24 * 60 * 60 * 1000):
-                    startTS = t + (startingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
-                    endTS = t + (endingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + endingTime.minute * 60 * 1000
+                    if startingTime.hour + TIMEZONE_OFFSET > 23:
+                        startTS = t + (startingTime.hour + TIMEZONE_OFFSET - 24) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
+                    else:
+                        startTS = t + (startingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
+                    if endingTime.hour + TIMEZONE_OFFSET > 23:
+                        endTS = t + (endingTime.hour + TIMEZONE_OFFSET - 24) * 60 * 60 * 1000 + endingTime.minute * 60 * 1000
+                    else:
+                        endTS = t + (endingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + endingTime.minute * 60 * 1000
                     query = {
                         "$and": [
                             {
@@ -106,35 +142,14 @@ def tryScheduler():
                 print("[Flask server.py] Handling location filtering for", s)
                 targetLat = u["locationFiltering"][s]["latitude"]
                 targetLong = u["locationFiltering"][s]["longitude"]
-                targetRadius = int(u["locationFiltering"][s]["radius"]) / 1000
+                targetRadius = u["locationFiltering"][s]["radius"]
                 print("Targeting on", targetLat, targetLong, "for data type", s)
                 locationRecord = list(locationDatum.find({"email": u["email"]}))
                 # get the time ranges for deletion
-                tsArray = []
-                for i, loc in enumerate(locationRecord):
-                    tsArrayObj = {"startTS": 0, "endTS": 0}
-                    # within deletion region
-                    if(calDistance(loc["latitude"], loc["longitude"], targetLat, targetLong) <= targetRadius):
-                        # first entry
-                        if i == 0:
-                            tsArrayObj["startTS"] = loc["timestamp"]
-                            tsArray.append(tsArrayObj)
-                        # all other non-continuous entries
-                        if i > 0 and loc["timestamp"] - locationRecord[i - 1]["timestamp"] >= INTERVAL_BETWEEN_LOCATION_RECORDS:
-                            tsArray[len(tsArray) - 1]["endTS"] = locationRecord[i - 1]["timestamp"]
-                            tsArrayObj["startTS"] = loc["timestamp"]
-                            tsArray.append(tsArrayObj)
-                    # outside of deletion region
-                    else:
-                        if len(tsArray) > 0 and i > 0:
-                            tsArray[len(tsArray) - 1]["endTS"] = locationRecord[i - 1]["timestamp"]
-                            tsArrayObj["startTS"] = loc["timestamp"]
-                            tsArray.append(tsArrayObj)
-                # set the last ts of tsArray as last entry in Location Member DB
-                if len(tsArray) > 0:
-                    tsArray[len(tsArray) - 1]["endTS"] = locationRecord[len(locationRecord) - 1]["timestamp"]
+                tsArray = getTSfromLocation(locationRecord, targetLat, targetLong, targetRadius)
                 # delete the data within the ts on ABCLogger DB
                 for ts in tsArray:
+                    print(ts["startTS"], ts["endTS"])
                     query = {
                         "$and": [
                             {
@@ -177,33 +192,6 @@ def dataDeletion():
     print("[Flask server.py] Deleted " + str(res.deleted_count) + " row(s) of data")
     client.close()
     return { "result": "deletedata" }
-
-# fetch data from MongoDB with the provided query filter
-@app.route("/data", methods=['POST'])
-def dataQuery():
-    print("[Flask server.py] POST path /data")
-    print("[Flask server.py] Process query with filter " + str(request.json["queryFilter"]))
-    # MongoDB connection
-    client = MongoClient(ABC_MONGODB_URI)
-    db = client[ABC_MONGODB_DB_NAME]
-    datum = db[ABC_MONGODB_COLLECTION]
-    # start querying
-    day=60*60*1000*24
-    end_timestamp = time.time()*1000 
-    start_timestamp = end_timestamp - day*2
-    query = {
-        "$and": [request.json["queryFilter"],  
-        {"timestamp": {"$gt": start_timestamp}}, 
-        {"timestamp": {"$lt": end_timestamp}}
-            ]
-        }
-    all_data = list(datum.find(query))
-    if(len(all_data) > 0):
-        print("[Flask server.py] First entry of fetched data: " + str(all_data[0]))
-    else:
-        print("[Flask server.py] No data is founded")
-    client.close()
-    return { "result": "data" }
 
 # fetch member data from PrivacyViz-Member MongoDB for login check
 @app.route("/login", methods=['POST'])
@@ -291,29 +279,121 @@ def saveLocationRecord():
     client.close()
     return { "result": True }
 
+# fetch data from MongoDB with the provided query filter
+@app.route("/data", methods=['POST'])
+def dataQuery():
+    print("[Flask server.py] POST path /data")
+    # init variable form post request
+    email = request.json["email"]
+    dataType = request.json["dataType"]
+    date = request.json["date"]
+    timeRange = request.json["timeRange"]
+    # connection config
+    memberClient = MongoClient(MEMBER_MONGODB_URI)
+    memberDB = memberClient[MEMBER_MONGODB_DB_NAME]
+    memberDatum = memberDB[MEMBER_MONGODB_COLLECTION]
+    locationDatum = memberDB[LOCATION_MONGODB_COLLECTION]
+    ABCClient = MongoClient(ABC_MONGODB_URI)
+    ABCDB = ABCClient[ABC_MONGODB_DB_NAME]
+    ABCDatum = ABCDB[ABC_MONGODB_COLLECTION]
+    user = memberDatum.find_one({"email": email})
+    # query for all data within time range
+    query = {
+        "$and": [
+            {
+                "subject.email": email,
+                "datumType": dataType.upper()
+            },  
+            {
+                "timestamp": {"$gt": date + timeRange[0]}
+            },
+            {
+                "timestamp": {"$lt": date + timeRange[1]}
+            }
+        ]
+    }
+    res = list(ABCDatum.find(query))
+    ABCClient.close()
+    # filter out time specified in PrivacyViz-Member MongoDB under time filtering
+    if user["status"][dataType] == "time":
+        print("[Flask server.py] Should handle time filtering for", dataType)
+        # handle filter starting time
+        startingTime = datetime.datetime.strptime(user["timeFiltering"][dataType]["startingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
+        if startingTime.hour + TIMEZONE_OFFSET > 23:
+            filterStartTS = date + (startingTime.hour + TIMEZONE_OFFSET - 24) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
+        else:
+            filterStartTS = date + (startingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
+        # handle filter ending time
+        endingTime = datetime.datetime.strptime(user["timeFiltering"][dataType]["endingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
+        if endingTime.hour + TIMEZONE_OFFSET > 23:
+            filterEndTS = date + (endingTime.hour + TIMEZONE_OFFSET - 24) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
+        else:
+            filterEndTS = date + (endingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
+        # filter out time + close conn + return
+        filtered_list = [r for r in res if r['timestamp'] < filterStartTS or r['timestamp'] > filterEndTS]
+        memberClient.close()
+        return json.loads(json_util.dumps({"res": filtered_list}))
+    # filter out location specified in PrivacyViz-Member MongoDB under location filtering
+    elif user["status"][dataType] == "location":
+        print("[Flask server.py] Should handle location filtering for", dataType)
+        # get location filtering detail from PrivacyViz-Member MongoDB
+        targetLat = user["locationFiltering"][dataType]["latitude"]
+        targetLong = user["locationFiltering"][dataType]["longitude"]
+        targetRadius = user["locationFiltering"][dataType]["radius"]
+        # get all location information from PrivacyViz-Member MongoDB Location collection
+        query = {
+            "$and": [
+                {
+                    "email": email,
+                },  
+                {
+                    "timestamp": {"$gt": date + timeRange[0]}
+                },
+                {
+                    "timestamp": {"$lt": date + timeRange[1]}
+                }
+            ]
+        }
+        locationRecord = list(locationDatum.find(query))
+        # get the time ranges for deletion
+        tsArray = getTSfromLocation(locationRecord, targetLat, targetLong, targetRadius)
+        # filter out the data within the ts
+        filtered_list = res
+        for ts in tsArray:
+            filtered_list = [e for e in res if e['timestamp'] < ts["startTS"] or e['timestamp'] > ts["endTS"]]
+        # close conn + return
+        memberClient.close()
+        return json.loads(json_util.dumps({"res": filtered_list}))
+    # no need filtering for show all, just close conn + return
+    else:
+        memberClient.close()
+        return json.loads(json_util.dumps({"res": res}))
+
 # test Flask server + PrivacyViz-Member MongoDB connection
 @app.route("/test", methods=['GET'])
 def testConnection():
     print("[Flask server.py] GET path /test")
-    client = MongoClient(MEMBER_MONGODB_URI)
-    db = client[MEMBER_MONGODB_DB_NAME]
-    datum = db[LOCATION_MONGODB_COLLECTION]
-    # query = {
-    #     "$and": [
-    #         {
-    #             "subject.email": 'emily@kse.kaist.ac.kr',
-    #             "datumType": "BLUETOOTH"
-    #         },  
-    #         {
-    #             "timestamp": {"$gt": 1680274800000} # Data after 01/04/2023
-    #         }
-    #     ]
-    # }
-    res = list(datum.find({}))
-    print(res[len(res) - 1])
+    client = MongoClient(ABC_MONGODB_URI)
+    db = client[ABC_MONGODB_DB_NAME]
+    datum = db[ABC_MONGODB_COLLECTION]
+    query = {
+        "$and": [
+            {
+                "subject.email": 'emily@kse.kaist.ac.kr',
+                "datumType": "BLUETOOTH"
+            },  
+            {
+                "timestamp": {"$gt": 1682592316687} # Data after 01/04/2023
+            },
+            {
+                "timestamp": {"$lt": 1682635521699}
+            }
+        ]
+    }
+    res = list(datum.find(query))
     client.close()
     if(res):
-        print("[Flask server.py] First entry of fetched data: " + str(res[0]))
+        print("[Flask server.py] First entry of fetched data:" , len(res))
     else:
         print("[Flask server.py] No data is founded")
         return { "result": "ConnSucess but nothing found" }
