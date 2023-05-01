@@ -206,7 +206,7 @@ export default function SettingPage({ route }) {
         // set status as time filtering + update to PrivacyViz-Member DB
         setStatus("time");
         setToggleStatus(true);
-        updateToDB({ ["status." + dt.name]: "time", ["timeFiltering." + dt.name + ".startingTime"]: timePicker1, ["timeFiltering." + dt.name + ".endingTime"]: timePicker2 });
+        updateToDB({ ["status." + dt.name]: "time", ["timeFiltering." + dt.name + ".startingTime"]: timePicker1, ["timeFiltering." + dt.name + ".endingTime"]: timePicker2, ["timeFiltering." + dt.name + ".applyTS"]: Date.now() });
     };
 
     const handleLocationToggleStatus = () => {
@@ -272,7 +272,7 @@ export default function SettingPage({ route }) {
         }
         setStatus("location");
         setToggleStatus(true);
-        updateToDB({ ["status." + dt.name]: "location", ["locationFiltering." + dt.name + ".radius"]: radius, ["locationFiltering." + dt.name + ".longitude"]: pickedLocation.longitude, ["locationFiltering." + dt.name + ".latitude"]: pickedLocation.latitude, ["locationFiltering." + dt.name + ".latitudeDelta"]: pickedLocationDelta.latitudeDelta, ["locationFiltering." + dt.name + ".longitudeDelta"]: pickedLocationDelta.longitudeDelta });
+        updateToDB({ ["status." + dt.name]: "location", ["locationFiltering." + dt.name + ".radius"]: radius, ["locationFiltering." + dt.name + ".longitude"]: pickedLocation.longitude, ["locationFiltering." + dt.name + ".latitude"]: pickedLocation.latitude, ["locationFiltering." + dt.name + ".latitudeDelta"]: pickedLocationDelta.latitudeDelta, ["locationFiltering." + dt.name + ".longitudeDelta"]: pickedLocationDelta.longitudeDelta, ["locationFiltering." + dt.name + ".applyTS"]: Date.now() });
     };
 
     const handleTimeRangeOnChange = (value) => {

@@ -106,13 +106,14 @@ def tryScheduler():
         for s in u["status"]:
             # handle time filtering
             if u["status"][s] == "time":
-                print("[Flask server.py] Handling time filtering for", s)
-                initTime = 1680274800000    # only handle data after 01/04/2023
+                print("[Flask server.py] Handling time filtering for", s, "from user", u["email"])
                 currentTime = int(time.time() * 1000)
                 startingTime = datetime.datetime.strptime(u["timeFiltering"][s]["startingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
                 endingTime = datetime.datetime.strptime(u["timeFiltering"][s]["endingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
+                applyTime = u["timeFiltering"][s]["applyTS"]
+                applyTime = applyTime - applyTime % (24 * 60 * 60 * 1000) - (TIMEZONE_OFFSET * 60 * 60 * 1000)
                 # loop for each day to delete data on ABCLogger DB
-                for t in range(initTime, currentTime, 24 * 60 * 60 * 1000):
+                for t in range(applyTime, currentTime, 24 * 60 * 60 * 1000):
                     if startingTime.hour + TIMEZONE_OFFSET > 23:
                         startTS = t + (startingTime.hour + TIMEZONE_OFFSET - 24) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
                     else:
@@ -139,12 +140,25 @@ def tryScheduler():
                     print(len(waitingForDelete))
             # handle location filtering
             if u["status"][s] == "location":
-                print("[Flask server.py] Handling location filtering for", s)
+                print("[Flask server.py] Handling location filtering for", s, "from user", u["email"])
                 targetLat = u["locationFiltering"][s]["latitude"]
                 targetLong = u["locationFiltering"][s]["longitude"]
                 targetRadius = u["locationFiltering"][s]["radius"]
                 print("Targeting on", targetLat, targetLong, "for data type", s)
-                locationRecord = list(locationDatum.find({"email": u["email"]}))
+                query = {
+                        "$and": [
+                            {
+                                "email": u["email"]
+                            },  
+                            {
+                                "timestamp": {"$gt": u["locationFiltering"][s]["applyTS"]}
+                            },
+                            {
+                                "timestamp": {"$lt": int(time.time() * 1000)}
+                            }
+                        ]
+                    }
+                locationRecord = list(locationDatum.find(query))
                 # get the time ranges for deletion
                 tsArray = getTSfromLocation(locationRecord, targetLat, targetLong, targetRadius)
                 # delete the data within the ts on ABCLogger DB
@@ -317,6 +331,7 @@ def dataQuery():
     # filter out time specified in PrivacyViz-Member MongoDB under time filtering
     if user["status"][dataType] == "time":
         print("[Flask server.py] Should handle time filtering for", dataType)
+        applyTime = user["timeFiltering"][dataType]["applyTS"]
         # handle filter starting time
         startingTime = datetime.datetime.strptime(user["timeFiltering"][dataType]["startingTime"], '%Y-%m-%dT%H:%M:%S.%fZ')
         if startingTime.hour + TIMEZONE_OFFSET > 23:
@@ -330,7 +345,7 @@ def dataQuery():
         else:
             filterEndTS = date + (endingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
         # filter out time + close conn + return
-        filtered_list = [r for r in res if r['timestamp'] < filterStartTS or r['timestamp'] > filterEndTS]
+        filtered_list = [r for r in res if (r['timestamp'] < filterStartTS or r['timestamp'] > filterEndTS) or r['timestamp'] < applyTime]
         memberClient.close()
         return json.loads(json_util.dumps({"res": filtered_list}))
     # filter out location specified in PrivacyViz-Member MongoDB under location filtering
@@ -340,6 +355,7 @@ def dataQuery():
         targetLat = user["locationFiltering"][dataType]["latitude"]
         targetLong = user["locationFiltering"][dataType]["longitude"]
         targetRadius = user["locationFiltering"][dataType]["radius"]
+        applyTime = user["locationFiltering"][dataType]["applyTS"]
         # get all location information from PrivacyViz-Member MongoDB Location collection
         query = {
             "$and": [
@@ -359,8 +375,9 @@ def dataQuery():
         tsArray = getTSfromLocation(locationRecord, targetLat, targetLong, targetRadius)
         # filter out the data within the ts
         filtered_list = res
+        # print(filtered_list[0]['timestamp'])
         for ts in tsArray:
-            filtered_list = [e for e in res if e['timestamp'] < ts["startTS"] or e['timestamp'] > ts["endTS"]]
+            filtered_list = [r for r in res if (r['timestamp'] < ts["startTS"] or r['timestamp'] > ts["endTS"]) or r['timestamp'] < applyTime]
         # close conn + return
         memberClient.close()
         return json.loads(json_util.dumps({"res": filtered_list}))
