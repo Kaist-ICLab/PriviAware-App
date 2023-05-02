@@ -123,7 +123,7 @@ export default function OverviewPage({ route }) {
                 <Text>Status dot colour:</Text>
                 <Text>Green: on, Orange: on with filtering, Grey: off</Text>
             </View>
-            <View style={{ marginTop: 10, marginBottom: 20, alignSelf: "center" }}>
+            <View style={{ marginTop: 20, marginBottom: 20, alignSelf: "center" }}>
                 <TouchableOpacity style={{ paddingHorizontal: 40, paddingVertical: 10, borderRadius: 20, backgroundColor: "#F3F2F2" }} onPress={logout}>
                     <Text style={{ color: "#000000" }}>Logout</Text>
                 </TouchableOpacity>

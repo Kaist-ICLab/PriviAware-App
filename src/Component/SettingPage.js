@@ -9,6 +9,9 @@ import { Slider } from '@miblanchard/react-native-slider';
 import { Picker } from '@react-native-picker/picker';
 
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
+import NumericGraph from './NumericGraph';
+import CategoricalGraph from './CategoricalGraph';
+import CountGraph from './CountGraph';
 
 export default function SettingPage({ route }) {
     const { dt, email } = route.params;
@@ -35,7 +38,9 @@ export default function SettingPage({ route }) {
     const [timeRangeDisplay, setTimeRangeDisplay] = useState([0, 24 * 60 * 60 * 1000 - 1]);
     const [date, setDate] = useState();
     const [allDate, setAllDate] = useState([]);
-    const [dataField, setDataField] = useState();
+    const [dataField, setDataField] = useState(route.params.dt.field[0]);
+    // data record related
+    const [data, setData] = useState([]);
 
     const AlertBox = (title, msg) => {
         Alert.alert(title, msg, [
@@ -101,6 +106,7 @@ export default function SettingPage({ route }) {
                 });
                 const data = await res.json();
                 console.log("[RN SettingPage.js] Received: " + data.res.length);
+                setData(data.res);
             }
         };
         fetchDataFromDB();
@@ -347,13 +353,19 @@ export default function SettingPage({ route }) {
                                     selectedValue={dataField}
                                     onValueChange={(value) => setDataField(value)}
                                 >
-                                    {route.params.dt.field.map((dt, i) => <Picker.Item key={i} label={dt} value={dt} />)}
+                                    {route.params.dt.field.map((dt, i) => <Picker.Item key={i} label={dt.name} value={dt} />)}
                                 </Picker>
                             </View>
                         </View>
                     </View>
-                    <View style={{ backgroundColor: "#D9D9D9", height: 120, justifyContent: "center" }}>
-                        <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>Graph</Text>
+                    <View style={{ backgroundColor: "#D9D9D9", height: 240 }}>
+                        {dataField.type === "num" ?
+                            <NumericGraph data={data} dataField={dataField} />
+                            : dataField.type === "cat" ?
+                                <CategoricalGraph data={data} dataField={dataField} />
+                                :
+                                <CountGraph data={data} dataField={dataField} />
+                        }
                     </View>
                 </View>
                 <Text style={{ marginHorizontal: 15, marginTop: 50, color: "#000000", fontSize: 18 }}>Filtering</Text>

@@ -18,10 +18,10 @@ end_timestamp = time.time()*1000
 start_timestamp = end_timestamp - day*2
 query = {
         "$and": [{
-            "subject.email": 'emily@kse.kaist.ac.kr',
-            "datumType": "BLUETOOTH"
+            # "subject.email": 'emily@kse.kaist.ac.kr',
+            "datumType": "PHYSICAL_ACTIVITY_TRANSITION"
         },  
-        {"timestamp": {"$gt": 1680274800000}}, 
+        {"timestamp": {"$gt": 1680274900000}}, 
         {"timestamp": {"$lt": end_timestamp}}
             ]
         }
