@@ -19,7 +19,6 @@ export default function CategoricalGraph({ data, dataField, dataType }) {
                     }
                     return acc;
                 }, {});
-                console.log(tempData);
             } else {
                 tempData = data.reduce((acc, obj) => {
                     const value = obj.value[dataField.name]
@@ -28,10 +27,11 @@ export default function CategoricalGraph({ data, dataField, dataType }) {
                 }, {});
             }
             const result = Object.entries(tempData).map(([key, value]) => ({ name: key, count: value }));
-            console.log(result);
+            console.log("[RN CategoricalGraph.js] Generated data: ", JSON.stringify(result));
             setProcessedData(result);
             setMaxData(Math.max(...(result.map(d => d.count))));
         }
+        else setProcessedData([]);
     }, [data, dataField]);
 
     return (

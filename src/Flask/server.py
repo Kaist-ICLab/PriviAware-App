@@ -345,6 +345,7 @@ def dataQuery():
         else:
             filterEndTS = date + (endingTime.hour + TIMEZONE_OFFSET) * 60 * 60 * 1000 + startingTime.minute * 60 * 1000
         # filter out time + close conn + return
+        filtered_list = []
         filtered_list = [r for r in res if (r['timestamp'] < filterStartTS or r['timestamp'] > filterEndTS) or r['timestamp'] < applyTime]
         memberClient.close()
         return json.loads(json_util.dumps({"res": filtered_list}))
@@ -374,10 +375,10 @@ def dataQuery():
         # get the time ranges for deletion
         tsArray = getTSfromLocation(locationRecord, targetLat, targetLong, targetRadius)
         # filter out the data within the ts
-        filtered_list = res
-        # print(filtered_list[0]['timestamp'])
+        filtered_list = []
         for ts in tsArray:
             filtered_list = [r for r in res if (r['timestamp'] < ts["startTS"] or r['timestamp'] > ts["endTS"]) or r['timestamp'] < applyTime]
+            res = [r for r in res if r['timestamp'] > ts["endTS"]]
         # close conn + return
         memberClient.close()
         return json.loads(json_util.dumps({"res": filtered_list}))

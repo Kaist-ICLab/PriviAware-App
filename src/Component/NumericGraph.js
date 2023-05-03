@@ -9,12 +9,11 @@ export default function NumericGraph({ data, dataField }) {
 
     useEffect(() => {
         if (data.length > 0 && dataField) {
-            console.log(data[0].value[dataField.name]);
-            console.log(dataField);
             const tempData = data.map((d) => ({ timestamp: d.timestamp, value: d.value[dataField.name] }));
             setProcessedData(tempData);
             setMaxData(Math.max(...(tempData.map(d => d.value))));
         }
+        else setProcessedData([]);
     }, [data, dataField]);
 
     const formatNumber = (num) => {

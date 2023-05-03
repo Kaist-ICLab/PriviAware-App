@@ -16,6 +16,7 @@ export default function CountGraph({ data, dataField }) {
             setMaxData(Math.max(...(tempData.map(d => d.value))));
             setProcessedData(tempData);
         }
+        else setProcessedData([]);
     }, [data, dataField]);
 
     const formatNumber = (num) => {
