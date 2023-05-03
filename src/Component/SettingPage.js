@@ -367,8 +367,16 @@ export default function SettingPage({ route }) {
                                 <CountGraph data={data} dataField={dataField} />
                         }
                     </View>
+                    <Text style={{ color: "#000000", fontSize: 15, alignSelf: "center", marginTop: 5 }}>
+                        {data.length > 1
+                            ?
+                            (data.length).toString() + " entries of data is collected in total"
+                            :
+                            (data.length).toString() + " entry of data is collected in total"
+                        }
+                    </Text>
                 </View>
-                <Text style={{ marginHorizontal: 15, marginTop: 50, color: "#000000", fontSize: 18 }}>Filtering</Text>
+                <Text style={{ marginHorizontal: 15, marginTop: 20, color: "#000000", fontSize: 18 }}>Filtering</Text>
                 <View style={{ marginHorizontal: 15, marginTop: 10 }}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                         <Text style={{ color: "#000000", fontSize: 15, alignSelf: "center" }}>Time</Text>
