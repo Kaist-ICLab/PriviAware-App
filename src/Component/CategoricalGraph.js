@@ -36,7 +36,7 @@ export default function CategoricalGraph({ data, dataField, dataType }) {
 
     return (
         <View style={{ flex: 1 }}>
-            {data.length > 0
+            {processedData.length > 0
                 ?
                 <View style={{ flex: 1, flexDirection: "row" }}>
                     <View style={{ flex: 1 }}>

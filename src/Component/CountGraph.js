@@ -8,7 +8,7 @@ export default function CountGraph({ data, dataField }) {
     const [maxData, setMaxData] = useState(0);
 
     useEffect(() => {
-        if (dataField) {
+        if (data.length > 0 && dataField) {
             let queryField = "";
             if (dataField.name === "numOfAP") queryField = "accessPoint";
             if (dataField.name === "numOfApps") queryField = "app";
@@ -18,6 +18,12 @@ export default function CountGraph({ data, dataField }) {
         }
     }, [data, dataField]);
 
+    const formatNumber = (num) => {
+        if(num >= 1000000) return (num / 1000000).toFixed(1) + "m";
+        if(num >= 1000) return (num /1000).toFixed(1) + "k";
+        return num.toString();
+    };
+
     const timestampToHoursConverter = (ts) => {
         const date = new Date(ts);
         return String(date.getHours()).padStart(2, '0') + ":" + String(date.getMinutes()).padStart(2, '0');
@@ -25,7 +31,7 @@ export default function CountGraph({ data, dataField }) {
 
     return (
         <View style={{ flex: 1 }}>
-            {data.length > 0
+            {processedData.length > 0
                 ?
                 <View style={{ flexDirection: "row", flex: 1 }}>
                     <View style={{ flex: 1 }}>
@@ -37,6 +43,8 @@ export default function CountGraph({ data, dataField }) {
                             min={0}
                             max={maxData}
                             contentInset={{ top: 5, bottom: 5 }}
+                            svg={{ fontSize: 10 }}
+                            formatLabel={value => formatNumber(value)}
                         />
                         <View style={{ flex: 1 }}></View>
                     </View>

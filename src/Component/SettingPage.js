@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { SafeAreaView, View, Text, TouchableOpacity, Alert, Switch, TextInput, KeyboardAvoidingView, Keyboard } from 'react-native';
+import { SafeAreaView, View, Text, TouchableOpacity, Alert, Switch, TextInput, KeyboardAvoidingView, Keyboard, ScrollView } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -298,7 +298,7 @@ export default function SettingPage({ route }) {
     };
 
     return (
-        <SafeAreaView style={{ backgroundColor: "#FEFFBE", flex: 1, overflow: "scroll" }}>
+        <ScrollView style={{ backgroundColor: "#FEFFBE", flex: 1, overflow: "scroll" }}>
             <KeyboardAvoidingView behavior="position">
                 <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                     <View style={{ flexDirection: "row" }}>
@@ -485,6 +485,6 @@ export default function SettingPage({ route }) {
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </ScrollView>
     )
 }
