@@ -368,7 +368,7 @@ export default function SettingPage({ route }) {
                         {dataField.type === "num" ?
                             <NumericGraph data={data} dataField={dataField} />
                             : dataField.type === "cat" ?
-                                <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} />
+                                <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} />
                                 :
                                 <CountGraph data={data} dataField={dataField} />
                         }

@@ -14,4 +14,6 @@ const DATATYPE = [
     // { name: "survey", field: ["isEntered"] }
 ];
 
-export { DATATYPE };
+const COLOURS = ['#7b4173', '#a55194', '#ce6dbd', '#de9ed6', '#8c613c', '#ad7f4f', '#c89b67', '#e5c5a5', '#559867', '#70b182', '#90c69b', '#b8e0c6']
+
+export { DATATYPE, COLOURS };
