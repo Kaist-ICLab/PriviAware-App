@@ -41,6 +41,7 @@ export default function SettingPage({ route }) {
     const [dataField, setDataField] = useState(route.params.dt.field[0]);
     // data record related
     const [data, setData] = useState([]);
+    const [tsArray, setTSArray] = useState([]);
 
     const AlertBox = (title, msg) => {
         Alert.alert(title, msg, [
@@ -107,6 +108,7 @@ export default function SettingPage({ route }) {
                 const data = await res.json();
                 console.log("[RN SettingPage.js] Received: " + data.res.length);
                 setData(data.res);
+                if(data.ts) setTSArray(data.ts);
             }
         };
         fetchDataFromDB();
@@ -368,20 +370,11 @@ export default function SettingPage({ route }) {
                         {dataField.type === "num" ?
                             <NumericGraph data={data} dataField={dataField} />
                             : dataField.type === "cat" ?
-                                <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} />
+                                <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} tsArray={tsArray} />
                                 :
                                 <CountGraph data={data} dataField={dataField} />
                         }
                     </View>
-                    <Text style={{ color: "#000000", fontSize: 15, alignSelf: "center", marginTop: 5 }}>
-                        {dataField.type === "cat"}
-                        {data.length > 1
-                            ?
-                            (data.length).toString() + " entries of data is collected in total"
-                            :
-                            (data.length).toString() + " entry of data is collected in total"
-                        }
-                    </Text>
                 </View>
                 <View style={{ backgroundColor: "#D9D9D9", marginHorizontal: 15, marginTop: 15 }}>
                     <Text style={{ marginHorizontal: 15, marginTop: 10, color: "#000000", fontSize: 18 }}>Contextual Filtering</Text>

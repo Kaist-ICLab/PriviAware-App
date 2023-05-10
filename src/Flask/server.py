@@ -42,7 +42,8 @@ DATATYPE = [
     { "name": "fitness" },
     { "name": "physical_activity" },
     { "name": "physical_activity_transition" },
-    { "name": "survey" }
+    { "name": "survey" },
+    { "name": "media" }
 ]
 TIMEZONE_OFFSET = 9
 INTERVAL_BETWEEN_LOCATION_RECORDS = 11 * 60 * 1000
@@ -348,7 +349,10 @@ def dataQuery():
         filtered_list = []
         filtered_list = [r for r in res if (r['timestamp'] < filterStartTS or r['timestamp'] > filterEndTS) or r['timestamp'] < applyTime]
         memberClient.close()
-        return json.loads(json_util.dumps({"res": filtered_list}))
+        if(date + timeRange[1] > applyTime):
+            return json.loads(json_util.dumps({"res": filtered_list, "ts": [{"startTS": filterStartTS, "endTS": filterEndTS}]}))
+        else:
+            return json.loads(json_util.dumps({"res": filtered_list}))
     # filter out location specified in PrivacyViz-Member MongoDB under location filtering
     elif user["status"][dataType] == "location":
         print("[Flask server.py] Should handle location filtering for", dataType)
@@ -375,13 +379,20 @@ def dataQuery():
         # get the time ranges for deletion
         tsArray = getTSfromLocation(locationRecord, targetLat, targetLong, targetRadius)
         # filter out the data within the ts
-        filtered_list = []
-        for ts in tsArray:
-            filtered_list = [r for r in res if (r['timestamp'] < ts["startTS"] or r['timestamp'] > ts["endTS"]) or r['timestamp'] < applyTime]
-            res = [r for r in res if r['timestamp'] > ts["endTS"]]
+        if len(tsArray) == 0:
+            filtered_list = res
+        else:
+            for ts in tsArray:
+                filtered_list = [r for r in res if (r['timestamp'] < ts["startTS"] or r['timestamp'] > ts["endTS"]) or r['timestamp'] < applyTime]
+                res = [r for r in res if r['timestamp'] > ts["endTS"]]
         # close conn + return
         memberClient.close()
-        return json.loads(json_util.dumps({"res": filtered_list}))
+        print(tsArray)
+        if(date + timeRange[1] > applyTime):
+            print("return from here")
+            return json.loads(json_util.dumps({"res": filtered_list, "ts": tsArray}))
+        else:
+            return json.loads(json_util.dumps({"res": filtered_list}))
     # no need filtering for show all, just close conn + return
     else:
         memberClient.close()
