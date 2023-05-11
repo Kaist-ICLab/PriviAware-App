@@ -7,6 +7,7 @@ import Geolocation from 'react-native-geolocation-service';
 import RNExitApp from 'react-native-exit-app';
 
 import { DATATYPE } from './Constant';
+import { DESCRIPTION } from './Description';
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 
 export default function OverviewPage({ route }) {
@@ -80,7 +81,7 @@ export default function OverviewPage({ route }) {
 
     const showInfo = (dt) => {
         const name = dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll("_", " ");
-        AlertBox(name, name + " description");
+        AlertBox(name, DESCRIPTION[dt.name].description);
     };
 
     const logoutAction = () => {

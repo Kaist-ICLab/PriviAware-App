@@ -8,6 +8,7 @@ import { FakeMarker } from 'react-native-map-coordinate-picker';
 import { Slider } from '@miblanchard/react-native-slider';
 import { Picker } from '@react-native-picker/picker';
 
+import { DESCRIPTION } from './Description';
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
 import LocationGraph from './LocationGraph';
 import NumericGraph from './NumericGraph';
@@ -128,7 +129,7 @@ export default function SettingPage({ route }) {
 
     const showInfo = () => {
         const name = dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll("_", " ");
-        AlertBox(name, name + " description");
+        AlertBox(name, DESCRIPTION[dt.name].description);
     };
 
     const handleToggleStatus = () => {
