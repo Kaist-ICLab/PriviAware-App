@@ -1,4 +1,4 @@
-const DESCRIPTION = {
+const DATATYPE_DESCRIPTION = {
     bluetooth: {
         description: "Bluetooth description\nSome more description"
     },
@@ -49,4 +49,4 @@ const DESCRIPTION = {
     },
 };
 
-export { DESCRIPTION };
+export { DATATYPE_DESCRIPTION };

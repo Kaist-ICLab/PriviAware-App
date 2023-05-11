@@ -137,7 +137,7 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
                                 return (
                                     <View style={{ flexDirection: "row", justifyContent: "center", marginRight: 10, alignSelf: "center" }}>
                                         <View style={{ backgroundColor: item.color, height: 10, width: 10, marginRight: 5, alignSelf: "center" }}></View>
-                                        <Text>{item.key}</Text>
+                                        <Text>{item.key.length === 0 ? "(No name)" : item.key}</Text>
                                     </View>
                                 )
                             }}
