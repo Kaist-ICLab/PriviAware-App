@@ -9,6 +9,7 @@ import { Slider } from '@miblanchard/react-native-slider';
 import { Picker } from '@react-native-picker/picker';
 
 import { SERVER_IP_ADDR, SERVER_PORT } from '@env';
+import LocationGraph from './LocationGraph';
 import NumericGraph from './NumericGraph';
 import CategoricalGraph from './CategoricalGraph';
 import CountGraph from './CountGraph';
@@ -108,7 +109,7 @@ export default function SettingPage({ route }) {
                 const data = await res.json();
                 console.log("[RN SettingPage.js] Received: " + data.res.length);
                 setData(data.res);
-                if(data.ts) setTSArray(data.ts);
+                if (data.ts) setTSArray(data.ts);
             }
         };
         fetchDataFromDB();
@@ -367,12 +368,15 @@ export default function SettingPage({ route }) {
                         <></>
                     }
                     <View style={{ height: 240 }}>
-                        {dataField.type === "num" ?
-                            <NumericGraph data={data} dataField={dataField} />
-                            : dataField.type === "cat" ?
-                                <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} tsArray={tsArray} />
-                                :
-                                <CountGraph data={data} dataField={dataField} />
+                        {route.params.dt.name === "location"
+                            ?
+                            <LocationGraph data={data} />
+                            : dataField.type === "num" ?
+                                <NumericGraph data={data} dataField={dataField} />
+                                : dataField.type === "cat" ?
+                                    <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} tsArray={tsArray} />
+                                    :
+                                    <CountGraph data={data} dataField={dataField} />
                         }
                     </View>
                 </View>

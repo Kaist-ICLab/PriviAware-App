@@ -18,8 +18,8 @@ end_timestamp = time.time()*1000
 start_timestamp = end_timestamp - day*2
 query = {
         "$and": [{
-            # "subject.email": 'emily@kse.kaist.ac.kr',
-            "datumType": "MESSAGE"
+            "subject.email": 'emily@kse.kaist.ac.kr',
+            "datumType": "LOCATION"
         },  
         {"timestamp": {"$gt": 1680274832000}}, 
         {"timestamp": {"$lt": 1683699427000}}
