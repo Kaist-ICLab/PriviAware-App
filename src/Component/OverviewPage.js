@@ -109,7 +109,7 @@ export default function OverviewPage({ route }) {
                         <View key={i} style={{ backgroundColor: (i % 2 ? "#D9D9D9" : "#F3F2F2"), flexDirection: "row", justifyContent: "space-between" }}>
                             <View style={{ flexDirection: "row" }}>
                                 <TouchableOpacity style={{ marginHorizontal: 15, marginVertical: 13 }} onPress={() => navToSetting(dt)}>
-                                    <Text style={{ fontSize: 15, textDecorationLine: "underline", color: "#000000" }}>{dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll("_", " ")}</Text>
+                                    <Text style={{ fontSize: 15, textDecorationLine: "underline", color: "#000000", fontWeight: dt.sensitivity ? "bold" : "normal" }}>{dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll("_", " ")}</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity style={{ alignSelf: "center" }} onPress={() => showInfo(dt)}>
                                     <AntDesign name="questioncircleo" size={15} />

@@ -66,7 +66,7 @@ export default function LocationGraph({ data }) {
                             >
                                 <Callout>
                                     <View>
-                                        <Text style={{ alignSelf: "center", color: "#000000", fontWeight: 800 }}>Detail</Text>
+                                        <Text style={{ alignSelf: "center", color: "#000000", fontWeight: "bold" }}>Detail</Text>
                                         {loc.timestamp.map((ts, i) => {
                                             return (
                                                 <Text key={i}>{"Timestamp: " + localTimestampToHoursConverter(ts) + ", Altitude: " + String(loc.altitude[i].toFixed(2))}</Text>
