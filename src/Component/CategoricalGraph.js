@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, View, Text } from 'react-native';
+import { FlatList, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { StackedBarChart, BarChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 
@@ -10,22 +10,6 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
     const [maxData, setMaxData] = useState(0);
     const [yAccessor, setYAccessor] = useState([]);
     const [label, setLabel] = useState([]);
-    // const [processedTS, setProcessedTS] = useState([]);
-
-    const timestampToHoursConverter = (ts) => {
-        const date = new Date(ts);
-        return String(date.getUTCHours()).padStart(2, '0');
-    };
-
-    // const localTimestampToHoursConverter = (ts) => {
-    //     const date = new Date(ts);
-    //     return date.getHours();
-    // };
-
-    // const UTCTimestampToHoursConverter = (ts) => {
-    //     const date = new Date(ts);
-    //     return date.getUTCHours();
-    // };
 
     useEffect(() => {
         if (data.length > 0 && dataField) {
@@ -73,18 +57,39 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
             setMaxData(max);
             setYAccessor(tempyAccessor);
             setLabel(tempyAccessor.map((k, i) => { return { key: k, color: COLOURS[i] } }));
-            // for (let i = 0; i < tsArray.length; i++) {
-            //     const start = localTimestampToHoursConverter(tsArray[i].startTS) + 1;
-            //     const end = localTimestampToHoursConverter(tsArray[i].endTS) - 1;
-            //     for (j = 0; j < tempTSArray.length; j++) {
-            //         if (UTCTimestampToHoursConverter(tempTSArray[j].timestamp) >= start && UTCTimestampToHoursConverter(tempTSArray[j].timestamp) <= end)
-            //             tempTSArray[j].value = max;
-            //     }
-            // }
-            // setProcessedTS(tempTSArray);
         }
         else setProcessedData([]);
     }, [data, dataField]);
+
+    const AlertBox = (title, msg) => {
+        Alert.alert(title, msg, [
+            {
+                text: "OK", style: "cancel"
+            }
+        ]);
+    };
+
+    const timestampToHoursConverter = (ts) => {
+        const date = new Date(ts);
+        return String(date.getUTCHours()).padStart(2, '0');
+    };
+
+    const timestampToFullHoursConverter = (ts) => {
+        const date = new Date(ts);
+        return String(date.getHours()).padStart(2, '0') + ":" + String(date.getMinutes()).padStart(2, '0') + ":" + String(date.getSeconds()).padStart(2, '0') + "." + String(date.getMilliseconds()).padStart(3, '0');
+    };
+
+    const showFewEntries = (key) => {
+        let msg = "";
+        let amount = 0;
+        const filteredData = data.filter(d => d.value[dataField.name] === key);
+        if (filteredData.length < 5) amount = filteredData.length;
+        else amount = 5;
+        for (let i = 0; i < amount; i++)
+            msg = msg.concat(timestampToFullHoursConverter(filteredData[i].timestamp) + ": " + JSON.stringify(filteredData[i].value) + "\n");
+        if (key.length === 0) key = "(No name)";
+        AlertBox("Collected data related to \"" + key + "\"", msg + "(At most 5 entries are shown)");
+    };
 
     return (
         <View style={{ flex: 1 }}>
@@ -135,10 +140,10 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
                             data={label}
                             renderItem={({ item }) => {
                                 return (
-                                    <View style={{ flexDirection: "row", justifyContent: "center", marginRight: 10, alignSelf: "center" }}>
+                                    <TouchableOpacity style={{ flexDirection: "row", justifyContent: "center", marginRight: 10, alignSelf: "center" }} onPress={() => showFewEntries(item.key)}>
                                         <View style={{ backgroundColor: item.color, height: 10, width: 10, marginRight: 5, alignSelf: "center" }}></View>
-                                        <Text>{item.key.length === 0 ? "(No name)" : item.key}</Text>
-                                    </View>
+                                        <Text style={{ textDecorationLine: "underline" }}>{item.key.length === 0 ? "(No name)" : item.key}</Text>
+                                    </TouchableOpacity>
                                 )
                             }}
                             horizontal

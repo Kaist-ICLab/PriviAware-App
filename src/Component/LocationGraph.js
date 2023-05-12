@@ -53,8 +53,8 @@ export default function LocationGraph({ data }) {
                 <MapView
                     style={{ height: "100%", width: "100%" }}
                     initialRegion={{
-                        latitude: 36.3742178,
-                        longitude: 127.3656,
+                        latitude: processedLoc[0].latitude,
+                        longitude: processedLoc[0].longitude,
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                     }}>
