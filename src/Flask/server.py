@@ -349,10 +349,7 @@ def dataQuery():
         filtered_list = []
         filtered_list = [r for r in res if (r['timestamp'] < filterStartTS or r['timestamp'] > filterEndTS) or r['timestamp'] < applyTime]
         memberClient.close()
-        if(date + timeRange[1] > applyTime):
-            return json.loads(json_util.dumps({"res": filtered_list, "ts": [{"startTS": filterStartTS, "endTS": filterEndTS}]}))
-        else:
-            return json.loads(json_util.dumps({"res": filtered_list}))
+        return json.loads(json_util.dumps({"res": filtered_list}))
     # filter out location specified in PrivacyViz-Member MongoDB under location filtering
     elif user["status"][dataType] == "location":
         print("[Flask server.py] Should handle location filtering for", dataType)
@@ -387,12 +384,7 @@ def dataQuery():
                 res = [r for r in res if r['timestamp'] > ts["endTS"]]
         # close conn + return
         memberClient.close()
-        print(tsArray)
-        if(date + timeRange[1] > applyTime):
-            print("return from here")
-            return json.loads(json_util.dumps({"res": filtered_list, "ts": tsArray}))
-        else:
-            return json.loads(json_util.dumps({"res": filtered_list}))
+        return json.loads(json_util.dumps({"res": filtered_list}))
     # no need filtering for show all, just close conn + return
     else:
         memberClient.close()

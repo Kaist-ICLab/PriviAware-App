@@ -5,7 +5,7 @@ import * as scale from 'd3-scale';
 
 import { COLOURS } from './Constant';
 
-export default function CategoricalGraph({ data, dataField, dataType, timeRange, date, tsArray }) {
+export default function CategoricalGraph({ data, dataField, dataType, timeRange, date }) {
     const [processedData, setProcessedData] = useState([]);
     const [maxData, setMaxData] = useState(0);
     const [yAccessor, setYAccessor] = useState([]);
