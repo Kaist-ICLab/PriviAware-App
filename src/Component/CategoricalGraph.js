@@ -71,7 +71,11 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
 
     const timestampToHoursConverter = (ts) => {
         const date = new Date(ts);
-        return String(date.getUTCHours()).padStart(2, '0');
+        const hour = date.getUTCHours();
+        if (hour === 0) return String(date.getUTCHours()) + "mn";
+        if (hour > 0 && hour < 12) return String(date.getUTCHours()) + "am";
+        if (hour === 12) return String(date.getUTCHours()) + "nn";
+        if (hour > 12) return String(date.getUTCHours() - 12) + "pm";
     };
 
     const timestampToFullHoursConverter = (ts) => {
@@ -114,45 +118,52 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
                 ?
                 <View style={{ flex: 1 }}>
                     <View style={{ flex: 1, flexDirection: "row" }}>
-                        <View style={{ flex: 1 }}>
-                            <YAxis
-                                style={{ flex: 19 }}
-                                data={processedData}
-                                yAccessor={() => yAccessor}
-                                min={0}
-                                max={maxData}
-                                contentInset={{ top: 8, bottom: 8 }}
-                            />
-                            <View style={{ flex: 1 }}></View>
+                        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginLeft: -10, marginRight: -7 }}>
+                            <Text style={{ fontSize: 9, color: "#000000", transform: [{ rotate: '-90deg' }] }}>Count</Text>
                         </View>
-                        <View style={{ flex: 9 }}>
-                            <StackedBarChart
-                                style={{ height: "100%", flex: 19 }}
-                                keys={yAccessor}
-                                data={processedData}
-                                colors={COLOURS}
-                                yMin={0}
-                                yMax={maxData}
-                                yAccessor={() => yAccessor}
-                                xAccessor={d => d.item.timestamp}
-                                spacingInner={0.5}
-                                contentInset={{ top: 8, bottom: 8 }}
-                            >
-                                <Grid svg={{ strokeOpacity: 0.5 }} />
-                            </StackedBarChart>
-                            <XAxis
-                                style={{ flex: 1, height: "100%" }}
-                                data={processedData}
-                                xAccessor={d => d.item.timestamp}
-                                scale={scale.scaleBand}
-                                formatLabel={(value) => timestampToHoursConverter(value)}
-                                svg={{ fontSize: 10, fill: 'black' }}
-                                spacingInner={0.5}
-                                contentInset={{ top: 8, bottom: 8 }}
-                            />
+                        <View style={{ flex: 11, flexDirection: "row" }}>
+                            <View style={{ flex: 1 }}>
+                                <YAxis
+                                    style={{ flex: 19 }}
+                                    data={processedData}
+                                    yAccessor={() => yAccessor}
+                                    min={0}
+                                    max={maxData}
+                                    svg={{ fontSize: 10, fill: 'black' }}
+                                    contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
+                                />
+                                <View style={{ flex: 1 }}></View>
+                            </View>
+                            <View style={{ flex: 18 }}>
+                                <StackedBarChart
+                                    style={{ height: "100%", flex: 19 }}
+                                    keys={yAccessor}
+                                    data={processedData}
+                                    colors={COLOURS}
+                                    yMin={0}
+                                    yMax={maxData}
+                                    yAccessor={() => yAccessor}
+                                    xAccessor={d => d.item.timestamp}
+                                    spacingInner={0.5}
+                                    contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
+                                >
+                                    <Grid svg={{ strokeOpacity: 0.5 }} />
+                                </StackedBarChart>
+                                <XAxis
+                                    style={{ flex: 1, height: "100%" }}
+                                    data={processedData}
+                                    xAccessor={d => d.item.timestamp}
+                                    scale={scale.scaleBand}
+                                    formatLabel={(value, i) => { if (!(i % 2)) return timestampToHoursConverter(value) }}
+                                    svg={{ fontSize: 10, fill: 'black' }}
+                                    spacingInner={0.5}
+                                    contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
+                                />
+                            </View>
                         </View>
                     </View>
-                    <View style={{ marginTop: 10 }}>
+                    <Text style={{ color: "#000000", fontSize: 10, alignSelf: "center" }}>Time</Text>
+                    <View style={{ marginTop: 5 }}>
                         <FlatList
                             data={label}
                             renderItem={({ item }) => {
@@ -167,6 +178,7 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
                         />
                     </View>
                 </View>
+
                 :
                 <View style={{ justifyContent: "center", flex: 1 }}>
                     <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>No Data</Text>
