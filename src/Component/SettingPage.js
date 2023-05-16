@@ -397,7 +397,7 @@ export default function SettingPage({ route }) {
                                 <View style={{ flexDirection: "row", justifyContent: "center" }}>
                                     <Text style={{ fontSize: 15, color: "#000000", alignSelf: "center" }}>Do not collect from</Text>
                                     <TouchableOpacity style={{ marginHorizontal: 10, alignSelf: "center" }} onPress={handleShowTimePicker1}>
-                                        <View style={{ backgroundColor: "#D9D9D9", height: 25, width: 50, justifyContent: "center" }}>
+                                        <View style={{ backgroundColor: "#FAFAFA", height: 25, width: 50, justifyContent: "center" }}>
                                             {timePicker1 ?
                                                 <Text style={{ alignSelf: "center", color: "#000000" }}>
                                                     {timePicker1.getHours().toString().padStart(2, "0") + ":" + timePicker1.getMinutes().toString().padStart(2, "0")}
@@ -415,7 +415,7 @@ export default function SettingPage({ route }) {
                                     </TouchableOpacity>
                                     <Text style={{ fontSize: 15, color: "#000000", alignSelf: "center" }}>to</Text>
                                     <TouchableOpacity style={{ marginHorizontal: 10, alignSelf: "center" }} onPress={handleShowTimePicker2}>
-                                        <View style={{ backgroundColor: "#D9D9D9", height: 25, width: 50, justifyContent: "center" }}>
+                                        <View style={{ backgroundColor: "#FAFAFA", height: 25, width: 50, justifyContent: "center" }}>
                                             {timePicker2 ?
                                                 <Text style={{ alignSelf: "center", color: "#000000" }}>
                                                     {timePicker2.getHours().toString().padStart(2, "0") + ":" + timePicker2.getMinutes().toString().padStart(2, "0")}
@@ -471,9 +471,9 @@ export default function SettingPage({ route }) {
                                     <View>
                                         <Text style={{ fontSize: 15, color: "#000000", alignSelf: "center" }}>Do not collect when I'm within</Text>
                                         <View style={{ flexDirection: "row", alignSelf: "center" }}>
-                                            <View style={{ backgroundColor: "#D9D9D9", height: 25, width: 50, justifyContent: "center", marginRight: 10 }}>
+                                            <View style={{ backgroundColor: "#FAFAFA", height: 25, width: 50, justifyContent: "center", marginRight: 10 }}>
                                                 <TextInput
-                                                    style={{ paddingVertical: 0 }}
+                                                    style={{ paddingVertical: 0, alignSelf: "center" }}
                                                     keyboardType="number-pad"
                                                     onChangeText={(value) => handleRadius(value)}
                                                     value={radius}
