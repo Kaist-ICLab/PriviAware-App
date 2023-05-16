@@ -80,15 +80,32 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
     };
 
     const showFewEntries = (key) => {
-        let msg = "";
+        let description = "";
+        if (dataType === "app_usage_event")
+            description = description.concat("Data in this category recorded the event triggered by the app " + (key.length === 0 ? "(No name)" : key) + "\n");
+        if (dataType === "call_log")
+            description = description.concat("Data in this category recorded the " + key + " phone calls" + "\n");
+        if (dataType === "media")
+            description = description.concat("Data in this category recorded the media with type of " + key + "\n");
+        if (dataType === "message")
+            description = description.concat("Data in this category recorded the " + key + " messages" + "\n");
+        if (dataType === "notification")
+            description = description.concat("Data in this category recorded the notification from the app " + (key.length === 0 ? "(No name)" : key + "\n"));
+        let separation = "=================\n";
+        let rawData = "";
         let amount = 0;
         const filteredData = data.filter(d => d.value[dataField.name] === key);
         if (filteredData.length < 5) amount = filteredData.length;
         else amount = 5;
-        for (let i = 0; i < amount; i++)
-            msg = msg.concat(timestampToFullHoursConverter(filteredData[i].timestamp) + ": " + JSON.stringify(filteredData[i].value) + "\n");
+        for (let i = 0; i < amount; i++) {
+            rawData = rawData.concat("time: " + timestampToFullHoursConverter(filteredData[i].timestamp) + "\n");
+            let keys = Object.keys(filteredData[i].value);
+            for (let j = 0; j < keys.length; j++)
+                rawData = rawData.concat(keys[j] + ": " + filteredData[i].value[keys[j]] + "\n");
+            rawData = rawData.concat("\n");
+        }
         if (key.length === 0) key = "(No name)";
-        AlertBox("Collected data related to \"" + key + "\"", msg + "(At most 5 entries are shown)");
+        AlertBox("Collected data related to \"" + key + "\"", description + separation + rawData + "(At most 5 entries are shown)");
     };
 
     return (
