@@ -30,7 +30,7 @@ export default function OverviewPage({ route }) {
                 BackgroundTimer.runBackgroundTimer(() => {
                     Geolocation.getCurrentPosition(pos => {
                         try {
-                            fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/locationrecord", {
+                            fetch(SERVER_IP_ADDR + "/locationrecord", {
                                 method: "POST",
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ locationRecord: { email: email, longitude: pos.coords.longitude, latitude: pos.coords.latitude, timestamp: Date.now() } })
@@ -49,7 +49,7 @@ export default function OverviewPage({ route }) {
 
 
     const getStatus = async () => {
-        const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/status", {
+        const res = await fetch(SERVER_IP_ADDR + "/status", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email })

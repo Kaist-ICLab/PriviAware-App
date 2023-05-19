@@ -44,7 +44,7 @@ export default function LoginPage() {
             AlertBox("Error", "Please enter your password");
             return;
         }
-        const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/login", {
+        const res = await fetch(SERVER_IP_ADDR + "/login", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, password: password })

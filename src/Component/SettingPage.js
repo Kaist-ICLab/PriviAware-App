@@ -60,7 +60,7 @@ export default function SettingPage({ route }) {
     useEffect(() => {
         const fetchFilteringSetting = async () => {
             if (route.params.status === "time") {
-                const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/getfiltering", {
+                const res = await fetch(SERVER_IP_ADDR + "/getfiltering", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: route.params.email })
@@ -71,7 +71,7 @@ export default function SettingPage({ route }) {
                 setTimePicker2(new Date(data["timeFiltering"][route.params.dt.name]["endingTime"]));
                 // if (!data.result) AlertBox("Error", "Error in updating setting");
             } else if (route.params.status === "location") {
-                const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/getfiltering", {
+                const res = await fetch(SERVER_IP_ADDR + "/getfiltering", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: route.params.email })
@@ -101,7 +101,7 @@ export default function SettingPage({ route }) {
         const fetchDataFromDB = async () => {
             if (route.params.email && route.params.dt.name && date && timeRange) {
                 console.log("[RN SettingPage.js] Fetch data from DB with param user:", route.params.email, "datatype:", route.params.dt.name, "date:", date, "timeRange[0]:", timeRange[0], "timeRange[1]:", timeRange[1]);
-                const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/data", {
+                const res = await fetch(SERVER_IP_ADDR + "/data", {
                     method: "POST",
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: route.params.email, dataType: route.params.dt.name, date: date, timeRange: timeRange })
@@ -115,7 +115,7 @@ export default function SettingPage({ route }) {
     }, [route.params.email, route.params.dt.name, date, timeRange])
 
     const updateToDB = async (newStatus) => {
-        const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/setstatus", {
+        const res = await fetch(SERVER_IP_ADDR + "/setstatus", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, newStatus: newStatus })

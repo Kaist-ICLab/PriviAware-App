@@ -58,7 +58,7 @@ export default function RegisterPage() {
             AlertBox("Error", "Passwords do not match");
             return;
         }
-        const res = await fetch("http://" + SERVER_IP_ADDR + ":" + SERVER_PORT + "/createuser", {
+        const res = await fetch(SERVER_IP_ADDR + "/createuser", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, password: password1 })
