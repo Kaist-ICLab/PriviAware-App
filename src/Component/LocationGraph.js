@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, ActivityIndicator } from "react-native";
 import MapView from 'react-native-maps';
 import { Marker, Callout } from 'react-native-maps';
 
-export default function LocationGraph({ data }) {
+export default function LocationGraph({ data, timeRange, date, zeroFlag }) {
     const [processedLoc, setProcessedLoc] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const tempProcessedData = [];
@@ -41,6 +42,16 @@ export default function LocationGraph({ data }) {
         setProcessedLoc(tempProcessedLoc);
     }, [data]);
 
+
+    useEffect(() => {
+        setLoading(true);
+    }, [data, timeRange, date]);
+
+    useEffect(() => {
+        if ((data.length > 0 && processedLoc.length > 0) || zeroFlag)
+            setLoading(false);
+    }, [data, processedLoc, zeroFlag]);
+
     const localTimestampToHoursConverter = (ts) => {
         const date = new Date(ts);
         return String(date.getHours()).padStart(2, '0') + ":" + String(date.getMinutes()).padStart(2, '0');
@@ -48,40 +59,47 @@ export default function LocationGraph({ data }) {
 
     return (
         <View style={{ flex: 1 }}>
-            {processedLoc.length > 0
+            {loading
                 ?
-                <MapView
-                    style={{ height: "100%", width: "100%" }}
-                    initialRegion={{
-                        latitude: processedLoc[0].latitude,
-                        longitude: processedLoc[0].longitude,
-                        latitudeDelta: 0.0922,
-                        longitudeDelta: 0.0421,
-                    }}>
-                    {processedLoc.map((loc, i) => {
-                        return (
-                            <Marker
-                                key={i}
-                                coordinate={{ latitude: loc.latitude, longitude: loc.longitude }}
-                            >
-                                <Callout>
-                                    <View>
-                                        <Text style={{ alignSelf: "center", color: "#000000", fontWeight: "bold" }}>Detail</Text>
-                                        {loc.timestamp.map((ts, i) => {
-                                            return (
-                                                <Text key={i}>{"Timestamp: " + localTimestampToHoursConverter(ts) + ", Altitude: " + String(loc.altitude[i].toFixed(2))}</Text>
-                                            )
-                                        })}
-                                    </View>
-                                </Callout>
-                            </Marker>
-                        )
-                    })}
-                </MapView>
-                :
-                <View style={{ justifyContent: "center", flex: 1 }}>
-                    <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>No Data</Text>
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                    <ActivityIndicator size="large" />
                 </View>
+                :
+                (processedLoc.length > 0
+                    ?
+                    <MapView
+                        style={{ height: "100%", width: "100%" }}
+                        initialRegion={{
+                            latitude: processedLoc[0].latitude,
+                            longitude: processedLoc[0].longitude,
+                            latitudeDelta: 0.0922,
+                            longitudeDelta: 0.0421,
+                        }}>
+                        {processedLoc.map((loc, i) => {
+                            return (
+                                <Marker
+                                    key={i}
+                                    coordinate={{ latitude: loc.latitude, longitude: loc.longitude }}
+                                >
+                                    <Callout>
+                                        <View>
+                                            <Text style={{ alignSelf: "center", color: "#000000", fontWeight: "bold" }}>Detail</Text>
+                                            {loc.timestamp.map((ts, i) => {
+                                                return (
+                                                    <Text key={i}>{"Timestamp: " + localTimestampToHoursConverter(ts) + ", Altitude: " + String(loc.altitude[i].toFixed(2))}</Text>
+                                                )
+                                            })}
+                                        </View>
+                                    </Callout>
+                                </Marker>
+                            )
+                        })}
+                    </MapView>
+                    :
+                    <View style={{ justifyContent: "center", flex: 1 }}>
+                        <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>No Data</Text>
+                    </View>
+                )
             }
         </View>
     )

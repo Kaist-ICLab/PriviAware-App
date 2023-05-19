@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView, View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,6 +11,7 @@ export default function LoginPage() {
     const [emailValidity, setEmailValidity] = useState(false);
     const [password, setPassword] = useState("");
     const [showPW, setShowPW] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleEmail = (value) => {
         if (value.includes("@")) setEmailValidity(true);
@@ -44,6 +45,7 @@ export default function LoginPage() {
             AlertBox("Error", "Please enter your password");
             return;
         }
+        setLoading(true);
         const res = await fetch(SERVER_IP_ADDR + "/login", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -52,7 +54,10 @@ export default function LoginPage() {
         const data = await res.json();
         console.log("[RN App.js] Received: " + JSON.stringify(data));
         if (!data.result) AlertBox("Error", "Incorrect email or password");
-        else navigation.navigate("Overview", { email: email });
+        else {
+            setLoading(false);
+            navigation.navigate("Overview", { email: email });
+        }
     };
 
     const register = () => {
@@ -62,7 +67,7 @@ export default function LoginPage() {
 
     return (
         <SafeAreaView style={{ backgroundColor: "#FEFFBE", flex: 1, justifyContent: "center" }}>
-            <View style={{ justifyContent: "space-around" }}>
+            <View style={{ justifyContent: "space-around", opacity: (loading ? 0.3 : 1) }}>
                 <Text style={{ alignSelf: "center", color: "#000000", fontSize: 40, marginBottom: 40 }}>Privacy-Viz</Text>
                 <View style={{ backgroundColor: "#DBDBDB", marginHorizontal: 40 }}>
                     <Text style={{ marginTop: 10, marginLeft: 20, color: "#000000", fontSize: 17 }}>Gmail</Text>
@@ -102,6 +107,14 @@ export default function LoginPage() {
                     </View>
                 </View>
             </View>
+            {loading
+                ?
+                <View style={{ flex: 1, justifyContent: "center", position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}>
+                    <ActivityIndicator size="large" />
+                </View>
+                :
+                <></>
+            }
         </SafeAreaView>
     )
 }

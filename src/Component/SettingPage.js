@@ -41,6 +41,7 @@ export default function SettingPage({ route }) {
     const [date, setDate] = useState();
     const [allDate, setAllDate] = useState([]);
     const [dataField, setDataField] = useState(route.params.dt.field[0]);
+    const [zeroFlag, setZeroFlag] = useState(false);
     // data record related
     const [data, setData] = useState([]);
 
@@ -108,6 +109,8 @@ export default function SettingPage({ route }) {
                 });
                 const data = await res.json();
                 console.log("[RN SettingPage.js] Received: " + data.res.length);
+                if (data.res.length === 0) setZeroFlag(true);
+                else setZeroFlag(false);
                 setData(data.res);
             }
         };
@@ -369,13 +372,13 @@ export default function SettingPage({ route }) {
                     <View style={{ height: 240 }}>
                         {route.params.dt.name === "location"
                             ?
-                            <LocationGraph data={data} />
+                            <LocationGraph data={data} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
                             : dataField.type === "num" ?
-                                <NumericGraph data={data} dataField={dataField} />
+                                <NumericGraph data={data} dataField={dataField} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
                                 : dataField.type === "cat" ?
-                                    <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} />
+                                    <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
                                     :
-                                    <CountGraph data={data} dataField={dataField} />
+                                    <CountGraph data={data} dataField={dataField} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
                         }
                     </View>
                 </View>

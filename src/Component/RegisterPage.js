@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { SafeAreaView, View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import { useNavigation } from '@react-navigation/native';
 
@@ -13,6 +13,7 @@ export default function RegisterPage() {
     const [email, setEmail] = useState("");
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleEmail = (value) => {
         if (value.includes("@")) setEmailValidity(true);
@@ -58,6 +59,7 @@ export default function RegisterPage() {
             AlertBox("Error", "Passwords do not match");
             return;
         }
+        setLoading(true);
         const res = await fetch(SERVER_IP_ADDR + "/createuser", {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -66,6 +68,7 @@ export default function RegisterPage() {
         const data = await res.json();
         console.log("[RN App.js] Received: " + JSON.stringify(data));
         if (data.result) {
+            setLoading(false);
             AlertBox("Success", "Account created!");
             navigation.navigate("Login");
         } else AlertBox("Error", "Email is registered");
@@ -73,7 +76,7 @@ export default function RegisterPage() {
 
     return (
         <SafeAreaView style={{ backgroundColor: "#FEFFBE", flex: 1, justifyContent: "center" }}>
-            <View style={{ justifyContent: "space-around" }}>
+            <View style={{ justifyContent: "space-around", opacity: (loading ? 0.3 : 1) }}>
                 <Text style={{ alignSelf: "center", color: "#000000", fontSize: 40 }}>Privacy-Viz</Text>
                 <Text style={{ alignSelf: "center", color: "#000000", fontSize: 25, marginBottom: 40 }}>Registration</Text>
                 <View style={{ backgroundColor: "#DBDBDB", marginHorizontal: 40 }}>
@@ -129,6 +132,14 @@ export default function RegisterPage() {
                     </View>
                 </View>
             </View>
+            {loading
+                ?
+                <View style={{ flex: 1, justifyContent: "center", position: "absolute", left: 0, right: 0, top: 0, bottom: 0 }}>
+                    <ActivityIndicator size="large" />
+                </View>
+                :
+                <></>
+            }
         </SafeAreaView>
     )
 }

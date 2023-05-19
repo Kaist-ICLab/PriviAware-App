@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, View, Text, TouchableOpacity, Alert } from 'react-native';
-import { StackedBarChart, BarChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
+import { FlatList, View, Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import { StackedBarChart, Grid, XAxis, YAxis } from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 
 import { COLOURS } from './Constant';
 
-export default function CategoricalGraph({ data, dataField, dataType, timeRange, date }) {
+export default function CategoricalGraph({ data, dataField, dataType, timeRange, date, zeroFlag }) {
     const [processedData, setProcessedData] = useState([]);
     const [maxData, setMaxData] = useState(0);
     const [yAccessor, setYAccessor] = useState([]);
     const [label, setLabel] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (data.length > 0 && dataField) {
@@ -60,6 +61,19 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
         }
         else setProcessedData([]);
     }, [data, dataField]);
+
+    useEffect(() => {
+        setLoading(true);
+    }, [data, dataField, dataType, timeRange, date]);
+
+    useEffect(() => {
+        if ((data.length > 0 && processedData.length > 0) || zeroFlag)
+            setLoading(false);
+    }, [data, processedData, zeroFlag]);
+
+    useEffect(() => {
+        console.log(loading);
+    }, [loading]);
 
     const AlertBox = (title, msg) => {
         Alert.alert(title, msg, [
@@ -114,75 +128,82 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
 
     return (
         <View style={{ flex: 1 }}>
-            {processedData.length > 0
+            {loading
                 ?
-                <View style={{ flex: 1 }}>
-                    <View style={{ flex: 1, flexDirection: "row" }}>
-                        <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginLeft: -10, marginRight: -7 }}>
-                            <Text style={{ fontSize: 9, color: "#000000", transform: [{ rotate: '-90deg' }] }}>Count</Text>
-                        </View>
-                        <View style={{ flex: 11, flexDirection: "row" }}>
-                            <View style={{ flex: 1 }}>
-                                <YAxis
-                                    style={{ flex: 19 }}
-                                    data={processedData}
-                                    yAccessor={() => yAccessor}
-                                    min={0}
-                                    max={maxData}
-                                    svg={{ fontSize: 10, fill: 'black' }}
-                                    contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
-                                />
-                                <View style={{ flex: 1 }}></View>
-                            </View>
-                            <View style={{ flex: 18 }}>
-                                <StackedBarChart
-                                    style={{ height: "100%", flex: 19 }}
-                                    keys={yAccessor}
-                                    data={processedData}
-                                    colors={COLOURS}
-                                    yMin={0}
-                                    yMax={maxData}
-                                    yAccessor={() => yAccessor}
-                                    xAccessor={d => d.item.timestamp}
-                                    spacingInner={0.5}
-                                    contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
-                                >
-                                    <Grid svg={{ strokeOpacity: 0.5 }} />
-                                </StackedBarChart>
-                                <XAxis
-                                    style={{ flex: 1, height: "100%" }}
-                                    data={processedData}
-                                    xAccessor={d => d.item.timestamp}
-                                    scale={scale.scaleBand}
-                                    formatLabel={(value, i) => { if (!(i % 2)) return timestampToHoursConverter(value) }}
-                                    svg={{ fontSize: 10, fill: 'black' }}
-                                    spacingInner={0.5}
-                                    contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
-                                />
-                            </View>
-                        </View>
-                    </View>
-                    <Text style={{ color: "#000000", fontSize: 10, alignSelf: "center" }}>Time</Text>
-                    <View style={{ marginTop: 5 }}>
-                        <FlatList
-                            data={label}
-                            renderItem={({ item }) => {
-                                return (
-                                    <TouchableOpacity style={{ flexDirection: "row", justifyContent: "center", marginRight: 10, alignSelf: "center" }} onPress={() => showFewEntries(item.key)}>
-                                        <View style={{ backgroundColor: item.color, height: 10, width: 10, marginRight: 5, alignSelf: "center" }}></View>
-                                        <Text style={{ textDecorationLine: "underline" }}>{item.key.length === 0 ? "(No name)" : item.key}</Text>
-                                    </TouchableOpacity>
-                                )
-                            }}
-                            horizontal
-                        />
-                    </View>
+                <View style={{ flex: 1, justifyContent: "center" }}>
+                    <ActivityIndicator size="large" />
                 </View>
-
                 :
-                <View style={{ justifyContent: "center", flex: 1 }}>
-                    <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>No Data</Text>
-                </View>
+                (processedData.length > 0
+                    ?
+                    <View style={{ flex: 1 }}>
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                            <View style={{ flex: 1, alignItems: "center", justifyContent: "center", marginLeft: -10, marginRight: -7 }}>
+                                <Text style={{ fontSize: 9, color: "#000000", transform: [{ rotate: '-90deg' }] }}>Count</Text>
+                            </View>
+                            <View style={{ flex: 11, flexDirection: "row" }}>
+                                <View style={{ flex: 1 }}>
+                                    <YAxis
+                                        style={{ flex: 19 }}
+                                        data={processedData}
+                                        yAccessor={() => yAccessor}
+                                        min={0}
+                                        max={maxData}
+                                        svg={{ fontSize: 10, fill: 'black' }}
+                                        contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
+                                    />
+                                    <View style={{ flex: 1 }}></View>
+                                </View>
+                                <View style={{ flex: 18 }}>
+                                    <StackedBarChart
+                                        style={{ height: "100%", flex: 19 }}
+                                        keys={yAccessor}
+                                        data={processedData}
+                                        colors={COLOURS}
+                                        yMin={0}
+                                        yMax={maxData}
+                                        yAccessor={() => yAccessor}
+                                        xAccessor={d => d.item.timestamp}
+                                        spacingInner={0.5}
+                                        contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
+                                    >
+                                        <Grid svg={{ strokeOpacity: 0.5 }} />
+                                    </StackedBarChart>
+                                    <XAxis
+                                        style={{ flex: 1, height: "100%" }}
+                                        data={processedData}
+                                        xAccessor={d => d.item.timestamp}
+                                        scale={scale.scaleBand}
+                                        formatLabel={(value, i) => { if (!(i % 2)) return timestampToHoursConverter(value) }}
+                                        svg={{ fontSize: 10, fill: 'black' }}
+                                        spacingInner={0.5}
+                                        contentInset={{ top: 8, bottom: 8, left: 10, right: 10 }}
+                                    />
+                                </View>
+                            </View>
+                        </View>
+                        <Text style={{ color: "#000000", fontSize: 10, alignSelf: "center" }}>Time</Text>
+                        <View style={{ marginTop: 5 }}>
+                            <FlatList
+                                data={label}
+                                renderItem={({ item }) => {
+                                    return (
+                                        <TouchableOpacity style={{ flexDirection: "row", justifyContent: "center", marginRight: 10, alignSelf: "center" }} onPress={() => showFewEntries(item.key)}>
+                                            <View style={{ backgroundColor: item.color, height: 10, width: 10, marginRight: 5, alignSelf: "center" }}></View>
+                                            <Text style={{ textDecorationLine: "underline" }}>{item.key.length === 0 ? "(No name)" : item.key}</Text>
+                                        </TouchableOpacity>
+                                    )
+                                }}
+                                horizontal
+                            />
+                        </View>
+                    </View>
+
+                    :
+                    <View style={{ justifyContent: "center", flex: 1 }}>
+                        <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>No Data</Text>
+                    </View>
+                )
             }
         </View>
     )
