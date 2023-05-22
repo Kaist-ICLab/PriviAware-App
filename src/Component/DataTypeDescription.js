@@ -1,51 +1,51 @@
 const DATATYPE_DESCRIPTION = {
     bluetooth: {
-        description: "Bluetooth description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the bluetooth data and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     wifi: {
-        description: "Wifi description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the wifi data and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     battery: {
-        description: "Battery description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the status and the level of the batter and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     data_traffic: {
-        description: "Data traffic description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the data traffice (amount of data bytes flowing in and out of the phone) and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     device_event: {
-        description: "Device event description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the device event and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     message: {
-        description: "Message event description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the amount of the messages that the users received or sent and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     call_log: {
-        description: "Call log event description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the number of calls that the users received and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     installed_app: {
-        description: "Installed app event description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the number and kind of application that the users installed and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     location: {
-        description: "Location event description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the amount and location of the places that the users visited and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     fitness: {
-        description: "Fitness event description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the users' movement and motion data(step count, calories, and travelled distance) and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     physical_activity: {
-        description: "Physical activity description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the physical activity and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     physical_activity_transition: {
-        description: "Physical activity transition description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the physical activity transition and the users' mental health.\nTo validate the correctness of the physical activity data.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     media: {
-        description: "Media description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the amount and the time of the video/photo taken and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     app_usage_event: {
-        description: "App usage event description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the app usage event and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     notification: {
-        description: "Notification description\nSome more description"
+        description: "Why is it collected?\nTo analyse the relationship between the app notification and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     survey: {
-        description: "Survey description\nSome more description"
+        description: "Why is it collected?\nTo act as a ground truth of the users' mental health to the study.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
 };
 
