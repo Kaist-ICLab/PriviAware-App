@@ -9,7 +9,7 @@ const DATATYPE_DESCRIPTION = {
         description: "Why is it collected?\nTo analyse the relationship between the status and the level of the batter and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     data_traffic: {
-        description: "Why is it collected?\nTo analyse the relationship between the data traffice (amount of data bytes flowing in and out of the phone) and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
+        description: "Why is it collected?\nTo analyse the relationship between the data traffic (amount of data bytes flowing in and out of the phone) and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     device_event: {
         description: "Why is it collected?\nTo analyse the relationship between the device event and the users' mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
@@ -18,7 +18,7 @@ const DATATYPE_DESCRIPTION = {
         description: "Why is it collected?\nTo analyse the relationship between the amount of the messages that the users received or sent and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     call_log: {
-        description: "Why is it collected?\nTo analyse the relationship between the number of calls that the users received and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
+        description: "Why is it collected?\nTo analyse the relationship between the number of calls that the users made or received and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"
     },
     installed_app: {
         description: "Why is it collected?\nTo analyse the relationship between the number and kind of application that the users installed and their mental health.\n\nWho can access?\nResearchers from ICLab, KAIST\n(emilyelhy@kaist.ac.kr)"

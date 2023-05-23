@@ -108,7 +108,7 @@ export default function OverviewPage({ route }) {
 
     return (
         <SafeAreaView style={{ backgroundColor: "#FEFFBE", flex: 1 }}>
-            <View style={{ opacity: (loading ? 0.3 : 1) }}>
+            <View style={{ opacity: (loading ? 0.3 : 1), flex: 1 }}>
                 <Text style={{ fontSize: 18, margin: 15, color: "#000000" }}>Logged in as: {email}</Text>
                 <ScrollView>
                     <Text style={{ marginHorizontal: 15, marginVertical: 10, color: "#b10000", fontSize: 15, fontWeight: "bold" }}>Sensitive Data</Text>
