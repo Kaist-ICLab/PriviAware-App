@@ -90,7 +90,7 @@ export default function SettingPage({ route }) {
     useEffect(() => {
         const dates = [];
         const current = Date.now();
-        const since = new Date(2023, 3, 1).getTime();
+        const since = new Date(2023, 4, 24).getTime();
         for (let i = since; i < current; i = i + 24 * 60 * 60 * 1000) {
             const dateTemp = new Date(i);
             dates.push({ label: String(dateTemp.getDate()).padStart(2, '0') + "-" + String(dateTemp.getMonth() + 1).padStart(2, '0') + "-" + String(dateTemp.getFullYear()), value: i });
