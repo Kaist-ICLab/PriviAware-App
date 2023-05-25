@@ -124,7 +124,7 @@ export default function SettingPage({ route }) {
             body: JSON.stringify({ email: email, newStatus: newStatus })
         });
         const data = await res.json();
-        console.log("[RN SettingPage.js] Received: " + JSON.stringify(data[0]));
+        console.log("[RN SettingPage.js] Received: " + JSON.stringify(data));
         if (!data.result) AlertBox("Error", "Error in updating setting");
     };
 
@@ -139,7 +139,7 @@ export default function SettingPage({ route }) {
             setToggleStatus(true);
             setLocationToggleStatus(false);
             setTimeToggleStatus(false);
-            updateToDB({ ["status." + dt.name]: "on", ["timeFiltering." + dt.name]: {} });
+            updateToDB({ ["status." + dt.name]: "on", ["timeFiltering." + dt.name]: {}, ["locationFiltering." + dt.name]: {} });
         } else {
             setStatus("off");
             setToggleStatus(false);
@@ -147,7 +147,7 @@ export default function SettingPage({ route }) {
             setTimeToggleStatus(false);
             setShowTimeSetting(false);
             setShowLocationSetting(false);
-            updateToDB({ ["status." + dt.name]: "off", ["timeFiltering." + dt.name]: {} });
+            updateToDB({ ["status." + dt.name]: "off", ["timeFiltering." + dt.name]: {}, ["locationFiltering." + dt.name]: {} });
         }
     };
 
@@ -370,15 +370,21 @@ export default function SettingPage({ route }) {
                         <></>
                     }
                     <View style={{ height: 240 }}>
-                        {route.params.dt.name === "location"
-                            ?
-                            <LocationGraph data={data} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
-                            : dataField.type === "num" ?
-                                <NumericGraph data={data} dataField={dataField} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
-                                : dataField.type === "cat" ?
-                                    <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
-                                    :
-                                    <CountGraph data={data} dataField={dataField} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
+                        {status === "off" ?
+                            <View style={{ justifyContent: "center", flex: 1 }}>
+                                <Text style={{ alignSelf: "center", color: "#000000", fontSize: 50 }}>No Data</Text>
+                            </View>
+                            :
+                            route.params.dt.name === "location"
+                                ?
+                                <LocationGraph data={data} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
+                                : dataField.type === "num" ?
+                                    <NumericGraph data={data} dataField={dataField} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
+                                    : dataField.type === "cat" ?
+                                        <CategoricalGraph data={data} dataField={dataField} dataType={route.params.dt.name} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
+                                        :
+                                        <CountGraph data={data} dataField={dataField} timeRange={timeRange} date={date} zeroFlag={zeroFlag} />
+
                         }
                     </View>
                 </View>

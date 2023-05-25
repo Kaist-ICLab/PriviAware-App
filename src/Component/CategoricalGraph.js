@@ -71,10 +71,6 @@ export default function CategoricalGraph({ data, dataField, dataType, timeRange,
             setLoading(false);
     }, [data, processedData, zeroFlag]);
 
-    useEffect(() => {
-        console.log(loading);
-    }, [loading]);
-
     const AlertBox = (title, msg) => {
         Alert.alert(title, msg, [
             {
