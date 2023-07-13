@@ -5,10 +5,16 @@
  * @format
  */
 
-import React, { useEffect } from 'react';
-import { SafeAreaView, StatusBar, useColorScheme, PermissionsAndroid, Alert } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import React, {useEffect} from 'react';
+import {
+  SafeAreaView,
+  StatusBar,
+  useColorScheme,
+  PermissionsAndroid,
+  Alert,
+} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createStackNavigator} from '@react-navigation/stack';
 import RNExitApp from 'react-native-exit-app';
 
 import LoginPage from './src/Component/LoginPage';
@@ -20,17 +26,20 @@ function App() {
   const PermissionAlertBox = (title, msg) => {
     Alert.alert(title, msg, [
       {
-        text: "OK", onPress: RNExitApp.exitApp
-      }
+        text: 'OK',
+        onPress: RNExitApp.exitApp,
+      },
     ]);
   };
 
   const requestLocationPermission = async () => {
     try {
-      const perm = await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION);
+      const perm = await PermissionsAndroid.check(
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
+      );
       if (perm) return true;
       const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION
+        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
       );
       return granted === PermissionsAndroid.RESULTS.GRANTED;
     } catch (err) {
@@ -43,7 +52,10 @@ function App() {
     const loginAction = async () => {
       const temp = await requestLocationPermission();
       if (!temp)
-        PermissionAlertBox("Warning", "Functions in this application require your location data. Some of the functions might not be accessble if you do not provide location data to this application.\n*You can always update this permission in Setting (Allow all the time).");
+        PermissionAlertBox(
+          'Warning',
+          'Functions in this application require your location data. Some of the functions might not be accessble if you do not provide location data to this application.\n*You can always update this permission in Setting (Allow all the time).',
+        );
     };
     loginAction();
   }, []);
@@ -53,14 +65,14 @@ function App() {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
-    flex: 1
+    flex: 1,
   };
 
   return (
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Navigator screenOptions={{headerShown: false}}>
           <Stack.Screen name="Login" component={LoginPage} />
           <Stack.Screen name="Register" component={RegisterPage} />
           <Stack.Screen name="Overview" component={OverviewPage} />
