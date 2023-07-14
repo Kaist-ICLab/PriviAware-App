@@ -1,6 +1,5 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
   TouchableOpacity,
@@ -25,6 +24,7 @@ import LocationGraph from '../Component/LocationGraph';
 import NumericGraph from '../Component/NumericGraph';
 import CategoricalGraph from '../Component/CategoricalGraph';
 import CountGraph from '../Component/CountGraph';
+import {globalStyles} from '../styles/global';
 
 export default function SettingPage({route}) {
   const {dt, email} = route.params;
@@ -433,8 +433,7 @@ export default function SettingPage({route}) {
   };
 
   return (
-    <ScrollView
-      style={{backgroundColor: '#FEFFBE', flex: 1, overflow: 'scroll'}}>
+    <ScrollView style={{...globalStyles.container, overflow: 'scroll'}}>
       <KeyboardAvoidingView behavior="position">
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{flexDirection: 'row'}}>
