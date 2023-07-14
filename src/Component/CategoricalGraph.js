@@ -10,7 +10,7 @@ import {
 import {StackedBarChart, Grid, XAxis, YAxis} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 
-import {COLOURS} from './Constant';
+import {COLOURS} from '../constants/Constant';
 
 export default function CategoricalGraph({
   data,

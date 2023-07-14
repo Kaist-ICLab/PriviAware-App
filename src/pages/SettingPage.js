@@ -19,7 +19,7 @@ import {FakeMarker} from 'react-native-map-coordinate-picker';
 import {Slider} from '@miblanchard/react-native-slider';
 import {Picker} from '@react-native-picker/picker';
 
-import {DATATYPE_DESCRIPTION} from '../Component/DataTypeDescription';
+import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
 import LocationGraph from '../Component/LocationGraph';
 import NumericGraph from '../Component/NumericGraph';
