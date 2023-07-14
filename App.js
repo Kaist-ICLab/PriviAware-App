@@ -17,10 +17,10 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import RNExitApp from 'react-native-exit-app';
 
-import LoginPage from './src/Component/LoginPage';
-import RegisterPage from './src/Component/RegisterPage';
-import OverviewPage from './src/Component/OverviewPage';
-import SettingPage from './src/Component/SettingPage';
+import LoginPage from './src/pages/LoginPage';
+import RegisterPage from './src/pages/RegisterPage';
+import OverviewPage from './src/pages/OverviewPage';
+import SettingPage from './src/pages/SettingPage';
 
 function App() {
   const PermissionAlertBox = (title, msg) => {
@@ -73,8 +73,8 @@ function App() {
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <NavigationContainer>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="Login" component={LoginPage} />
-          <Stack.Screen name="Register" component={RegisterPage} />
+          {/* <Stack.Screen name="Login" component={LoginPage} />
+          <Stack.Screen name="Register" component={RegisterPage} /> */}
           <Stack.Screen name="Overview" component={OverviewPage} />
           <Stack.Screen name="Setting" component={SettingPage} />
         </Stack.Navigator>

@@ -14,13 +14,15 @@ import {useNavigation} from '@react-navigation/native';
 import BackgroundTimer from 'react-native-background-timer';
 import Geolocation from 'react-native-geolocation-service';
 import RNExitApp from 'react-native-exit-app';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from './Constant';
-import {DATATYPE_DESCRIPTION} from './DataTypeDescription';
+import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '../Component/Constant';
+import {DATATYPE_DESCRIPTION} from '../Component/DataTypeDescription';
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
 
 export default function OverviewPage({route}) {
-  const {email} = route.params;
+  // const {email} = route.params;
+  const email = 'test@test.com';
   const navigation = useNavigation();
   const [status, setStatus] = useState({});
   const [loading, setLoading] = useState(true);
@@ -166,8 +168,13 @@ export default function OverviewPage({route}) {
                   justifyContent: 'space-between',
                 }}>
                 <View style={{flexDirection: 'row'}}>
+                  <MaterialCommunityIcons
+                    name={dt.icon}
+                    size={20}
+                    style={{marginHorizontal: 4, marginVertical: 13}}
+                  />
                   <TouchableOpacity
-                    style={{marginHorizontal: 15, marginVertical: 13}}
+                    style={{marginEnd: 15, marginVertical: 13}}
                     onPress={() => navToSetting(dt)}>
                     <Text
                       style={{
@@ -223,8 +230,13 @@ export default function OverviewPage({route}) {
                   justifyContent: 'space-between',
                 }}>
                 <View style={{flexDirection: 'row'}}>
+                  <MaterialCommunityIcons
+                    name={dt.icon}
+                    size={20}
+                    style={{marginHorizontal: 4, marginVertical: 13}}
+                  />
                   <TouchableOpacity
-                    style={{marginHorizontal: 15, marginVertical: 13}}
+                    style={{marginEnd: 15, marginVertical: 13}}
                     onPress={() => navToSetting(dt)}>
                     <Text
                       style={{

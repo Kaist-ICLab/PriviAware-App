@@ -19,12 +19,12 @@ import {FakeMarker} from 'react-native-map-coordinate-picker';
 import {Slider} from '@miblanchard/react-native-slider';
 import {Picker} from '@react-native-picker/picker';
 
-import {DATATYPE_DESCRIPTION} from './DataTypeDescription';
+import {DATATYPE_DESCRIPTION} from '../Component/DataTypeDescription';
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
-import LocationGraph from './LocationGraph';
-import NumericGraph from './NumericGraph';
-import CategoricalGraph from './CategoricalGraph';
-import CountGraph from './CountGraph';
+import LocationGraph from '../Component/LocationGraph';
+import NumericGraph from '../Component/NumericGraph';
+import CategoricalGraph from '../Component/CategoricalGraph';
+import CountGraph from '../Component/CountGraph';
 
 export default function SettingPage({route}) {
   const {dt, email} = route.params;
