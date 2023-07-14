@@ -5,7 +5,7 @@ export const globalStyles = StyleSheet.create({
     marginVertical: 15,
     alignSelf: 'center',
     fontWeight: 'bold',
-    fontSize: 20,
+    fontSize: 30,
   },
   container: {backgroundColor: '#ffffff', flex: 1, padding: 12},
 });

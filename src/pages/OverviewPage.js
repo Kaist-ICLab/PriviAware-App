@@ -170,7 +170,7 @@ export default function OverviewPage({route}) {
                   onPress={() => navToSetting(dt)}>
                   <Text
                     style={{
-                      fontSize: 15,
+                      fontSize: 16,
                     }}>
                     {dt.name.charAt(0).toUpperCase() +
                       dt.name.slice(1).replaceAll('_', ' ')}
@@ -209,8 +209,7 @@ export default function OverviewPage({route}) {
                   onPress={() => navToSetting(dt)}>
                   <Text
                     style={{
-                      fontSize: 15,
-                      color: '#000000',
+                      fontSize: 16,
                     }}>
                     {dt.name.charAt(0).toUpperCase() +
                       dt.name.slice(1).replaceAll('_', ' ')}
@@ -288,9 +287,9 @@ export default function OverviewPage({route}) {
 
 const styles = StyleSheet.create({
   listTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 22,
     marginTop: 20,
+    marginBottom: 5,
   },
   listContent: {
     borderColor: '#E8E8E8',

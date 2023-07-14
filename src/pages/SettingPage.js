@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   ScrollView,
+  StyleSheet,
+  Button,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
@@ -17,6 +19,7 @@ import MapView from 'react-native-maps';
 import {FakeMarker} from 'react-native-map-coordinate-picker';
 import {Slider} from '@miblanchard/react-native-slider';
 import {Picker} from '@react-native-picker/picker';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
@@ -25,6 +28,8 @@ import NumericGraph from '../Component/NumericGraph';
 import CategoricalGraph from '../Component/CategoricalGraph';
 import CountGraph from '../Component/CountGraph';
 import {globalStyles} from '../styles/global';
+import {colorSet} from '../constants/Colors';
+import {TouchableHighlight} from 'react-native-gesture-handler';
 
 export default function SettingPage({route}) {
   const {dt, email} = route.params;
@@ -588,31 +593,14 @@ export default function SettingPage({route}) {
             )}
           </View>
         </View>
-        <View
-          style={{
-            backgroundColor: '#D9D9D9',
-            marginHorizontal: 15,
-            marginTop: 15,
-          }}>
-          <Text
-            style={{
-              marginHorizontal: 15,
-              marginTop: 10,
-              color: '#000000',
-              fontSize: 18,
-            }}>
-            Contextual Filtering
-          </Text>
+        <Text style={styles.listTitle}>Contextual Filtering</Text>
+        <View style={styles.filterDetail}>
           <View style={{marginHorizontal: 15, marginTop: 10}}>
-            <View
-              style={{flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Text
-                style={{color: '#000000', fontSize: 15, alignSelf: 'center'}}>
-                Time
-              </Text>
+            <View style={styles.spacedRow}>
+              <Text style={styles.detailTitle}>Time</Text>
               <Switch
                 style={{alignSelf: 'center'}}
-                trackColor={{true: '#128300', false: '#3D3D3D'}}
+                trackColor={{true: colorSet.primary, false: '#3D3D3D'}}
                 thumbColor={'#F5F5F5'}
                 onValueChange={handleTimeToggleStatus}
                 value={timeToggleStatus}
@@ -721,16 +709,12 @@ export default function SettingPage({route}) {
               style={{
                 marginHorizontal: 15,
                 marginTop: 10,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
+                ...styles.spacedRow,
               }}>
-              <Text
-                style={{color: '#000000', fontSize: 15, alignSelf: 'center'}}>
-                Location
-              </Text>
+              <Text style={styles.detailTitle}>Location</Text>
               <Switch
                 style={{alignSelf: 'center'}}
-                trackColor={{true: '#128300', false: '#3D3D3D'}}
+                trackColor={{true: colorSet.primary, false: '#3D3D3D'}}
                 thumbColor={'#F5F5F5'}
                 onValueChange={handleLocationToggleStatus}
                 value={locationToggleStatus}
@@ -809,8 +793,56 @@ export default function SettingPage({route}) {
             )}
           </View>
         </View>
-        <View style={{height: 50}}></View>
+        <View
+          style={{
+            ...styles.filterListContents,
+            backgroundColor: colorSet.secondary,
+          }}>
+          <Text> Location</Text>
+          <TouchableHighlight onPress={() => {}}>
+            <View>
+              <MaterialCommunityIcons name="plus" size={20} />
+            </View>
+          </TouchableHighlight>
+        </View>
+        <TouchableOpacity>
+          <View
+            style={{
+              ...styles.filterListContents,
+              backgroundColor: colorSet.lightGray,
+            }}>
+            <Text> New Filter</Text>
+            <Button title="+" />
+          </View>
+        </TouchableOpacity>
       </KeyboardAvoidingView>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  listTitle: {
+    fontSize: 22,
+    marginTop: 20,
+  },
+  filterDetail: {
+    backgroundColor: colorSet.lightGray,
+    borderRadius: 10,
+    marginTop: 10,
+  },
+  filterListContents: {
+    borderRadius: 20,
+    marginTop: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 10,
+  },
+  detailTitle: {color: '#000000', fontSize: 15, alignSelf: 'center'},
+  listContent: {
+    borderColor: '#E8E8E8',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  spacedRow: {flexDirection: 'row', justifyContent: 'space-between'},
+});
