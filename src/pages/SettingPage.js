@@ -5,21 +5,16 @@ import {
   TouchableOpacity,
   Alert,
   Switch,
-  TextInput,
   KeyboardAvoidingView,
   Keyboard,
   ScrollView,
   StyleSheet,
-  Button,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import MapView from 'react-native-maps';
-import {FakeMarker} from 'react-native-map-coordinate-picker';
+
 import {Slider} from '@miblanchard/react-native-slider';
 import {Picker} from '@react-native-picker/picker';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
@@ -29,7 +24,6 @@ import CategoricalGraph from '../Component/CategoricalGraph';
 import CountGraph from '../Component/CountGraph';
 import {globalStyles} from '../styles/global';
 import {colorSet} from '../constants/Colors';
-import {TouchableHighlight} from 'react-native-gesture-handler';
 import FilteringInfo from '../Component/FilteringInfo';
 
 export default function SettingPage({route}) {
@@ -248,14 +242,6 @@ export default function SettingPage({route}) {
         ['timeFiltering.' + dt.name]: {},
       });
     } else {
-      // return if location filtering is on
-      if (locationToggleStatus) {
-        AlertBox(
-          'Error',
-          'Turn off location filtering before turning on time filtering',
-        );
-        return;
-      }
       // Show time setting for user
       setShowTimeSetting(true);
     }
@@ -339,13 +325,6 @@ export default function SettingPage({route}) {
         ['timeFiltering.' + dt.name]: {},
       });
     } else {
-      if (timeToggleStatus) {
-        AlertBox(
-          'Error',
-          'Turn off time filtering before turning on location filtering',
-        );
-        return;
-      }
       // Show location setting for user
       setShowLocationSetting(true);
     }
@@ -422,6 +401,34 @@ export default function SettingPage({route}) {
     });
   };
 
+  const handleFilterOptions = {
+    handleShowTimePicker1,
+    handleShowTimePicker2,
+    handleTimeToggleStatus,
+    handleTimePicker1Confirm,
+    handleTimePicker2Confirm,
+    applyTimeSetting,
+    handleLocationToggleStatus,
+    handleOnPanDrag,
+    handleRegionChange,
+    handleRadius,
+    applyLocationSetting,
+  };
+
+  const filterValues = {
+    timeToggleStatus,
+    showTimeSetting,
+    timePicker1,
+    timePicker2,
+    showTimePicker1,
+    showTimePicker2,
+    showLocationSetting,
+    locationToggleStatus,
+    pickedLocation,
+    pickedLocationDelta,
+    radius,
+    dragging,
+  };
   const handleTimeRangeOnChange = value => {
     setTimeRangeDisplay(value);
   };
@@ -593,208 +600,11 @@ export default function SettingPage({route}) {
           </View>
         </View>
         <Text style={styles.listTitle}>Contextual Filtering</Text>
-        <View style={styles.filterDetail}>
-          <View style={{marginHorizontal: 15, marginTop: 10}}>
-            <View style={styles.spacedRow}>
-              <Text style={styles.detailTitle}>Time</Text>
-              <Switch
-                style={{alignSelf: 'center'}}
-                trackColor={{true: colorSet.primary, false: '#3D3D3D'}}
-                thumbColor={'#F5F5F5'}
-                onValueChange={handleTimeToggleStatus}
-                value={timeToggleStatus}
-              />
-            </View>
-            {showTimeSetting ? (
-              <View style={{marginTop: 5}}>
-                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: '#000000',
-                      alignSelf: 'center',
-                    }}>
-                    Do not collect from
-                  </Text>
-                  <TouchableOpacity
-                    style={{marginHorizontal: 10, alignSelf: 'center'}}
-                    onPress={handleShowTimePicker1}>
-                    <View
-                      style={{
-                        backgroundColor: '#FAFAFA',
-                        height: 25,
-                        width: 50,
-                        justifyContent: 'center',
-                      }}>
-                      {timePicker1 ? (
-                        <Text style={{alignSelf: 'center', color: '#000000'}}>
-                          {timePicker1.getHours().toString().padStart(2, '0') +
-                            ':' +
-                            timePicker1
-                              .getMinutes()
-                              .toString()
-                              .padStart(2, '0')}
-                        </Text>
-                      ) : (
-                        <></>
-                      )}
-                    </View>
-                    <DateTimePickerModal
-                      isVisible={showTimePicker1}
-                      mode="time"
-                      onConfirm={handleTimePicker1Confirm}
-                      onCancel={handleShowTimePicker1}
-                    />
-                  </TouchableOpacity>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: '#000000',
-                      alignSelf: 'center',
-                    }}>
-                    to
-                  </Text>
-                  <TouchableOpacity
-                    style={{marginHorizontal: 10, alignSelf: 'center'}}
-                    onPress={handleShowTimePicker2}>
-                    <View
-                      style={{
-                        backgroundColor: '#FAFAFA',
-                        height: 25,
-                        width: 50,
-                        justifyContent: 'center',
-                      }}>
-                      {timePicker2 ? (
-                        <Text style={{alignSelf: 'center', color: '#000000'}}>
-                          {timePicker2.getHours().toString().padStart(2, '0') +
-                            ':' +
-                            timePicker2
-                              .getMinutes()
-                              .toString()
-                              .padStart(2, '0')}
-                        </Text>
-                      ) : (
-                        <></>
-                      )}
-                    </View>
-                    <DateTimePickerModal
-                      isVisible={showTimePicker2}
-                      mode="time"
-                      onConfirm={handleTimePicker2Confirm}
-                      onCancel={handleShowTimePicker2}
-                    />
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{marginTop: 5, marginBottom: 15, alignSelf: 'center'}}>
-                  <TouchableOpacity
-                    style={{
-                      paddingHorizontal: 20,
-                      paddingVertical: 8,
-                      borderRadius: 20,
-                      backgroundColor: '#128300',
-                    }}
-                    onPress={applyTimeSetting}>
-                    <Text style={{color: '#FFFFFF'}}>Apply</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : (
-              <></>
-            )}
-          </View>
-          <View style={{marginBottom: 15}}>
-            <View
-              style={{
-                marginHorizontal: 15,
-                marginTop: 10,
-                ...styles.spacedRow,
-              }}>
-              <Text style={styles.detailTitle}>Location</Text>
-              <Switch
-                style={{alignSelf: 'center'}}
-                trackColor={{true: colorSet.primary, false: '#3D3D3D'}}
-                thumbColor={'#F5F5F5'}
-                onValueChange={handleLocationToggleStatus}
-                value={locationToggleStatus}
-              />
-            </View>
-            {showLocationSetting ? (
-              <View style={{marginHorizontal: 15, marginTop: 5}}>
-                <MapView
-                  style={{height: 200, width: '100%'}}
-                  region={{
-                    latitude: pickedLocation.latitude,
-                    longitude: pickedLocation.longitude,
-                    latitudeDelta: pickedLocationDelta.latitudeDelta,
-                    longitudeDelta: pickedLocationDelta.longitudeDelta,
-                  }}
-                  onPanDrag={handleOnPanDrag}
-                  onRegionChangeComplete={handleRegionChange}
-                />
-                <FakeMarker dragging={dragging}></FakeMarker>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    marginTop: 5,
-                    justifyContent: 'space-around',
-                    alignItems: 'center',
-                  }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        color: '#000000',
-                        alignSelf: 'center',
-                      }}>
-                      Do not collect when I'm within
-                    </Text>
-                    <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-                      <View
-                        style={{
-                          backgroundColor: '#FAFAFA',
-                          height: 25,
-                          width: 50,
-                          justifyContent: 'center',
-                          marginRight: 10,
-                        }}>
-                        <TextInput
-                          style={{paddingVertical: 0, alignSelf: 'center'}}
-                          keyboardType="number-pad"
-                          onChangeText={value => handleRadius(value)}
-                          value={radius}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          color: '#000000',
-                          alignSelf: 'center',
-                        }}>
-                        m from this point
-                      </Text>
-                    </View>
-                  </View>
-                  <TouchableOpacity
-                    style={{
-                      paddingHorizontal: 20,
-                      paddingVertical: 8,
-                      borderRadius: 20,
-                      backgroundColor: '#128300',
-                    }}
-                    onPress={applyLocationSetting}>
-                    <Text style={{color: '#FFFFFF'}}>Apply</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ) : (
-              <></>
-            )}
-          </View>
-        </View>
-
-        <FilteringInfo isNew={true} />
-        <FilteringInfo isNew={false} />
+        <FilteringInfo
+          isNew={true}
+          filterValues={filterValues}
+          handleFilterOptions={handleFilterOptions}
+        />
       </KeyboardAvoidingView>
     </ScrollView>
   );
@@ -818,11 +628,4 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   detailTitle: {color: '#000000', fontSize: 15, alignSelf: 'center'},
-  listContent: {
-    borderColor: '#E8E8E8',
-    borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  spacedRow: {flexDirection: 'row', justifyContent: 'space-between'},
 });
