@@ -45,14 +45,11 @@ export default function SettingPage({route}) {
     route.params.status === 'time',
   );
   const [timePicker1, setTimePicker1] = useState();
-  const [showTimePicker1, setShowTimePicker1] = useState(false);
   const [timePicker2, setTimePicker2] = useState();
-  const [showTimePicker2, setShowTimePicker2] = useState(false);
   // location setting related
   const [showLocationSetting, setShowLocationSetting] = useState(
     route.params.status === 'location',
   );
-  const [dragging, setDragging] = useState(false);
   const [pickedLocation, setPickedLocation] = useState({
     latitude: 36.374228,
     longitude: 127.365861,
@@ -62,6 +59,7 @@ export default function SettingPage({route}) {
     longitudeDelta: 0.0122,
   });
   const [radius, setRadius] = useState();
+
   // data visualisation related
   const [timeRange, setTimeRange] = useState([0, 24 * 60 * 60 * 1000 - 1]);
   const [timeRangeDisplay, setTimeRangeDisplay] = useState([
@@ -95,6 +93,8 @@ export default function SettingPage({route}) {
 
   useEffect(() => {
     const fetchFilteringSetting = async () => {
+      //여기 해당하는 부분은 단일 filter에 대해서만 implemented 되어있음
+      //filters의 정보를 가져와서 mapping하는 구조로 변환하는 게 필요. 백엔드 차원에서 구현해야할 듯
       if (route.params.status === 'time') {
         const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
           method: 'POST',
@@ -103,12 +103,11 @@ export default function SettingPage({route}) {
         });
         const data = await res.json();
         console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
-        setTimePicker1(
-          new Date(data['timeFiltering'][route.params.dt.name]['startingTime']),
-        );
-        setTimePicker2(
-          new Date(data['timeFiltering'][route.params.dt.name]['endingTime']),
-        );
+
+        const {startingTime, endingTime} =
+          data['timeFiltering'][route.params.dt.name];
+        setTimePicker1(new Date(startingTime));
+        setTimePicker2(new Date(endingTime));
         // if (!data.result) AlertBox("Error", "Error in updating setting");
       } else if (route.params.status === 'location') {
         const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
@@ -118,17 +117,19 @@ export default function SettingPage({route}) {
         });
         const data = await res.json();
         console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
-        setRadius(data['locationFiltering'][route.params.dt.name]['radius']);
+
+        const {radius, latitude, longitude, latitudeDelta, longitudeDelta} =
+          data['locationFiltering'][route.params.dt.name];
+
+        setRadius(radius);
         setPickedLocation({
-          latitude: data['locationFiltering'][route.params.dt.name]['latitude'],
-          longitude:
-            data['locationFiltering'][route.params.dt.name]['longitude'],
+          latitude: latitude,
+          longitude: longitude,
         });
         setPickedLocationDelta({
-          latitudeDelta:
-            data['locationFiltering'][route.params.dt.name]['latitudeDelta'],
+          latitudeDelta: latitudeDelta === undefined ? 0.0122 : latitudeDelta,
           longitudeDelta:
-            data['locationFiltering'][route.params.dt.name]['longitudeDelta'],
+            longitudeDelta === undefined ? 0.0122 : longitudeDelta,
         });
       }
     };
@@ -232,203 +233,6 @@ export default function SettingPage({route}) {
     }
   };
 
-  const handleTimeToggleStatus = () => {
-    if (timeToggleStatus) {
-      setStatus('on');
-      setToggleStatus(true);
-      setShowTimeSetting(false);
-      updateToDB({
-        ['status.' + dt.name]: 'on',
-        ['timeFiltering.' + dt.name]: {},
-      });
-    } else {
-      // Show time setting for user
-      setShowTimeSetting(true);
-    }
-    setTimeToggleStatus(!timeToggleStatus);
-  };
-
-  const handleShowTimePicker1 = () => {
-    setShowTimePicker1(!showTimePicker1);
-  };
-
-  const handleTimePicker1Confirm = date => {
-    setTimePicker1(date);
-    handleShowTimePicker1();
-  };
-
-  const handleShowTimePicker2 = () => {
-    setShowTimePicker2(!showTimePicker2);
-  };
-
-  const handleTimePicker2Confirm = date => {
-    setTimePicker2(date);
-    handleShowTimePicker2();
-  };
-
-  const applyTimeSetting = () => {
-    // reject all impossible cases
-    if (!timePicker1 || !timePicker2) {
-      AlertBox('Error', 'Please enter both starting time and ending time');
-      setShowTimeSetting(false);
-      setTimeToggleStatus(false);
-      if (status === 'time') {
-        setStatus('on');
-        updateToDB({
-          ['status.' + dt.name]: 'on',
-          ['timeFiltering.' + dt.name]: {},
-        });
-        return;
-      }
-      updateToDB({
-        ['status.' + dt.name]: status,
-        ['timeFiltering.' + dt.name]: {},
-      });
-      return;
-    }
-    if (timePicker1 > timePicker2) {
-      AlertBox('Error', 'Starting time cannot be earlier than ending time');
-      setShowTimeSetting(false);
-      setTimeToggleStatus(false);
-      if (status === 'time') {
-        setStatus('on');
-        updateToDB({
-          ['status.' + dt.name]: 'on',
-          ['timeFiltering.' + dt.name]: {},
-        });
-        return;
-      }
-      updateToDB({
-        ['status.' + dt.name]: status,
-        ['timeFiltering.' + dt.name]: {},
-      });
-      return;
-    }
-    // set status as time filtering + update to PrivacyViz-Member DB
-    setStatus('time');
-    setToggleStatus(true);
-    updateToDB({
-      ['status.' + dt.name]: 'time',
-      ['timeFiltering.' + dt.name + '.startingTime']: timePicker1,
-      ['timeFiltering.' + dt.name + '.endingTime']: timePicker2,
-      ['timeFiltering.' + dt.name + '.applyTS']: Date.now(),
-    });
-  };
-
-  const handleLocationToggleStatus = () => {
-    if (locationToggleStatus) {
-      setStatus('on');
-      setToggleStatus(true);
-      setShowLocationSetting(false);
-      updateToDB({
-        ['status.' + dt.name]: 'on',
-        ['timeFiltering.' + dt.name]: {},
-      });
-    } else {
-      // Show location setting for user
-      setShowLocationSetting(true);
-    }
-    setLocationToggleStatus(!locationToggleStatus);
-  };
-
-  const handleOnPanDrag = () => {
-    setDragging(true);
-  };
-
-  const handleRegionChange = region => {
-    setDragging(false);
-    const {latitude, longitude, latitudeDelta, longitudeDelta} = region;
-    setPickedLocation({latitude, longitude});
-    setPickedLocationDelta({latitudeDelta, longitudeDelta});
-  };
-
-  const handleRadius = value => {
-    setRadius(value);
-  };
-
-  const applyLocationSetting = () => {
-    Keyboard.dismiss();
-    // reject all impossible cases
-    if (!radius || !pickedLocation || !pickedLocationDelta) {
-      AlertBox('Error', 'Please enter the distance');
-      setShowLocationSetting(false);
-      setLocationToggleStatus(false);
-      if (status === 'location') {
-        setStatus('on');
-        updateToDB({
-          ['status.' + dt.name]: 'on',
-          ['locationFiltering.' + dt.name]: {},
-        });
-        return;
-      }
-      updateToDB({
-        ['status.' + dt.name]: status,
-        ['locationFiltering.' + dt.name]: {},
-      });
-      return;
-    }
-    const parsed = parseInt(radius);
-    if (isNaN(parsed) || parsed < 0 || parsed > 500) {
-      AlertBox('Error', 'Please enter an integer between 0 and 500');
-      setShowLocationSetting(false);
-      setLocationToggleStatus(false);
-      if (status === 'location') {
-        setStatus('on');
-        updateToDB({
-          ['status.' + dt.name]: 'on',
-          ['locationFiltering.' + dt.name]: {},
-        });
-        return;
-      }
-      updateToDB({
-        ['status.' + dt.name]: status,
-        ['locationFiltering.' + dt.name]: {},
-      });
-      return;
-    }
-    setStatus('location');
-    setToggleStatus(true);
-    updateToDB({
-      ['status.' + dt.name]: 'location',
-      ['locationFiltering.' + dt.name + '.radius']: radius,
-      ['locationFiltering.' + dt.name + '.longitude']: pickedLocation.longitude,
-      ['locationFiltering.' + dt.name + '.latitude']: pickedLocation.latitude,
-      ['locationFiltering.' + dt.name + '.latitudeDelta']:
-        pickedLocationDelta.latitudeDelta,
-      ['locationFiltering.' + dt.name + '.longitudeDelta']:
-        pickedLocationDelta.longitudeDelta,
-      ['locationFiltering.' + dt.name + '.applyTS']: Date.now(),
-    });
-  };
-
-  const handleFilterOptions = {
-    handleShowTimePicker1,
-    handleShowTimePicker2,
-    handleTimeToggleStatus,
-    handleTimePicker1Confirm,
-    handleTimePicker2Confirm,
-    applyTimeSetting,
-    handleLocationToggleStatus,
-    handleOnPanDrag,
-    handleRegionChange,
-    handleRadius,
-    applyLocationSetting,
-  };
-
-  const filterValues = {
-    timeToggleStatus,
-    showTimeSetting,
-    timePicker1,
-    timePicker2,
-    showTimePicker1,
-    showTimePicker2,
-    showLocationSetting,
-    locationToggleStatus,
-    pickedLocation,
-    pickedLocationDelta,
-    radius,
-    dragging,
-  };
   const handleTimeRangeOnChange = value => {
     setTimeRangeDisplay(value);
   };
@@ -602,8 +406,10 @@ export default function SettingPage({route}) {
         <Text style={styles.listTitle}>Contextual Filtering</Text>
         <FilteringInfo
           isNew={true}
-          filterValues={filterValues}
-          handleFilterOptions={handleFilterOptions}
+          setToggleStatus={setToggleStatus}
+          updateToDB={updateToDB}
+          dt={dt}
+          filterStatus={route.params.status}
         />
       </KeyboardAvoidingView>
     </ScrollView>

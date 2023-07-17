@@ -15,19 +15,27 @@ import Collapsible from 'react-native-collapsible';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {colorSet} from '../constants/Colors';
+import useFilter from './useFilteringInfo';
 
-function FilteringInfo({isNew, handleFilterOptions, filterValues}) {
+function FilteringInfo({isNew, setToggleStatus, updateToDB, dt, filterStatus}) {
+  const {handleFilterOptions, filterValues} = useFilter(
+    setToggleStatus,
+    updateToDB,
+    dt,
+    filterStatus,
+  );
+
   const {
     handleShowTimePicker1,
     handleShowTimePicker2,
     handleTimeToggleStatus,
     handleTimePicker1Confirm,
     handleTimePicker2Confirm,
-    applyTimeSetting,
     handleLocationToggleStatus,
     handleOnPanDrag,
     handleRegionChange,
     handleRadius,
+    applyTimeSetting,
     applyLocationSetting,
   } = handleFilterOptions;
 
@@ -99,160 +107,122 @@ function FilteringInfo({isNew, handleFilterOptions, filterValues}) {
       </TouchableOpacity>
       <Collapsible collapsed={isCollapsed}>
         <View style={styles.filterDetail}>
-          <View style={{marginHorizontal: 15, marginTop: 10}}>
+          <View style={{marginBottom: 10}}>
             <View style={styles.spacedRow}>
-              <Text style={styles.detailTitle}>Time</Text>
+              <Text style={styles.filterTitle}>Time</Text>
               <Switch
-                style={{alignSelf: 'center'}}
-                trackColor={{true: colorSet.primary, false: '#3D3D3D'}}
+                trackColor={{true: colorSet.primary, false: colorSet.primary}}
                 thumbColor={'#F5F5F5'}
                 onValueChange={handleTimeToggleStatus}
                 value={timeToggleStatus}
               />
             </View>
             {showTimeSetting && (
-              <View style={{marginTop: 5}}>
-                <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: '#000000',
-                      alignSelf: 'center',
-                    }}>
-                    Do not collect from
-                  </Text>
-                  <TouchableOpacity
-                    style={{marginHorizontal: 10, alignSelf: 'center'}}
-                    onPress={handleShowTimePicker1}>
-                    <View
-                      style={{
-                        backgroundColor: '#FAFAFA',
-                        height: 25,
-                        width: 50,
-                        justifyContent: 'center',
-                      }}>
-                      {timePicker1 ? (
-                        <Text style={{alignSelf: 'center', color: '#000000'}}>
-                          {timePicker1.getHours().toString().padStart(2, '0') +
-                            ':' +
-                            timePicker1
-                              .getMinutes()
-                              .toString()
-                              .padStart(2, '0')}
-                        </Text>
-                      ) : (
-                        <></>
-                      )}
-                    </View>
-                    <DateTimePickerModal
-                      isVisible={showTimePicker1}
-                      mode="time"
-                      onConfirm={handleTimePicker1Confirm}
-                      onCancel={handleShowTimePicker1}
-                    />
-                  </TouchableOpacity>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: '#000000',
-                      alignSelf: 'center',
-                    }}>
-                    to
-                  </Text>
-                  <TouchableOpacity
-                    style={{marginHorizontal: 10, alignSelf: 'center'}}
-                    onPress={handleShowTimePicker2}>
-                    <View
-                      style={{
-                        backgroundColor: '#FAFAFA',
-                        height: 25,
-                        width: 50,
-                        justifyContent: 'center',
-                      }}>
-                      {timePicker2 ? (
-                        <Text style={{alignSelf: 'center', color: '#000000'}}>
-                          {timePicker2.getHours().toString().padStart(2, '0') +
-                            ':' +
-                            timePicker2
-                              .getMinutes()
-                              .toString()
-                              .padStart(2, '0')}
-                        </Text>
-                      ) : (
-                        <></>
-                      )}
-                    </View>
-                    <DateTimePickerModal
-                      isVisible={showTimePicker2}
-                      mode="time"
-                      onConfirm={handleTimePicker2Confirm}
-                      onCancel={handleShowTimePicker2}
-                    />
-                  </TouchableOpacity>
-                </View>
+              <View style={{...styles.spacedRow}}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: '#000000',
+                    alignSelf: 'center',
+                  }}>
+                  Do not collect from
+                </Text>
+                <TouchableOpacity
+                  style={{marginHorizontal: 10, alignSelf: 'center'}}
+                  onPress={handleShowTimePicker1}>
+                  <View style={styles.textInput}>
+                    {timePicker1 ? (
+                      <Text style={{alignSelf: 'center', color: '#000000'}}>
+                        {timePicker1.getHours().toString().padStart(2, '0') +
+                          ':' +
+                          timePicker1.getMinutes().toString().padStart(2, '0')}
+                      </Text>
+                    ) : (
+                      <></>
+                    )}
+                  </View>
+                  <DateTimePickerModal
+                    isVisible={showTimePicker1}
+                    mode="time"
+                    onConfirm={handleTimePicker1Confirm}
+                    onCancel={handleShowTimePicker1}
+                  />
+                </TouchableOpacity>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: '#000000',
+                    alignSelf: 'center',
+                  }}>
+                  to
+                </Text>
+                <TouchableOpacity
+                  style={{marginHorizontal: 10, alignSelf: 'center'}}
+                  onPress={handleShowTimePicker2}>
+                  <View style={styles.textInput}>
+                    {timePicker2 ? (
+                      <Text style={{alignSelf: 'center', color: '#000000'}}>
+                        {timePicker2.getHours().toString().padStart(2, '0') +
+                          ':' +
+                          timePicker2.getMinutes().toString().padStart(2, '0')}
+                      </Text>
+                    ) : (
+                      <></>
+                    )}
+                  </View>
+                  <DateTimePickerModal
+                    isVisible={showTimePicker2}
+                    mode="time"
+                    onConfirm={handleTimePicker2Confirm}
+                    onCancel={handleShowTimePicker2}
+                  />
+                </TouchableOpacity>
               </View>
             )}
           </View>
-          <View style={{marginBottom: 15}}>
-            <View
-              style={{
-                marginHorizontal: 15,
-                marginTop: 10,
-                ...styles.spacedRow,
-              }}>
-              <Text style={styles.detailTitle}>Location</Text>
+
+          <View style={{marginBottom: 10}}>
+            <View style={styles.spacedRow}>
+              <Text style={styles.filterTitle}>Location</Text>
               <Switch
-                style={{alignSelf: 'center'}}
-                trackColor={{true: colorSet.primary, false: '#3D3D3D'}}
+                trackColor={{true: colorSet.primary, false: colorSet.primary}}
                 thumbColor={'#F5F5F5'}
                 onValueChange={handleLocationToggleStatus}
                 value={locationToggleStatus}
               />
             </View>
             {showLocationSetting && (
-              <View style={{marginHorizontal: 15, marginTop: 5}}>
+              <>
                 <View
                   style={{
-                    flexDirection: 'row',
-                    marginTop: 5,
-                    justifyContent: 'space-around',
+                    ...styles.spacedRow,
+                    marginVertical: 10,
                     alignItems: 'center',
                   }}>
-                  <View>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        color: '#000000',
-                        alignSelf: 'center',
-                      }}>
-                      Do not collect when I'm within
-                    </Text>
-                    <View style={{flexDirection: 'row', alignSelf: 'center'}}>
-                      <View
-                        style={{
-                          backgroundColor: '#FAFAFA',
-                          height: 25,
-                          width: 50,
-                          justifyContent: 'center',
-                          marginRight: 10,
-                        }}>
-                        <TextInput
-                          style={{paddingVertical: 0, alignSelf: 'center'}}
-                          keyboardType="number-pad"
-                          onChangeText={value => handleRadius(value)}
-                          value={radius}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          fontSize: 15,
-                          color: '#000000',
-                          alignSelf: 'center',
-                        }}>
-                        m from this point
-                      </Text>
-                    </View>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: '#000000',
+                      alignSelf: 'center',
+                    }}>
+                    Do not collect within
+                  </Text>
+                  <View style={styles.textInput}>
+                    <TextInput
+                      style={{paddingVertical: 0, alignSelf: 'center'}}
+                      keyboardType="number-pad"
+                      onChangeText={value => handleRadius(value)}
+                      value={radius}
+                    />
                   </View>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: '#000000',
+                      alignSelf: 'center',
+                    }}>
+                    m of the pin
+                  </Text>
                 </View>
                 <MapView
                   style={{height: 200, width: '100%'}}
@@ -266,7 +236,7 @@ function FilteringInfo({isNew, handleFilterOptions, filterValues}) {
                   onRegionChangeComplete={handleRegionChange}
                 />
                 <FakeMarker dragging={dragging} />
-              </View>
+              </>
             )}
           </View>
 
@@ -290,6 +260,9 @@ function FilteringInfo({isNew, handleFilterOptions, filterValues}) {
 }
 
 const styles = StyleSheet.create({
+  filterDetail: {
+    padding: 10,
+  },
   filteringInfoWrapper: {
     borderRadius: 20,
     marginTop: 10,
@@ -317,7 +290,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  spacedRow: {flexDirection: 'row', justifyContent: 'space-between'},
+  spacedRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5,
+  },
   centeredRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -335,6 +312,18 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFFFFF',
     fontSize: 15,
+  },
+  textInput: {
+    height: 25,
+    width: 50,
+    borderColor: colorSet.secondary,
+    borderWidth: 2,
+    borderRadius: 8,
+    justifyContent: 'center',
+  },
+  filterTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
