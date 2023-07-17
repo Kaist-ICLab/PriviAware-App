@@ -30,6 +30,7 @@ import CountGraph from '../Component/CountGraph';
 import {globalStyles} from '../styles/global';
 import {colorSet} from '../constants/Colors';
 import {TouchableHighlight} from 'react-native-gesture-handler';
+import FilteringInfo from '../Component/FilteringInfo';
 
 export default function SettingPage({route}) {
   const {dt, email} = route.params;
@@ -472,7 +473,6 @@ export default function SettingPage({route}) {
           <View style={{flexDirection: 'row'}}>
             <Text
               style={{
-                alignSelf: 'flex-start',
                 flex: 3,
                 alignSelf: 'center',
                 fontSize: 15,
@@ -520,7 +520,6 @@ export default function SettingPage({route}) {
             <View style={{flexDirection: 'row'}}>
               <Text
                 style={{
-                  alignSelf: 'flex-start',
                   flex: 3,
                   alignSelf: 'center',
                   fontSize: 15,
@@ -793,28 +792,9 @@ export default function SettingPage({route}) {
             )}
           </View>
         </View>
-        <View
-          style={{
-            ...styles.filterListContents,
-            backgroundColor: colorSet.secondary,
-          }}>
-          <Text> Location</Text>
-          <TouchableHighlight onPress={() => {}}>
-            <View>
-              <MaterialCommunityIcons name="plus" size={20} />
-            </View>
-          </TouchableHighlight>
-        </View>
-        <TouchableOpacity>
-          <View
-            style={{
-              ...styles.filterListContents,
-              backgroundColor: colorSet.lightGray,
-            }}>
-            <Text> New Filter</Text>
-            <Button title="+" />
-          </View>
-        </TouchableOpacity>
+
+        <FilteringInfo isNew={true} />
+        <FilteringInfo isNew={false} />
       </KeyboardAvoidingView>
     </ScrollView>
   );
