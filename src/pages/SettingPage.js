@@ -250,8 +250,12 @@ export default function SettingPage({route}) {
   };
 
   return (
-    <ScrollView style={{...globalStyles.container, overflow: 'scroll'}}>
-      <KeyboardAvoidingView behavior="position">
+    <KeyboardAvoidingView
+      behavior="height"
+      enabled
+      keyboardVerticalOffset={10}
+      style={{flex: 1, flexDirection: 'column', ...globalStyles.container}}>
+      <ScrollView>
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <View style={{flexDirection: 'row'}}>
             <TouchableOpacity
@@ -411,8 +415,8 @@ export default function SettingPage({route}) {
           dt={dt}
           filterStatus={route.params.status}
         />
-      </KeyboardAvoidingView>
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
