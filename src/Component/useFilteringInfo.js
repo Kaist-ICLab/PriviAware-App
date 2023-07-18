@@ -1,37 +1,57 @@
 import React, {useState} from 'react';
 import {Keyboard, Alert} from 'react-native';
 
-const useFilter = (setToggleStatus, updateToDB, dt, filterStatus) => {
-  const [status, setStatus] = useState(filterStatus);
+const INITIAL_COORDINATE = {
+  latitude: 36.374228,
+  longitude: 127.365861,
+};
 
-  const [timeToggleStatus, setTimeToggleStatus] = useState(
-    filterStatus === 'time',
-  );
-  const [locationToggleStatus, setLocationToggleStatus] = useState(
-    filterStatus === 'location',
-  );
+const INITIAL_COORDINATE_DELTA = {
+  latitudeDelta: 0.0122,
+  longitudeDelta: 0.0122,
+};
+
+const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
+  const [status, setStatus] = useState(filterStatus);
+  let [isLocationOn, isTimeOn] =
+    filter !== undefined
+      ? [
+          filter.locationFiltering !== undefined,
+          filter.timeFiltering !== undefined,
+        ]
+      : [false, false];
+
+  const [timeToggleStatus, setTimeToggleStatus] = useState(isTimeOn);
+  const [locationToggleStatus, setLocationToggleStatus] =
+    useState(isLocationOn);
+
   // time setting related
-  const [showTimeSetting, setShowTimeSetting] = useState(
-    filterStatus === 'time',
-  );
-  const [timePicker1, setTimePicker1] = useState();
+  const [showTimeSetting, setShowTimeSetting] = useState(isTimeOn);
+  const {startingTime, endingTime} = isTimeOn ? filter.timeFiltering : {};
+  const {
+    radius: rad,
+    latitude,
+    longitude,
+    latitudeDelta,
+    longitudeDelta,
+  } = isLocationOn ? filter.locationFiltering : {};
+
+  const [timePicker1, setTimePicker1] = useState(new Date(startingTime));
+  const [timePicker2, setTimePicker2] = useState(new Date(endingTime));
+
   const [showTimePicker1, setShowTimePicker1] = useState(false);
-  const [timePicker2, setTimePicker2] = useState();
   const [showTimePicker2, setShowTimePicker2] = useState(false);
+
   // location setting related
-  const [showLocationSetting, setShowLocationSetting] = useState(
-    filterStatus === 'location',
-  );
+  const [showLocationSetting, setShowLocationSetting] = useState(isLocationOn);
   const [dragging, setDragging] = useState(false);
-  const [pickedLocation, setPickedLocation] = useState({
-    latitude: 36.374228,
-    longitude: 127.365861,
-  });
-  const [pickedLocationDelta, setPickedLocationDelta] = useState({
-    latitudeDelta: 0.0122,
-    longitudeDelta: 0.0122,
-  });
-  const [radius, setRadius] = useState();
+  const [pickedLocation, setPickedLocation] = useState(
+    isLocationOn ? {latitude, longitude} : INITIAL_COORDINATE,
+  );
+  const [pickedLocationDelta, setPickedLocationDelta] = useState(
+    isLocationOn ? {latitudeDelta, longitudeDelta} : INITIAL_COORDINATE_DELTA,
+  );
+  const [radius, setRadius] = useState(rad);
 
   const AlertBox = (title, msg) => {
     Alert.alert(title, msg, [

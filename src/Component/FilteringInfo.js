@@ -17,12 +17,24 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {colorSet} from '../constants/Colors';
 import useFilter from './useFilteringInfo';
 
-function FilteringInfo({isNew, setToggleStatus, updateToDB, dt, filterStatus}) {
+const SAVE_TEXT = 'Save';
+const DELETE_TEXT = 'Delete';
+const ADD_TEXT = 'Add';
+
+function FilteringInfo({
+  isNew,
+  filter,
+  setToggleStatus,
+  updateToDB,
+  dt,
+  filterStatus,
+}) {
   const {handleFilterOptions, filterValues} = useFilter(
     setToggleStatus,
     updateToDB,
     dt,
     filterStatus,
+    filter,
   );
 
   const {
@@ -78,6 +90,16 @@ function FilteringInfo({isNew, setToggleStatus, updateToDB, dt, filterStatus}) {
     ],
   };
 
+  const keys = Object.keys(filter ?? {});
+  const blockName = [];
+
+  if (keys.includes('locationFiltering')) {
+    blockName.push('Location');
+  }
+  if (keys.includes('timeFiltering')) {
+    blockName.push('Time');
+  }
+
   return (
     <View
       style={{
@@ -90,7 +112,9 @@ function FilteringInfo({isNew, setToggleStatus, updateToDB, dt, filterStatus}) {
           handleAnimation();
           setIsCollapsed(() => !isCollapsed);
         }}>
-        <Text> New Filter </Text>
+        <Text>
+          {blockName.length === 0 ? 'New Filter' : blockName.join(' + ')}
+        </Text>
         {isNew ? (
           <View style={styles.dotButton}>
             <MaterialCommunityIcons name="plus" color="#ffffff" size={20} />
@@ -131,14 +155,12 @@ function FilteringInfo({isNew, setToggleStatus, updateToDB, dt, filterStatus}) {
                   style={{marginHorizontal: 10, alignSelf: 'center'}}
                   onPress={handleShowTimePicker1}>
                   <View style={styles.textInput}>
-                    {timePicker1 ? (
+                    {!isNaN(timePicker1) && (
                       <Text style={{alignSelf: 'center', color: '#000000'}}>
                         {timePicker1.getHours().toString().padStart(2, '0') +
                           ':' +
                           timePicker1.getMinutes().toString().padStart(2, '0')}
                       </Text>
-                    ) : (
-                      <></>
                     )}
                   </View>
                   <DateTimePickerModal
@@ -160,14 +182,12 @@ function FilteringInfo({isNew, setToggleStatus, updateToDB, dt, filterStatus}) {
                   style={{marginHorizontal: 10, alignSelf: 'center'}}
                   onPress={handleShowTimePicker2}>
                   <View style={styles.textInput}>
-                    {timePicker2 ? (
+                    {!isNaN(timePicker2) && (
                       <Text style={{alignSelf: 'center', color: '#000000'}}>
                         {timePicker2.getHours().toString().padStart(2, '0') +
                           ':' +
                           timePicker2.getMinutes().toString().padStart(2, '0')}
                       </Text>
-                    ) : (
-                      <></>
                     )}
                   </View>
                   <DateTimePickerModal
@@ -212,6 +232,7 @@ function FilteringInfo({isNew, setToggleStatus, updateToDB, dt, filterStatus}) {
                       style={{paddingVertical: 0, alignSelf: 'center'}}
                       keyboardType="number-pad"
                       onChangeText={value => handleRadius(value)}
+                      defaultValue={`${radius ?? 0}`}
                       value={radius}
                     />
                   </View>
@@ -244,13 +265,15 @@ function FilteringInfo({isNew, setToggleStatus, updateToDB, dt, filterStatus}) {
             <TouchableOpacity
               style={{...styles.button, backgroundColor: colorSet.primary}}
               onPress={() => {}}>
-              <Text style={styles.buttonText}>Add</Text>
+              <Text style={styles.buttonText}>
+                {isNew ? ADD_TEXT : SAVE_TEXT}
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{...styles.button, backgroundColor: colorSet.gray}}
               onPress={() => {}}>
-              <Text style={styles.buttonText}>Delete</Text>
+              <Text style={styles.buttonText}>{DELETE_TEXT}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -316,7 +339,8 @@ const styles = StyleSheet.create({
   textInput: {
     height: 25,
     width: 50,
-    borderColor: colorSet.secondary,
+    opacity: 0.5,
+    borderColor: colorSet.gray,
     borderWidth: 2,
     borderRadius: 8,
     justifyContent: 'center',

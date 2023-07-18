@@ -25,6 +25,7 @@ import CountGraph from '../Component/CountGraph';
 import {globalStyles} from '../styles/global';
 import {colorSet} from '../constants/Colors';
 import FilteringInfo from '../Component/FilteringInfo';
+import filterList from '../mocks/filterInfo';
 
 export default function SettingPage({route}) {
   const {dt, email} = route.params;
@@ -34,31 +35,8 @@ export default function SettingPage({route}) {
   const [toggleStatus, setToggleStatus] = useState(
     route.params.status !== 'off',
   );
-  const [timeToggleStatus, setTimeToggleStatus] = useState(
-    route.params.status === 'time',
-  );
-  const [locationToggleStatus, setLocationToggleStatus] = useState(
-    route.params.status === 'location',
-  );
-  // time setting related
-  const [showTimeSetting, setShowTimeSetting] = useState(
-    route.params.status === 'time',
-  );
-  const [timePicker1, setTimePicker1] = useState();
-  const [timePicker2, setTimePicker2] = useState();
-  // location setting related
-  const [showLocationSetting, setShowLocationSetting] = useState(
-    route.params.status === 'location',
-  );
-  const [pickedLocation, setPickedLocation] = useState({
-    latitude: 36.374228,
-    longitude: 127.365861,
-  });
-  const [pickedLocationDelta, setPickedLocationDelta] = useState({
-    latitudeDelta: 0.0122,
-    longitudeDelta: 0.0122,
-  });
-  const [radius, setRadius] = useState();
+
+  const [filterInfo, setFilterInfo] = useState(filterList);
 
   // data visualisation related
   const [timeRange, setTimeRange] = useState([0, 24 * 60 * 60 * 1000 - 1]);
@@ -106,8 +84,6 @@ export default function SettingPage({route}) {
 
         const {startingTime, endingTime} =
           data['timeFiltering'][route.params.dt.name];
-        setTimePicker1(new Date(startingTime));
-        setTimePicker2(new Date(endingTime));
         // if (!data.result) AlertBox("Error", "Error in updating setting");
       } else if (route.params.status === 'location') {
         const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
@@ -120,17 +96,6 @@ export default function SettingPage({route}) {
 
         const {radius, latitude, longitude, latitudeDelta, longitudeDelta} =
           data['locationFiltering'][route.params.dt.name];
-
-        setRadius(radius);
-        setPickedLocation({
-          latitude: latitude,
-          longitude: longitude,
-        });
-        setPickedLocationDelta({
-          latitudeDelta: latitudeDelta === undefined ? 0.0122 : latitudeDelta,
-          longitudeDelta:
-            longitudeDelta === undefined ? 0.0122 : longitudeDelta,
-        });
       }
     };
     fetchFilteringSetting();
@@ -211,8 +176,6 @@ export default function SettingPage({route}) {
     if (status === 'off') {
       setStatus('on');
       setToggleStatus(true);
-      setLocationToggleStatus(false);
-      setTimeToggleStatus(false);
       updateToDB({
         ['status.' + dt.name]: 'on',
         ['timeFiltering.' + dt.name]: {},
@@ -221,10 +184,6 @@ export default function SettingPage({route}) {
     } else {
       setStatus('off');
       setToggleStatus(false);
-      setLocationToggleStatus(false);
-      setTimeToggleStatus(false);
-      setShowTimeSetting(false);
-      setShowLocationSetting(false);
       updateToDB({
         ['status.' + dt.name]: 'off',
         ['timeFiltering.' + dt.name]: {},
@@ -408,6 +367,19 @@ export default function SettingPage({route}) {
           </View>
         </View>
         <Text style={styles.listTitle}>Contextual Filtering</Text>
+
+        {filterInfo.map((filter, i) => (
+          <FilteringInfo
+            key={i}
+            isNew={false}
+            filter={filter}
+            setToggleStatus={setToggleStatus}
+            updateToDB={updateToDB}
+            dt={dt}
+            filterStatus={route.params.status}
+          />
+        ))}
+
         <FilteringInfo
           isNew={true}
           setToggleStatus={setToggleStatus}
