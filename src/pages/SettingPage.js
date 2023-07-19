@@ -26,6 +26,7 @@ import {colorSet} from '../constants/Colors';
 import FilteringInfo from '../Component/FilteringInfo';
 import filterList from '../mocks/filterInfo';
 import {timestampToHoursConverter, dateToString} from '../utils';
+import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 
 // TODO: datepicker 까지 만들어놓고 전달드리기
 
@@ -239,22 +240,20 @@ export default function SettingPage({route}) {
           <View style={styles.spacedRow}>
             <Text style={{...styles.propertyTitle, flex: 3}}>Date</Text>
             <View style={styles.datePickerInput}>
-              <DateTimePickerModal
-                isVisible={isDatePickerVisible}
+              <CustomDateTimepickerModal
                 mode="date"
-                date={date}
-                onConfirm={handleConfirm}
-                onCancel={hideDatePicker}
+                data={date}
+                handleData={handleDate}
+                textFormatter={dateToString}
               />
-              <TouchableOpacity onPress={showDatePicker}>
-                <Text>{dateToString(date)}</Text>
-              </TouchableOpacity>
             </View>
           </View>
 
           <View style={styles.spacedRow}>
             <Text style={{...styles.propertyTitle, flex: 3}}>Hour</Text>
-            <View style={styles.datePickerInput}></View>
+            <View style={styles.timePickerInput}></View>
+            <Text style={{...styles.propertyTitle, flex: 3}}>to</Text>
+            <View style={styles.timePickerInput}></View>
           </View>
 
           <View style={{marginVertical: 5}}>
@@ -413,5 +412,15 @@ const styles = StyleSheet.create({
     backgroundColor: colorSet.lightGray,
     justifyContent: 'center',
     flex: 7,
+  },
+  timePickerInput: {
+    height: 30,
+    width: '50%',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: colorSet.secondary,
+    backgroundColor: colorSet.lightGray,
+    justifyContent: 'center',
+    flex: 5,
   },
 });
