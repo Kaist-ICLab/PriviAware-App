@@ -6,15 +6,14 @@ import {
   Alert,
   Switch,
   KeyboardAvoidingView,
-  Keyboard,
   ScrollView,
   StyleSheet,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-
 import {Slider} from '@miblanchard/react-native-slider';
 import {Picker} from '@react-native-picker/picker';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
@@ -26,6 +25,9 @@ import {globalStyles} from '../styles/global';
 import {colorSet} from '../constants/Colors';
 import FilteringInfo from '../Component/FilteringInfo';
 import filterList from '../mocks/filterInfo';
+import {timestampToHoursConverter, dateToString} from '../utils';
+
+// TODO: datepicker 까지 만들어놓고 전달드리기
 
 export default function SettingPage({route}) {
   const {dt, email} = route.params;
@@ -36,6 +38,22 @@ export default function SettingPage({route}) {
     route.params.status !== 'off',
   );
 
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = date => {
+    handleDate(date);
+    hideDatePicker();
+  };
+
+  // TODO: load filter List data from server, here is a mock data
   const [filterInfo, setFilterInfo] = useState(filterList);
 
   // data visualisation related
@@ -44,7 +62,8 @@ export default function SettingPage({route}) {
     0,
     24 * 60 * 60 * 1000 - 1,
   ]);
-  const [date, setDate] = useState();
+  const [date, setDate] = useState(new Date());
+
   const [allDate, setAllDate] = useState([]);
   const [dataField, setDataField] = useState(route.params.dt.field[0]);
   const [zeroFlag, setZeroFlag] = useState(false);
@@ -60,43 +79,16 @@ export default function SettingPage({route}) {
     ]);
   };
 
-  const timestampToHoursConverter = ts => {
-    const date = new Date(ts);
-    return (
-      String(date.getUTCHours()).padStart(2, '0') +
-      ':' +
-      String(date.getUTCMinutes()).padStart(2, '0')
-    );
-  };
-
   useEffect(() => {
     const fetchFilteringSetting = async () => {
-      //여기 해당하는 부분은 단일 filter에 대해서만 implemented 되어있음
-      //filters의 정보를 가져와서 mapping하는 구조로 변환하는 게 필요. 백엔드 차원에서 구현해야할 듯
-      if (route.params.status === 'time') {
-        const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({email: route.params.email}),
-        });
-        const data = await res.json();
-        console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
-
-        const {startingTime, endingTime} =
-          data['timeFiltering'][route.params.dt.name];
-        // if (!data.result) AlertBox("Error", "Error in updating setting");
-      } else if (route.params.status === 'location') {
-        const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({email: route.params.email}),
-        });
-        const data = await res.json();
-        console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
-
-        const {radius, latitude, longitude, latitudeDelta, longitudeDelta} =
-          data['locationFiltering'][route.params.dt.name];
-      }
+      // TODO fetch filter data as list format from server
+      const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email: route.params.email}),
+      });
+      const data = await res.json();
+      console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
     };
     fetchFilteringSetting();
   }, [route.params.status, route.params.email, route.params.dt]);
@@ -244,35 +236,27 @@ export default function SettingPage({route}) {
           </View>
         </View>
         <View style={{marginHorizontal: 15, marginTop: 10}}>
-          <View style={{flexDirection: 'row'}}>
-            <Text
-              style={{
-                flex: 3,
-                alignSelf: 'center',
-                fontSize: 15,
-                color: '#000000',
-              }}>
-              Date
-            </Text>
-            <View
-              style={{
-                height: 30,
-                width: '80%',
-                borderWidth: 1,
-                borderRadius: 10,
-                justifyContent: 'center',
-                flex: 7,
-              }}>
-              <Picker
-                style={{width: '100%'}}
-                selectedValue={date}
-                onValueChange={value => handleDate(value)}>
-                {allDate.map(d => (
-                  <Picker.Item key={d.value} label={d.label} value={d.value} />
-                ))}
-              </Picker>
+          <View style={styles.spacedRow}>
+            <Text style={{...styles.propertyTitle, flex: 3}}>Date</Text>
+            <View style={styles.datePickerInput}>
+              <DateTimePickerModal
+                isVisible={isDatePickerVisible}
+                mode="date"
+                date={date}
+                onConfirm={handleConfirm}
+                onCancel={hideDatePicker}
+              />
+              <TouchableOpacity onPress={showDatePicker}>
+                <Text>{dateToString(date)}</Text>
+              </TouchableOpacity>
             </View>
           </View>
+
+          <View style={styles.spacedRow}>
+            <Text style={{...styles.propertyTitle, flex: 3}}>Hour</Text>
+            <View style={styles.datePickerInput}></View>
+          </View>
+
           <View style={{marginVertical: 5}}>
             <Text style={{color: '#000000', alignSelf: 'center'}}>
               Selecting time from{' '}
@@ -410,4 +394,24 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   detailTitle: {color: '#000000', fontSize: 15, alignSelf: 'center'},
+  spacedRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  propertyTitle: {
+    alignSelf: 'center',
+    fontSize: 15,
+    color: '#000000',
+  },
+  datePickerInput: {
+    height: 30,
+    width: '80%',
+    borderWidth: 1,
+    borderRadius: 10,
+    borderColor: colorSet.secondary,
+    backgroundColor: colorSet.lightGray,
+    justifyContent: 'center',
+    flex: 7,
+  },
 });
