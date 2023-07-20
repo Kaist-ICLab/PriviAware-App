@@ -13,7 +13,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
 import {Slider} from '@miblanchard/react-native-slider';
 import {Picker} from '@react-native-picker/picker';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
@@ -27,6 +26,8 @@ import FilteringInfo from '../Component/FilteringInfo';
 import filterList from '../mocks/filterInfo';
 import {timestampToHoursConverter, dateToString} from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
+import {appUsageData, batteryData, locationData} from '../mocks/graphdata';
+import dayjs from 'dayjs';
 
 // TODO: datepicker 까지 만들어놓고 전달드리기
 
@@ -39,21 +40,6 @@ export default function SettingPage({route}) {
     route.params.status !== 'off',
   );
 
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
-
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
-
-  const handleConfirm = date => {
-    handleDate(date);
-    hideDatePicker();
-  };
-
   // TODO: load filter List data from server, here is a mock data
   const [filterInfo, setFilterInfo] = useState(filterList);
 
@@ -63,7 +49,11 @@ export default function SettingPage({route}) {
     0,
     24 * 60 * 60 * 1000 - 1,
   ]);
-  const [date, setDate] = useState(new Date());
+
+  const today = new Date();
+  console.log('start: ', dayjs(today).startOf('day'));
+
+  const [date, setDate] = useState(today);
 
   const [allDate, setAllDate] = useState([]);
   const [dataField, setDataField] = useState(route.params.dt.field[0]);
@@ -307,6 +297,30 @@ export default function SettingPage({route}) {
             <></>
           )}
           <View style={{height: 240}}>
+            {/* <NumericGraph
+              data={batteryData}
+              dataField={dataField}
+              timeRange={timeRange}
+              date={date}
+              zeroFlag={zeroFlag}
+            /> */}
+
+            {/* <LocationGraph
+              data={locationData}
+              timeRange={timeRange}
+              date={date}
+              zeroFlag={zeroFlag}
+            /> */}
+
+            <CategoricalGraph
+              data={appUsageData}
+              dataField={dataField}
+              dataType={route.params.dt.name}
+              timeRange={timeRange}
+              date={date}
+              zeroFlag={zeroFlag}
+            />
+
             {status === 'off' ? (
               <View style={{justifyContent: 'center', flex: 1}}>
                 <Text
@@ -362,7 +376,6 @@ export default function SettingPage({route}) {
             filterStatus={route.params.status}
           />
         ))}
-
         <FilteringInfo
           isNew={true}
           setToggleStatus={setToggleStatus}

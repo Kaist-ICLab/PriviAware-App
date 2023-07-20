@@ -12,7 +12,7 @@ if __name__ == "__main__":
     db = client.abc
     collection = db.datum #users
 
-datatype = "CALL LOG"
+datatype = "APP_USAGE_EVENT"
 
 hour=60*60*1000
 day=60*60*1000*24
@@ -24,13 +24,15 @@ query = {
             "datumType": datatype
         },  
         {"timestamp": {"$gt": 1680274832000}}, 
-        {"timestamp": {"$lt": 1683699427000}}
+        {"timestamp": {"$lt": 1689799821000}}
             ]
         }
 
 all_data = collection.find_one(query)
-print('extracted', datatype)
-print(all_data)
+res = list(collection.find(query))
+
+print('all data', res[:100])
+
 # df = pd.json_normalize(all_data)
 # print('normalized')
 # df.to_csv('test.csv')
