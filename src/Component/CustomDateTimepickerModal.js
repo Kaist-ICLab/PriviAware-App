@@ -5,6 +5,8 @@ import {TouchableOpacity, Text} from 'react-native';
 function CustomDateTimepickerModal({mode, data, handleData, textFormatter}) {
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
+  console.log('data,', data);
+
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };

@@ -24,14 +24,21 @@ import {globalStyles} from '../styles/global';
 import {colorSet} from '../constants/Colors';
 import FilteringInfo from '../Component/FilteringInfo';
 import filterList from '../mocks/filterInfo';
-import {timestampToHoursConverter, dateToString} from '../utils';
+import {
+  timestampToHoursConverter,
+  dateToString,
+  dateToTimeString,
+} from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 import {appUsageData, batteryData, locationData} from '../mocks/graphdata';
 import dayjs from 'dayjs';
 
-// TODO: datepicker 까지 만들어놓고 전달드리기
-
 export default function SettingPage({route}) {
+  const today = new Date();
+
+  const startToday = dayjs(today).startOf('day');
+  const endToday = dayjs(today).endOf('day');
+
   const {dt, email} = route.params;
   const navigation = useNavigation();
   const [status, setStatus] = useState(route.params.status);
@@ -43,15 +50,13 @@ export default function SettingPage({route}) {
   // TODO: load filter List data from server, here is a mock data
   const [filterInfo, setFilterInfo] = useState(filterList);
 
+  // TODO : unify the data format, Data object or timestamp?
   // data visualisation related
   const [timeRange, setTimeRange] = useState([0, 24 * 60 * 60 * 1000 - 1]);
   const [timeRangeDisplay, setTimeRangeDisplay] = useState([
-    0,
-    24 * 60 * 60 * 1000 - 1,
+    new Date(startToday),
+    new Date(endToday),
   ]);
-
-  const today = new Date();
-  console.log('start: ', dayjs(today).startOf('day'));
 
   const [date, setDate] = useState(today);
 
@@ -187,6 +192,14 @@ export default function SettingPage({route}) {
     setDate(value);
   };
 
+  const handleTimeRange = (value, index) => {
+    if (index === 0) {
+      setTimeRangeDisplay(prev => [value, prev[1]]);
+    } else {
+      setTimeRangeDisplay(prev => [prev[0], value]);
+    }
+  };
+
   const back = () => {
     navigation.navigate('Overview', {email: email});
   };
@@ -241,9 +254,23 @@ export default function SettingPage({route}) {
 
           <View style={styles.spacedRow}>
             <Text style={{...styles.propertyTitle, flex: 3}}>Hour</Text>
-            <View style={styles.timePickerInput}></View>
+            <View style={styles.timePickerInput}>
+              <CustomDateTimepickerModal
+                mode="time"
+                data={timeRangeDisplay[0]}
+                handleData={v => handleTimeRange(v, 0)}
+                textFormatter={dateToTimeString}
+              />
+            </View>
             <Text style={{...styles.propertyTitle, flex: 3}}>to</Text>
-            <View style={styles.timePickerInput}></View>
+            <View style={styles.timePickerInput}>
+              <CustomDateTimepickerModal
+                mode="time"
+                data={timeRangeDisplay[1]}
+                handleData={v => handleTimeRange(v, 1)}
+                textFormatter={dateToTimeString}
+              />
+            </View>
           </View>
 
           <View style={{marginVertical: 5}}>
@@ -312,14 +339,14 @@ export default function SettingPage({route}) {
               zeroFlag={zeroFlag}
             /> */}
 
-            <CategoricalGraph
+            {/* <CategoricalGraph
               data={appUsageData}
               dataField={dataField}
               dataType={route.params.dt.name}
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
-            />
+            /> */}
 
             {status === 'off' ? (
               <View style={{justifyContent: 'center', flex: 1}}>
