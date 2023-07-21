@@ -56,10 +56,15 @@ const convertLocalToUTCDate = date => {
   return date;
 };
 
+const dateToTimestamp = date => {
+  return date.getTime();
+};
+
 export {
   timestampToHoursConverter,
   dateToString,
   dateToTimeString,
   convertUTCToLocalDate,
   convertLocalToUTCDate,
+  dateToTimestamp,
 };

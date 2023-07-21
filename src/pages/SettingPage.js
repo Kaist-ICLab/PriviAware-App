@@ -30,6 +30,7 @@ import {
   dateToTimeString,
   convertUTCToLocalDate,
   convertLocalToUTCDate,
+  dateToTimestamp,
 } from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 import {appUsageData, batteryData, locationData} from '../mocks/graphdata';
@@ -55,10 +56,8 @@ export default function SettingPage({route}) {
   // TODO: load filter List data from server, here is a mock data
   const [filterInfo, setFilterInfo] = useState(filterList);
 
-  // TODO : unify the data format, Data object or timestamp?
   // data visualisation related
-  const [timeRange, setTimeRange] = useState([0, 24 * 60 * 60 * 1000 - 1]);
-  const [timeRangeDisplay, setTimeRangeDisplay] = useState([
+  const [timeRange, setTimeRange] = useState([
     new Date(startToday),
     new Date(endToday),
   ]);
@@ -128,6 +127,11 @@ export default function SettingPage({route}) {
           'timeRange[1]:',
           timeRange[1],
         );
+        const timeRangeasTimestamp = [
+          dateToTimestamp(timeRange[0]),
+          dateToTimestamp(timeRange[1]),
+        ];
+
         const res = await fetch(SERVER_IP_ADDR + '/data', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
@@ -135,7 +139,7 @@ export default function SettingPage({route}) {
             email: route.params.email,
             dataType: route.params.dt.name,
             date: date,
-            timeRange: timeRange,
+            timeRange: timeRangeasTimestamp,
           }),
         });
         const data = await res.json();
@@ -185,24 +189,17 @@ export default function SettingPage({route}) {
     }
   };
 
-  const handleTimeRangeOnChange = value => {
-    setTimeRangeDisplay(value);
-  };
-
-  const handleTimeRangeSubmitChange = value => {
-    setTimeRange(value);
-  };
-
   const handleDate = value => {
     setDate(value);
   };
 
   const handleTimeRange = (value, index) => {
+    // the value got from the picker is local time, need to convert to UTC time
     const convertedDate = convertLocalToUTCDate(value);
     if (index === 0) {
-      setTimeRangeDisplay(prev => [convertedDate, prev[1]]);
+      setTimeRange(prev => [convertedDate, prev[1]]);
     } else {
-      setTimeRangeDisplay(prev => [prev[0], convertedDate]);
+      setTimeRange(prev => [prev[0], convertedDate]);
     }
   };
 
@@ -254,6 +251,7 @@ export default function SettingPage({route}) {
                 data={date}
                 handleData={handleDate}
                 textFormatter={dateToString}
+                textStyle={styles.dateTimePickerText}
               />
             </View>
           </View>
@@ -263,39 +261,25 @@ export default function SettingPage({route}) {
             <View style={styles.timePickerInput}>
               <CustomDateTimepickerModal
                 mode="time"
-                data={convertUTCToLocalDate(timeRangeDisplay[0])}
+                // timeRange is UTC time but datetimepicker is using local time. So we need to convert UTC to local time
+                data={convertUTCToLocalDate(timeRange[0])}
                 handleData={v => handleTimeRange(v, 0)}
                 textFormatter={dateToTimeString}
+                textStyle={styles.dateTimePickerText}
               />
             </View>
             <Text style={{...styles.propertyTitle, flex: 3}}>to</Text>
             <View style={styles.timePickerInput}>
               <CustomDateTimepickerModal
                 mode="time"
-                data={convertUTCToLocalDate(timeRangeDisplay[1])}
+                data={convertUTCToLocalDate(timeRange[1])}
                 handleData={v => handleTimeRange(v, 1)}
                 textFormatter={dateToTimeString}
+                textStyle={styles.dateTimePickerText}
               />
             </View>
           </View>
 
-          <View style={{marginVertical: 5}}>
-            <Text style={{color: '#000000', alignSelf: 'center'}}>
-              Selecting time from{' '}
-              {timestampToHoursConverter(timeRangeDisplay[0])} to{' '}
-              {timestampToHoursConverter(timeRangeDisplay[1])}
-            </Text>
-            <Slider
-              minimumValue={0}
-              maximumValue={24 * 60 * 60 * 1000 - 1}
-              step={dataField.type === 'cat' ? 60 * 60 * 1000 : 60 * 1000}
-              thumbTintColor={'#797B02'}
-              minimumTrackTintColor={'#797B02'}
-              value={timeRangeDisplay}
-              onValueChange={value => handleTimeRangeOnChange(value)}
-              onSlidingComplete={value => handleTimeRangeSubmitChange(value)}
-            />
-          </View>
           {route.params.dt.field.length > 1 ? (
             <View style={{flexDirection: 'row'}}>
               <Text
@@ -467,6 +451,11 @@ const styles = StyleSheet.create({
     borderColor: colorSet.secondary,
     backgroundColor: colorSet.lightGray,
     justifyContent: 'center',
+
     flex: 5,
+  },
+  dateTimePickerText: {
+    color: colorSet.gray,
+    textAlign: 'center',
   },
 });
