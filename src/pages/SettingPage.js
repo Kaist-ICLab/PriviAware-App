@@ -28,16 +28,21 @@ import {
   timestampToHoursConverter,
   dateToString,
   dateToTimeString,
+  convertUTCToLocalDate,
+  convertLocalToUTCDate,
 } from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 import {appUsageData, batteryData, locationData} from '../mocks/graphdata';
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 export default function SettingPage({route}) {
   const today = new Date();
 
-  const startToday = dayjs(today).startOf('day');
-  const endToday = dayjs(today).endOf('day');
+  const startToday = dayjs(today).utc().startOf('day');
+  const endToday = dayjs(today).utc().endOf('day');
 
   const {dt, email} = route.params;
   const navigation = useNavigation();
@@ -193,10 +198,11 @@ export default function SettingPage({route}) {
   };
 
   const handleTimeRange = (value, index) => {
+    const convertedDate = convertLocalToUTCDate(value);
     if (index === 0) {
-      setTimeRangeDisplay(prev => [value, prev[1]]);
+      setTimeRangeDisplay(prev => [convertedDate, prev[1]]);
     } else {
-      setTimeRangeDisplay(prev => [prev[0], value]);
+      setTimeRangeDisplay(prev => [prev[0], convertedDate]);
     }
   };
 
@@ -257,7 +263,7 @@ export default function SettingPage({route}) {
             <View style={styles.timePickerInput}>
               <CustomDateTimepickerModal
                 mode="time"
-                data={timeRangeDisplay[0]}
+                data={convertUTCToLocalDate(timeRangeDisplay[0])}
                 handleData={v => handleTimeRange(v, 0)}
                 textFormatter={dateToTimeString}
               />
@@ -266,7 +272,7 @@ export default function SettingPage({route}) {
             <View style={styles.timePickerInput}>
               <CustomDateTimepickerModal
                 mode="time"
-                data={timeRangeDisplay[1]}
+                data={convertUTCToLocalDate(timeRangeDisplay[1])}
                 handleData={v => handleTimeRange(v, 1)}
                 textFormatter={dateToTimeString}
               />
