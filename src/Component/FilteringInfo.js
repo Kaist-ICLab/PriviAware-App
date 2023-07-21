@@ -71,7 +71,7 @@ function FilteringInfo({
 
   const handleAnimation = () => {
     Animated.timing(rotateAnimation, {
-      toValue: isCollapsed ? 0 : 1,
+      toValue: isCollapsed ? 1 : 0,
       duration: 200,
       useNativeDriver: true,
     }).start(() => {});
@@ -79,7 +79,7 @@ function FilteringInfo({
 
   const cwRotating = rotateAnimation.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '180deg'],
+    outputRange: ['180deg', '0deg'],
   });
 
   const animatedStyle = {
@@ -109,6 +109,7 @@ function FilteringInfo({
       <TouchableOpacity
         style={styles.filteringInfoRow}
         onPress={async () => {
+          console.log('눌림');
           handleAnimation();
           setIsCollapsed(() => !isCollapsed);
         }}>
