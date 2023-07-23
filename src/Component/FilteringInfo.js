@@ -109,7 +109,6 @@ function FilteringInfo({
       <TouchableOpacity
         style={styles.filteringInfoRow}
         onPress={async () => {
-          console.log('눌림');
           handleAnimation();
           setIsCollapsed(() => !isCollapsed);
         }}>
@@ -136,7 +135,7 @@ function FilteringInfo({
             <View style={styles.spacedRow}>
               <Text style={styles.filterTitle}>Time</Text>
               <Switch
-                trackColor={{true: colorSet.primary, false: colorSet.primary}}
+                trackColor={{true: colorSet.primary, false: colorSet.gray}}
                 thumbColor={'#F5F5F5'}
                 onValueChange={handleTimeToggleStatus}
                 value={timeToggleStatus}
@@ -206,7 +205,7 @@ function FilteringInfo({
             <View style={styles.spacedRow}>
               <Text style={styles.filterTitle}>Location</Text>
               <Switch
-                trackColor={{true: colorSet.primary, false: colorSet.primary}}
+                trackColor={{true: colorSet.primary, false: colorSet.gray}}
                 thumbColor={'#F5F5F5'}
                 onValueChange={handleLocationToggleStatus}
                 value={locationToggleStatus}
