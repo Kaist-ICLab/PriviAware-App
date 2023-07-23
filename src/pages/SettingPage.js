@@ -271,9 +271,8 @@ export default function SettingPage({route}) {
             <Text
               style={{
                 ...styles.propertyTitle,
-                flex: 3,
-                justifyContent: 'center',
-                margin: 0,
+                flex: 2,
+                textAlign: 'center',
               }}>
               to
             </Text>
@@ -442,20 +441,20 @@ const styles = StyleSheet.create({
     color: '#000000',
   },
   datePickerInput: {
-    height: 30,
+    height: 24,
     width: '80%',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 6,
     borderColor: colorSet.secondary,
     backgroundColor: colorSet.lightGray,
     justifyContent: 'center',
-    flex: 7,
+    flex: 12,
   },
   timePickerInput: {
-    height: 30,
+    height: 24,
     width: '50%',
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 6,
     borderColor: colorSet.secondary,
     backgroundColor: colorSet.lightGray,
     justifyContent: 'center',
