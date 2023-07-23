@@ -12,16 +12,16 @@ function CustomDateTimepickerModal({
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
   const showDatePicker = () => {
-    setDatePickerVisibility(true);
+    setDatePickerVisibility(() => true);
   };
 
   const hideDatePicker = () => {
-    setDatePickerVisibility(false);
+    setDatePickerVisibility(() => false);
   };
 
   const handleConfirm = date => {
-    handleData(date);
     hideDatePicker();
+    handleData(date);
   };
 
   return (

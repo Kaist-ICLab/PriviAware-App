@@ -268,7 +268,15 @@ export default function SettingPage({route}) {
                 textStyle={styles.dateTimePickerText}
               />
             </View>
-            <Text style={{...styles.propertyTitle, flex: 3}}>to</Text>
+            <Text
+              style={{
+                ...styles.propertyTitle,
+                flex: 3,
+                justifyContent: 'center',
+                margin: 0,
+              }}>
+              to
+            </Text>
             <View style={styles.timePickerInput}>
               <CustomDateTimepickerModal
                 mode="time"
@@ -451,11 +459,10 @@ const styles = StyleSheet.create({
     borderColor: colorSet.secondary,
     backgroundColor: colorSet.lightGray,
     justifyContent: 'center',
-
     flex: 5,
   },
   dateTimePickerText: {
     color: colorSet.gray,
-    textAlign: 'center',
+    marginStart: 10,
   },
 });
