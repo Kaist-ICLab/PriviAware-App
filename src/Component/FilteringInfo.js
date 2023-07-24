@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import MapView from 'react-native-maps';
+import MapView, {Circle} from 'react-native-maps';
 import {FakeMarker} from 'react-native-map-coordinate-picker';
 import Collapsible from 'react-native-collapsible';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -247,18 +247,34 @@ function FilteringInfo({
                     m of the pin
                   </Text>
                 </View>
-                <MapView
-                  style={{height: 200, width: '100%'}}
-                  region={{
-                    latitude: pickedLocation.latitude,
-                    longitude: pickedLocation.longitude,
-                    latitudeDelta: pickedLocationDelta.latitudeDelta,
-                    longitudeDelta: pickedLocationDelta.longitudeDelta,
-                  }}
-                  onPanDrag={handleOnPanDrag}
-                  onRegionChangeComplete={handleRegionChange}
-                />
-                <FakeMarker dragging={dragging} />
+                <View>
+                  <MapView
+                    style={{height: 200, width: '100%'}}
+                    region={{
+                      latitude: pickedLocation.latitude,
+                      longitude: pickedLocation.longitude,
+                      latitudeDelta: pickedLocationDelta.latitudeDelta,
+                      longitudeDelta: pickedLocationDelta.longitudeDelta,
+                    }}
+                    onPanDrag={handleOnPanDrag}
+                    onRegionChangeComplete={handleRegionChange}>
+                    <Circle
+                      center={{
+                        latitude: pickedLocation.latitude,
+                        longitude: pickedLocation.longitude,
+                      }}
+                      strokeWidth={1}
+                      opacity={0.5}
+                      strokeColor={colorSet.primary}
+                      fillColor={'#5A54921A'}
+                      radius={3000}
+                    />
+                  </MapView>
+                  <FakeMarker
+                    dragging={dragging}
+                    icon={require('../assets/images/pin.png')}
+                  />
+                </View>
               </>
             )}
           </View>

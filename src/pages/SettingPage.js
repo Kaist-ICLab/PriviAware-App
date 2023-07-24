@@ -321,14 +321,14 @@ export default function SettingPage({route}) {
             <></>
           )}
           <View style={{height: 240, marginTop: 20}}>
-            {/* <NumericGraph
+            <NumericGraph
               data={batteryData}
               dataType={convertDataType(route.params.dt.name)}
               dataField={dataField}
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
-            /> */}
+            />
 
             {/* <LocationGraph
               data={locationData}
@@ -336,7 +336,7 @@ export default function SettingPage({route}) {
               date={date}
               zeroFlag={zeroFlag}
             /> */}
-
+            {/* 
             <CategoricalGraph
               data={appUsageData}
               dataField={dataField}
@@ -344,7 +344,7 @@ export default function SettingPage({route}) {
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
-            />
+            /> */}
             {/* 
             {status === 'off' ? (
               <View style={{justifyContent: 'center', flex: 1}}>

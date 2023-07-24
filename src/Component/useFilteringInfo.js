@@ -11,6 +11,9 @@ const INITIAL_COORDINATE_DELTA = {
   longitudeDelta: 0.0122,
 };
 
+/**
+ * a custom hook for filteringInfo component
+ */
 const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
   const [status, setStatus] = useState(filterStatus);
   let [isLocationOn, isTimeOn] =
