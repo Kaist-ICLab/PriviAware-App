@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, ActivityIndicator} from 'react-native';
 import {LineChart, XAxis, YAxis, Grid} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
+import {formatNumber} from '../utils';
 
 export default function CountGraph({
   data,
@@ -36,12 +37,6 @@ export default function CountGraph({
     if ((data.length > 0 && processedData.length > 0) || zeroFlag)
       setLoading(false);
   }, [data, processedData, zeroFlag]);
-
-  const formatNumber = num => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'm';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
-    return num.toString();
-  };
 
   const timestampToHoursConverter = ts => {
     const date = new Date(ts);

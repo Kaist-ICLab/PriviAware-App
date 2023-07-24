@@ -1,11 +1,43 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, ActivityIndicator} from 'react-native';
 import {LineChart, XAxis, YAxis, Grid} from 'react-native-svg-charts';
+import {Circle} from 'react-native-svg';
 import * as scale from 'd3-scale';
+
+import {formatNumber, timestampToHoursConverter} from '../utils';
+import {colorSet} from '../constants/Colors';
+import YAxisName from './YAxisName';
+
+/**
+ * drawing circles for each data point
+ */
+const Decorator = ({x, y, data}) => {
+  return data.map((point, index) => {
+    return (
+      <Circle
+        key={index}
+        cx={x(point.timestamp)}
+        cy={y(point.value)}
+        r={3}
+        stroke={colorSet.primary}
+      />
+    );
+  });
+};
+
+const flexRatio = {
+  upper: 19,
+  lower: 1,
+  yAxis: 1,
+  graph: 9,
+};
+
+const CORRECTION_VALUE = 7;
 
 export default function NumericGraph({
   data,
   dataField,
+  dataType,
   timeRange,
   date,
   zeroFlag,
@@ -29,25 +61,18 @@ export default function NumericGraph({
     setLoading(true);
   }, [data, dataField, timeRange, date]);
 
+  //for the development, the after the date changed, new data will be fetched.
+  //but this is mock data, so the data will not be changed.
+  //I include date at useEffect's dependency array to make sure the data will be fetched again.
+  //after attach the normal api, you should remove the date from the dependency array.
+
   useEffect(() => {
-    if ((data.length > 0 && processedData.length > 0) || zeroFlag)
+    if ((data.length > 0 && processedData.length > 0) || zeroFlag) {
       setLoading(false);
-  }, [data, processedData, zeroFlag]);
+    }
+  }, [data, processedData, zeroFlag, date]);
 
-  const formatNumber = num => {
-    if (num >= 1000000) return (num / 1000000).toFixed(1) + 'm';
-    if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
-    return num.toString();
-  };
-
-  const timestampToHoursConverter = ts => {
-    const date = new Date(ts);
-    return (
-      String(date.getHours()).padStart(2, '0') +
-      ':' +
-      String(date.getMinutes()).padStart(2, '0')
-    );
-  };
+  const axisName = `${dataType} ${dataField.name}`;
 
   return (
     <View style={{flex: 1}}>
@@ -57,23 +82,30 @@ export default function NumericGraph({
         </View>
       ) : processedData.length > 0 ? (
         <View style={{flexDirection: 'row', flex: 1}}>
-          <View style={{flex: 1}}>
-            <YAxis
-              style={{flex: 19}}
-              data={processedData}
-              yAccessor={d => d.item.value}
-              numberOfTicks={5}
-              min={0}
-              max={maxData}
-              contentInset={{top: 5, bottom: 5}}
-              svg={{fontSize: 10}}
-              formatLabel={value => formatNumber(value)}
+          <View style={{flex: flexRatio.yAxis, flexDirection: 'row'}}>
+            <YAxisName
+              textHeight={10}
+              textLength={axisName.length * CORRECTION_VALUE}
+              name={axisName}
             />
-            <View style={{flex: 1}}></View>
+            <View>
+              <YAxis
+                style={{flex: flexRatio.upper}}
+                data={processedData}
+                yAccessor={d => d.item.value}
+                numberOfTicks={5}
+                min={0}
+                max={maxData}
+                contentInset={{top: 5, bottom: 10}}
+                svg={{fontSize: 10}}
+                formatLabel={formatNumber}
+              />
+              <View style={{flex: flexRatio.lower}} />
+            </View>
           </View>
-          <View style={{flex: 9}}>
+          <View style={{flex: flexRatio.graph}}>
             <LineChart
-              style={{height: '100%', flex: 19}}
+              style={{height: '100%', flex: flexRatio.upper}}
               data={processedData}
               yAccessor={d => d.item.value}
               xAccessor={d => d.item.timestamp}
@@ -81,17 +113,18 @@ export default function NumericGraph({
               yMax={maxData}
               xScale={scale.scaleTime}
               numberOfTicks={10}
-              svg={{stroke: '#ff0000'}}
-              contentInset={{top: 5, bottom: 5}}>
+              svg={{stroke: colorSet.primary}}
+              contentInset={{top: 5, bottom: 10, left: 10, right: 10}}>
               <Grid />
+              <Decorator />
             </LineChart>
             <XAxis
-              style={{flex: 1}}
+              style={{flex: flexRatio.lower}}
               data={processedData}
               xAccessor={d => d.item.timestamp}
               numberOfTicks={3}
-              formatLabel={value => timestampToHoursConverter(value)}
-              contentInset={{top: 5, bottom: 5}}
+              formatLabel={timestampToHoursConverter}
+              contentInset={{left: 10, right: 10}}
             />
           </View>
         </View>

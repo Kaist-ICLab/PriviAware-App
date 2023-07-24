@@ -60,6 +60,15 @@ const dateToTimestamp = date => {
   return date.getTime();
 };
 
+/**
+ * if the number is too large, convert it to a short string with a unit(k, m)
+ */
+const formatNumber = num => {
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + 'm';
+  if (num >= 1000) return (num / 1000).toFixed(1) + 'k';
+  return num.toString();
+};
+
 export {
   timestampToHoursConverter,
   dateToString,
@@ -67,4 +76,5 @@ export {
   convertUTCToLocalDate,
   convertLocalToUTCDate,
   dateToTimestamp,
+  formatNumber,
 };

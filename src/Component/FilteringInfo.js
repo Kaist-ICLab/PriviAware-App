@@ -17,9 +17,11 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import {colorSet} from '../constants/Colors';
 import useFilter from './useFilteringInfo';
 
-const SAVE_TEXT = 'Save';
-const DELETE_TEXT = 'Delete';
-const ADD_TEXT = 'Add';
+const BUTTON_TEXT = {
+  SAVE: 'Save',
+  DELETE: 'Delete',
+  ADD: 'Add',
+};
 
 function FilteringInfo({
   isNew,
@@ -266,14 +268,14 @@ function FilteringInfo({
               style={{...styles.button, backgroundColor: colorSet.primary}}
               onPress={() => {}}>
               <Text style={styles.buttonText}>
-                {isNew ? ADD_TEXT : SAVE_TEXT}
+                {isNew ? BUTTON_TEXT.ADD : BUTTON_TEXT.SAVE}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={{...styles.button, backgroundColor: colorSet.gray}}
               onPress={() => {}}>
-              <Text style={styles.buttonText}>{DELETE_TEXT}</Text>
+              <Text style={styles.buttonText}>{BUTTON_TEXT.DELETE}</Text>
             </TouchableOpacity>
           </View>
         </View>

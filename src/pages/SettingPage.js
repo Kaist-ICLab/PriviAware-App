@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation} from '@react-navigation/native';
-import {Slider} from '@miblanchard/react-native-slider';
 import {Picker} from '@react-native-picker/picker';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
@@ -207,6 +206,9 @@ export default function SettingPage({route}) {
     navigation.navigate('Overview', {email: email});
   };
 
+  const dataType =
+    dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll('_', ' ');
+
   return (
     <KeyboardAvoidingView
       behavior="height"
@@ -222,9 +224,7 @@ export default function SettingPage({route}) {
               <AntDesign name="arrowleft" size={20} />
             </TouchableOpacity>
             <Text style={{fontSize: 18, margin: 15, color: '#000000'}}>
-              {dt.name.charAt(0).toUpperCase() +
-                dt.name.slice(1).replaceAll('_', ' ')}{' '}
-              setting
+              {dataType} setting
             </Text>
             <TouchableOpacity style={{alignSelf: 'center'}} onPress={showInfo}>
               <AntDesign name="questioncircleo" size={15} />
@@ -320,14 +320,15 @@ export default function SettingPage({route}) {
           ) : (
             <></>
           )}
-          <View style={{height: 240}}>
-            {/* <NumericGraph
+          <View style={{height: 240, marginTop: 20}}>
+            <NumericGraph
               data={batteryData}
+              dataType={dataType}
               dataField={dataField}
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
-            /> */}
+            />
 
             {/* <LocationGraph
               data={locationData}
@@ -344,7 +345,7 @@ export default function SettingPage({route}) {
               date={date}
               zeroFlag={zeroFlag}
             /> */}
-
+            {/* 
             {status === 'off' ? (
               <View style={{justifyContent: 'center', flex: 1}}>
                 <Text
@@ -384,7 +385,7 @@ export default function SettingPage({route}) {
                 date={date}
                 zeroFlag={zeroFlag}
               />
-            )}
+            )} */}
           </View>
         </View>
         <Text style={styles.listTitle}>Contextual Filtering</Text>
