@@ -321,21 +321,21 @@ export default function SettingPage({route}) {
             <></>
           )}
           <View style={{height: 240, marginTop: 20}}>
-            <NumericGraph
+            {/* <NumericGraph
               data={batteryData}
               dataType={dataType}
               dataField={dataField}
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
-            />
+            /> */}
 
-            {/* <LocationGraph
+            <LocationGraph
               data={locationData}
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
-            /> */}
+            />
 
             {/* <CategoricalGraph
               data={appUsageData}
