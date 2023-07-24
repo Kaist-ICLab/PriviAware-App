@@ -2,7 +2,7 @@ import React from 'react';
 import {View, Text} from 'react-native';
 import {colorSet} from '../constants/Colors';
 
-function YAxisName({textHeight, textLength, name}) {
+function YAxisName({textHeight, textLength, name, fontSize}) {
   const OFFSET = textLength / 2 - textHeight / 2;
 
   return (
@@ -15,6 +15,7 @@ function YAxisName({textHeight, textLength, name}) {
       <Text
         style={{
           color: colorSet.gray,
+          fontSize: fontSize ? fontSize : 10,
           transform: [{rotate: '-90deg'}, {translateY: -OFFSET}],
           width: textLength,
         }}>

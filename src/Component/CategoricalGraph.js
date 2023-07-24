@@ -11,6 +11,14 @@ import {StackedBarChart, Grid, XAxis, YAxis} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 
 import {COLOURS} from '../constants/Constant';
+import YAxisName from './YAxisName';
+import {
+  convertDataType,
+  timestampToFullHoursConverter,
+  timestampToHoursWithUnitConverter,
+} from '../utils';
+
+const CORRECTION_VALUE = 5;
 
 export default function CategoricalGraph({
   data,
@@ -112,28 +120,6 @@ export default function CategoricalGraph({
     ]);
   };
 
-  const timestampToHoursConverter = ts => {
-    const date = new Date(ts);
-    const hour = date.getUTCHours();
-    if (hour === 0) return String(date.getUTCHours()) + 'mn';
-    if (hour > 0 && hour < 12) return String(date.getUTCHours()) + 'am';
-    if (hour === 12) return String(date.getUTCHours()) + 'nn';
-    if (hour > 12) return String(date.getUTCHours() - 12) + 'pm';
-  };
-
-  const timestampToFullHoursConverter = ts => {
-    const date = new Date(ts);
-    return (
-      String(date.getHours()).padStart(2, '0') +
-      ':' +
-      String(date.getMinutes()).padStart(2, '0') +
-      ':' +
-      String(date.getSeconds()).padStart(2, '0') +
-      '.' +
-      String(date.getMilliseconds()).padStart(3, '0')
-    );
-  };
-
   const showFewEntries = key => {
     let description = '';
     if (dataType === 'app_usage_event')
@@ -185,7 +171,7 @@ export default function CategoricalGraph({
     );
   };
 
-  console.log(processedData);
+  const axisName = `${convertDataType(dataType)}`;
 
   return (
     <View style={{flex: 1}}>
@@ -196,23 +182,11 @@ export default function CategoricalGraph({
       ) : processedData.length > 0 ? (
         <View style={{flex: 1}}>
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: -10,
-                marginRight: -7,
-              }}>
-              <Text
-                style={{
-                  fontSize: 9,
-                  color: '#000000',
-                  transform: [{rotate: '-90deg'}],
-                }}>
-                Count
-              </Text>
-            </View>
+            <YAxisName
+              textHeight={10}
+              textLength={axisName.length * CORRECTION_VALUE}
+              name={axisName}
+            />
             <View style={{flex: 11, flexDirection: 'row'}}>
               <View style={{flex: 1}}>
                 <YAxis
@@ -246,7 +220,8 @@ export default function CategoricalGraph({
                   xAccessor={d => d.item.timestamp}
                   scale={scale.scaleBand}
                   formatLabel={(value, i) => {
-                    if (!(i % 2)) return timestampToHoursConverter(value);
+                    if (!(i % 2))
+                      return timestampToHoursWithUnitConverter(value);
                   }}
                   svg={{fontSize: 10, fill: 'black'}}
                   spacingInner={0.5}

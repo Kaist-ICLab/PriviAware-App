@@ -32,7 +32,7 @@ const flexRatio = {
   graph: 9,
 };
 
-const CORRECTION_VALUE = 7;
+const CORRECTION_VALUE = 5;
 
 export default function NumericGraph({
   data,

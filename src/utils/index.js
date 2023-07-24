@@ -69,12 +69,43 @@ const formatNumber = num => {
   return num.toString();
 };
 
+const convertDataType = dataType =>
+  dataType.charAt(0).toUpperCase() + dataType.slice(1).replaceAll('_', ' ');
+
+/**
+ * convert timestamp to hours with unit, ex) 12am, 1pm, 12nn, 0mn
+ */
+const timestampToHoursWithUnitConverter = ts => {
+  const date = new Date(ts);
+  const hour = date.getUTCHours();
+  if (hour === 0) return String(date.getUTCHours()) + 'MN';
+  if (hour > 0 && hour < 12) return String(date.getUTCHours()) + 'AM';
+  if (hour === 12) return String(date.getUTCHours()) + 'NN';
+  if (hour > 12) return String(date.getUTCHours() - 12) + 'PM';
+};
+
+const timestampToFullHoursConverter = ts => {
+  const date = new Date(ts);
+  return (
+    String(date.getHours()).padStart(2, '0') +
+    ':' +
+    String(date.getMinutes()).padStart(2, '0') +
+    ':' +
+    String(date.getSeconds()).padStart(2, '0') +
+    '.' +
+    String(date.getMilliseconds()).padStart(3, '0')
+  );
+};
+
 export {
   timestampToHoursConverter,
+  timestampToHoursWithUnitConverter,
+  timestampToFullHoursConverter,
   dateToString,
   dateToTimeString,
   convertUTCToLocalDate,
   convertLocalToUTCDate,
   dateToTimestamp,
   formatNumber,
+  convertDataType,
 };

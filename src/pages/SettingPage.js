@@ -30,6 +30,7 @@ import {
   convertUTCToLocalDate,
   convertLocalToUTCDate,
   dateToTimestamp,
+  convertDataType,
 } from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 import {appUsageData, batteryData, locationData} from '../mocks/graphdata';
@@ -206,8 +207,7 @@ export default function SettingPage({route}) {
     navigation.navigate('Overview', {email: email});
   };
 
-  const dataType =
-    dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll('_', ' ');
+  const dataType = convertDataType(route.params.dt.name);
 
   return (
     <KeyboardAvoidingView
@@ -323,28 +323,28 @@ export default function SettingPage({route}) {
           <View style={{height: 240, marginTop: 20}}>
             {/* <NumericGraph
               data={batteryData}
-              dataType={dataType}
+              dataType={convertDataType(route.params.dt.name)}
               dataField={dataField}
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
             /> */}
 
-            <LocationGraph
+            {/* <LocationGraph
               data={locationData}
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
-            />
+            /> */}
 
-            {/* <CategoricalGraph
+            <CategoricalGraph
               data={appUsageData}
               dataField={dataField}
               dataType={route.params.dt.name}
               timeRange={timeRange}
               date={date}
               zeroFlag={zeroFlag}
-            /> */}
+            />
             {/* 
             {status === 'off' ? (
               <View style={{justifyContent: 'center', flex: 1}}>
