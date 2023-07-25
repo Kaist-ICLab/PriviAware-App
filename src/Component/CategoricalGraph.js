@@ -34,6 +34,8 @@ export default function CategoricalGraph({
   const [label, setLabel] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  console.log('tRange', timeRange);
+
   useEffect(() => {
     if (data.length > 0 && dataField) {
       let tempData = [];
@@ -46,6 +48,19 @@ export default function CategoricalGraph({
         //   d =>
         //     d.timestamp >= date + i && d.timestamp < date + i + 60 * 60 * 1000,
         // );
+
+        data.map(d => {
+          console.log(
+            'd.timestamp',
+            d.timestamp,
+            'date',
+            date,
+            'i',
+            i,
+            d.timestamp >= date + i && d.timestamp < date + i + 60 * 60 * 1000,
+          );
+        });
+
         const currentData = data;
         if (dataType === 'physical_activity' && dataField.name === 'type') {
           tempObj = data.reduce(
