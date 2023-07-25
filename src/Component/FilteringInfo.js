@@ -272,7 +272,7 @@ function FilteringInfo({
                   </MapView>
                   <FakeMarker
                     dragging={dragging}
-                    icon={require('../assets/images/pin.png')}
+                    icon={require('../assets/images/pin_resized.png')}
                   />
                 </View>
               </>
