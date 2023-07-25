@@ -144,15 +144,8 @@ function FilteringInfo({
               />
             </View>
             {showTimeSetting && (
-              <View style={{...styles.spacedRow}}>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: '#000000',
-                    alignSelf: 'center',
-                  }}>
-                  Do not collect from
-                </Text>
+              <View style={styles.spacedRow}>
+                <Text style={styles.filterDirection}>Do not collect from</Text>
                 <TouchableOpacity
                   style={{marginHorizontal: 10, alignSelf: 'center'}}
                   onPress={handleShowTimePicker1}>
@@ -172,14 +165,7 @@ function FilteringInfo({
                     onCancel={handleShowTimePicker1}
                   />
                 </TouchableOpacity>
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: '#000000',
-                    alignSelf: 'center',
-                  }}>
-                  to
-                </Text>
+                <Text style={styles.filterDirection}>to</Text>
                 <TouchableOpacity
                   style={{marginHorizontal: 10, alignSelf: 'center'}}
                   onPress={handleShowTimePicker2}>
@@ -221,35 +207,23 @@ function FilteringInfo({
                     marginVertical: 10,
                     alignItems: 'center',
                   }}>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: '#000000',
-                      alignSelf: 'center',
-                    }}>
+                  <Text style={styles.filterDirection}>
                     Do not collect within
                   </Text>
                   <View style={styles.textInput}>
                     <TextInput
                       style={{paddingVertical: 0, alignSelf: 'center'}}
                       keyboardType="number-pad"
-                      onChangeText={value => handleRadius(value)}
+                      onChangeText={handleRadius}
                       defaultValue={`${radius ?? 0}`}
                       value={radius}
                     />
                   </View>
-                  <Text
-                    style={{
-                      fontSize: 15,
-                      color: '#000000',
-                      alignSelf: 'center',
-                    }}>
-                    m of the pin
-                  </Text>
+                  <Text style={styles.filterDirection}>m of the pin</Text>
                 </View>
                 <View>
                   <MapView
-                    style={{height: 200, width: '100%'}}
+                    style={styles.map}
                     region={{
                       latitude: pickedLocation.latitude,
                       longitude: pickedLocation.longitude,
@@ -267,7 +241,7 @@ function FilteringInfo({
                       opacity={0.5}
                       strokeColor={colorSet.primary}
                       fillColor={'#5A54921A'}
-                      radius={3000}
+                      radius={parseFloat(radius)}
                     />
                   </MapView>
                   <FakeMarker
@@ -366,6 +340,12 @@ const styles = StyleSheet.create({
   filterTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  map: {height: 200, width: '100%'},
+  filterDirection: {
+    fontSize: 15,
+    color: '#000000',
+    alignSelf: 'center',
   },
 });
 
