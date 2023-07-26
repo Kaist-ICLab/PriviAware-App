@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, ActivityIndicator} from 'react-native';
+import {View, Text, ActivityIndicator, useColorScheme} from 'react-native';
 import {LineChart, XAxis, YAxis, Grid} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 import {Circle} from 'react-native-svg';
@@ -35,6 +35,9 @@ const Decorator = ({x, y, data}) => {
 };
 
 export default function LineGraph({loading, processedData, axisName, maxData}) {
+  const colorScheme = useColorScheme();
+  const theme = colorScheme !== 'dark' ? 'black' : '#DEDDE966';
+
   return (
     <View style={{flex: 1}}>
       {loading ? (
@@ -58,7 +61,7 @@ export default function LineGraph({loading, processedData, axisName, maxData}) {
                 min={0}
                 max={maxData}
                 contentInset={{top: 5, bottom: 10}}
-                svg={{fontSize: 10}}
+                svg={{fontSize: 10, fill: theme}}
                 formatLabel={formatNumber}
               />
               <View style={{flex: flexRatio.lower}} />
@@ -76,7 +79,7 @@ export default function LineGraph({loading, processedData, axisName, maxData}) {
               numberOfTicks={10}
               svg={{stroke: colorSet.primary}}
               contentInset={{top: 5, bottom: 10, left: 10, right: 10}}>
-              <Grid />
+              <Grid svg={{stroke: theme}} />
               <Decorator />
             </LineChart>
             <XAxis
@@ -86,14 +89,15 @@ export default function LineGraph({loading, processedData, axisName, maxData}) {
               numberOfTicks={3}
               formatLabel={timestampToHoursConverter}
               contentInset={{left: 10, right: 10}}
+              svg={{
+                fill: theme,
+              }}
             />
           </View>
         </View>
       ) : (
         <View style={{justifyContent: 'center', flex: 1}}>
-          <Text style={{alignSelf: 'center', color: '#000000', fontSize: 50}}>
-            No Data
-          </Text>
+          <Text style={{alignSelf: 'center', fontSize: 50}}>No Data</Text>
         </View>
       )}
     </View>

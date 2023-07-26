@@ -102,7 +102,11 @@ export default function LocationGraph({data, timeRange, date, zeroFlag}) {
                     </Text>
                     {loc.timestamp.map((ts, i) => {
                       return (
-                        <Text key={i}>
+                        <Text
+                          style={{
+                            color: '#000000',
+                          }}
+                          key={i}>
                           {'Timestamp: ' +
                             localTimestampToHoursConverter(ts) +
                             ', Altitude: ' +

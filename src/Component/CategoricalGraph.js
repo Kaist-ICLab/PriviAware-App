@@ -6,11 +6,12 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  useColorScheme,
 } from 'react-native';
 import {StackedBarChart, Grid, XAxis, YAxis} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 
-import {COLOURS} from '../constants/Constant';
+import {COLORS_SET1, COLOURS} from '../constants/Constant';
 import YAxisName from './YAxisName';
 import {
   convertDataType,
@@ -39,6 +40,10 @@ export default function CategoricalGraph({
   const [yAccessor, setYAccessor] = useState([]);
   const [label, setLabel] = useState([]);
   const [loading, setLoading] = useState(false);
+  const colorScheme = useColorScheme();
+
+  const theme = colorScheme !== 'dark' ? '#000000' : '#DEDDE966';
+  const graphColorSet = colorScheme === 'dark' ? COLORS_SET1 : COLOURS;
 
   useEffect(() => {
     if (data.length > 0 && dataField) {
@@ -121,7 +126,7 @@ export default function CategoricalGraph({
       setYAccessor(tempyAccessor);
       setLabel(
         tempyAccessor.map((k, i) => {
-          return {key: k, color: COLOURS[i]};
+          return {key: k, color: graphColorSet[i]};
         }),
       );
     } else setProcessedData([]);
@@ -220,7 +225,7 @@ export default function CategoricalGraph({
                   yAccessor={() => yAccessor}
                   min={0}
                   max={maxData}
-                  svg={{fontSize: 10, fill: 'black'}}
+                  svg={{fontSize: 10, fill: theme}}
                   contentInset={{top: 8, bottom: 8, left: 10, right: 10}}
                 />
                 <View style={{flex: 1}}></View>
@@ -230,14 +235,14 @@ export default function CategoricalGraph({
                   style={{height: '100%', flex: 19}}
                   keys={yAccessor}
                   data={processedData}
-                  colors={COLOURS}
+                  colors={graphColorSet}
                   yMin={0}
                   yMax={maxData}
                   yAccessor={() => yAccessor}
                   xAccessor={d => d.item.timestamp}
                   spacingInner={0.5}
                   contentInset={{top: 8, bottom: 8, left: 10, right: 10}}>
-                  <Grid svg={{strokeOpacity: 0.5}} />
+                  <Grid svg={{strokeOpacity: 0.5, stroke: theme}} />
                 </StackedBarChart>
                 <XAxis
                   style={{flex: 1, height: '100%'}}
@@ -248,7 +253,7 @@ export default function CategoricalGraph({
                     if (!(i % 2))
                       return timestampToHoursWithUnitConverter(value);
                   }}
-                  svg={{fontSize: 10, fill: 'black'}}
+                  svg={{fontSize: 10, fill: theme}}
                   spacingInner={0.5}
                   contentInset={{top: 8, bottom: 8, left: 10, right: 10}}
                 />
@@ -291,9 +296,7 @@ export default function CategoricalGraph({
         </View>
       ) : (
         <View style={{justifyContent: 'center', flex: 1}}>
-          <Text style={{alignSelf: 'center', color: '#000000', fontSize: 50}}>
-            No Data
-          </Text>
+          <Text style={{alignSelf: 'center', fontSize: 50}}>No Data</Text>
         </View>
       )}
     </View>

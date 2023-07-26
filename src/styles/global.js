@@ -7,5 +7,5 @@ export const globalStyles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 30,
   },
-  container: {backgroundColor: '#ffffff', flex: 1, padding: 12},
+  container: {flex: 1, padding: 12},
 });

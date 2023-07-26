@@ -10,7 +10,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
 import {Picker} from '@react-native-picker/picker';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
@@ -24,7 +24,6 @@ import {colorSet} from '../constants/Colors';
 import FilteringInfo from '../Component/FilteringInfo';
 import filterList from '../mocks/filterInfo';
 import {
-  timestampToHoursConverter,
   dateToString,
   dateToTimeString,
   convertUTCToLocalDate,
@@ -41,6 +40,7 @@ import wifiInfo from '../mocks/wifiInfo';
 dayjs.extend(utc);
 
 export default function SettingPage({route}) {
+  const {colors} = useTheme();
   const today = new Date();
 
   const startToday = dayjs(today).utc().startOf('day');
@@ -239,7 +239,7 @@ export default function SettingPage({route}) {
               onPress={back}>
               <AntDesign name="arrowleft" size={20} />
             </TouchableOpacity>
-            <Text style={{fontSize: 18, margin: 15, color: '#000000'}}>
+            <Text style={{fontSize: 18, margin: 15, color: colors.text}}>
               {dataType} setting
             </Text>
             <TouchableOpacity style={{alignSelf: 'center'}} onPress={showInfo}>
@@ -260,20 +260,29 @@ export default function SettingPage({route}) {
         </View>
         <View style={{marginHorizontal: 15, marginTop: 10}}>
           <View style={styles.spacedRow}>
-            <Text style={{...styles.propertyTitle, flex: 3}}>Date</Text>
+            <Text
+              style={{...styles.propertyTitle, flex: 3, color: colors.text}}>
+              Date
+            </Text>
             <View style={styles.datePickerInput}>
               <CustomDateTimepickerModal
                 mode="date"
                 data={date}
                 handleData={handleDate}
                 textFormatter={dateToString}
-                textStyle={styles.dateTimePickerText}
+                textStyle={[
+                  styles.dateTimePickerText,
+                  {backgroundColor: colors.card},
+                ]}
               />
             </View>
           </View>
 
           <View style={styles.spacedRow}>
-            <Text style={{...styles.propertyTitle, flex: 3}}>Hour</Text>
+            <Text
+              style={{...styles.propertyTitle, flex: 3, color: colors.text}}>
+              Hour
+            </Text>
             <View style={styles.timePickerInput}>
               <CustomDateTimepickerModal
                 mode="time"
@@ -281,7 +290,10 @@ export default function SettingPage({route}) {
                 data={convertUTCToLocalDate(timeRange[0])}
                 handleData={v => handleTimeRange(v, 0)}
                 textFormatter={dateToTimeString}
-                textStyle={styles.dateTimePickerText}
+                textStyle={[
+                  styles.dateTimePickerText,
+                  {backgroundColor: colors.card},
+                ]}
               />
             </View>
             <Text
@@ -298,7 +310,10 @@ export default function SettingPage({route}) {
                 data={convertUTCToLocalDate(timeRange[1])}
                 handleData={v => handleTimeRange(v, 1)}
                 textFormatter={dateToTimeString}
-                textStyle={styles.dateTimePickerText}
+                textStyle={[
+                  styles.dateTimePickerText,
+                  {backgroundColor: colors.card},
+                ]}
               />
             </View>
           </View>
@@ -440,7 +455,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 6,
     borderColor: colorSet.secondary,
-    backgroundColor: colorSet.lightGray,
     justifyContent: 'center',
     flex: 12,
   },
@@ -450,12 +464,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 6,
     borderColor: colorSet.secondary,
-    backgroundColor: colorSet.lightGray,
     justifyContent: 'center',
     flex: 5,
   },
   dateTimePickerText: {
     color: colorSet.gray,
-    marginStart: 10,
+    paddingStart: 10,
   },
 });

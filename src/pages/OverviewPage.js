@@ -11,7 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
 import BackgroundTimer from 'react-native-background-timer';
 import Geolocation from 'react-native-geolocation-service';
 import RNExitApp from 'react-native-exit-app';
@@ -29,6 +29,8 @@ const collectionStatus = {
 };
 
 export default function OverviewPage({route}) {
+  const {colors} = useTheme();
+
   // const {email} = route.params;
   const email = 'test@test.com';
   const navigation = useNavigation();
@@ -150,7 +152,8 @@ export default function OverviewPage({route}) {
   };
 
   return (
-    <SafeAreaView style={globalStyles.container}>
+    <SafeAreaView
+      style={[globalStyles.container, {backgroundColor: colors.background}]}>
       <View style={{opacity: loading ? 0.3 : 1, flex: 1}}>
         <Text style={globalStyles.header}>Data Types</Text>
         <Text style={styles.loginInfo}>Logged in as: {email}</Text>

@@ -7,6 +7,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useColorScheme,
 } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import MapView, {Circle} from 'react-native-maps';
@@ -14,7 +15,7 @@ import {FakeMarker} from 'react-native-map-coordinate-picker';
 import Collapsible from 'react-native-collapsible';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {colorSet} from '../constants/Colors';
+import {DarkTheme, LightTheme, colorSet} from '../constants/Colors';
 import useFilter from './useFilteringInfo';
 
 const BUTTON_TEXT = {
@@ -31,6 +32,9 @@ function FilteringInfo({
   dt,
   filterStatus,
 }) {
+  const colorScheme = useColorScheme();
+  const theme = colorScheme === 'dark' ? DarkTheme.colors : LightTheme.colors;
+
   const {handleFilterOptions, filterValues} = useFilter(
     setToggleStatus,
     updateToDB,
@@ -106,7 +110,7 @@ function FilteringInfo({
     <View
       style={{
         ...styles.filteringInfoWrapper,
-        backgroundColor: isNew ? colorSet.lightGray : colorSet.secondary,
+        backgroundColor: isNew ? theme.lightGray : theme.lightPurple,
       }}>
       <TouchableOpacity
         style={styles.filteringInfoRow}
@@ -151,7 +155,7 @@ function FilteringInfo({
                   onPress={handleShowTimePicker1}>
                   <View style={styles.textInput}>
                     {!isNaN(timePicker1) && (
-                      <Text style={{alignSelf: 'center', color: '#000000'}}>
+                      <Text style={{alignSelf: 'center'}}>
                         {timePicker1.getHours().toString().padStart(2, '0') +
                           ':' +
                           timePicker1.getMinutes().toString().padStart(2, '0')}
@@ -171,7 +175,7 @@ function FilteringInfo({
                   onPress={handleShowTimePicker2}>
                   <View style={styles.textInput}>
                     {!isNaN(timePicker2) && (
-                      <Text style={{alignSelf: 'center', color: '#000000'}}>
+                      <Text style={{alignSelf: 'center'}}>
                         {timePicker2.getHours().toString().padStart(2, '0') +
                           ':' +
                           timePicker2.getMinutes().toString().padStart(2, '0')}
@@ -212,7 +216,10 @@ function FilteringInfo({
                   </Text>
                   <View style={styles.textInput}>
                     <TextInput
-                      style={{paddingVertical: 0, alignSelf: 'center'}}
+                      style={{
+                        paddingVertical: 0,
+                        alignSelf: 'center',
+                      }}
                       keyboardType="number-pad"
                       onChangeText={handleRadius}
                       defaultValue={`${radius ?? 0}`}
@@ -344,7 +351,6 @@ const styles = StyleSheet.create({
   map: {height: 200, width: '100%'},
   filterDirection: {
     fontSize: 15,
-    color: '#000000',
     alignSelf: 'center',
   },
 });
