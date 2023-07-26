@@ -248,7 +248,7 @@ export default function SettingPage({route}) {
           <View style={{margin: 15}}>
             <Switch
               trackColor={{
-                true: status === 'on' ? '#128300' : '#DC7700',
+                true: status === 'on' ? '#5A5492' : '#D9D9D9',
                 false: '#3D3D3D',
               }}
               thumbColor={'#F5F5F5'}
@@ -360,6 +360,7 @@ export default function SettingPage({route}) {
               date={date}
               zeroFlag={zeroFlag}
             />
+
             {/* 
             {status === 'off' ? (
               <View style={{justifyContent: 'center', flex: 1}}>

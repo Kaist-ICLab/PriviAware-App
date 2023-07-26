@@ -24,6 +24,7 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 
 const CORRECTION_VALUE = 5;
+const HOUR_MILLISECONDS = 60 * 60 * 1000;
 
 export default function CategoricalGraph({
   data,
@@ -45,7 +46,7 @@ export default function CategoricalGraph({
       let tempObj = {};
       let max = 0;
       let tempyAccessor = [];
-      let tempTSArray = [];
+      let filteredDataNum = 0;
 
       const startDay = new Date(dayjs(date).utc().startOf('day'));
       const startTimestamp =
@@ -53,14 +54,20 @@ export default function CategoricalGraph({
       const endTimestamp =
         dateToTimestamp(timeRange[1]) - dateToTimestamp(startDay);
 
-      for (let i = startTimestamp; i < endTimestamp; i = i + 60 * 60 * 1000) {
+      for (
+        let i = startTimestamp;
+        i < endTimestamp;
+        i = i + HOUR_MILLISECONDS
+      ) {
         const dateTimeStamp = parseInt(dateToTimestamp(date), 10) + i;
 
         const currentData = data.filter(
           d =>
             d.timestamp >= dateTimeStamp &&
-            d.timestamp < dateTimeStamp + 60 * 60 * 1000,
+            d.timestamp < dateTimeStamp + HOUR_MILLISECONDS,
         );
+
+        filteredDataNum += currentData.length;
 
         if (dataType === 'physical_activity' && dataField.name === 'type') {
           tempObj = data.reduce(
@@ -83,10 +90,10 @@ export default function CategoricalGraph({
             },
             {timestamp: i},
           );
+          tempData.push(tempObj);
         }
-        tempData.push(tempObj);
-        tempTSArray.push({timestamp: i, value: 0});
       }
+
       for (let i = 0; i < tempData.length; i++) {
         const keys = Object.keys(tempData[i]).filter(
           key => key !== 'timestamp',
@@ -97,16 +104,19 @@ export default function CategoricalGraph({
         if (count > max) max = count;
         tempyAccessor = [...new Set([...tempyAccessor, ...keys])];
       }
+
       for (let i = 0; i < tempData.length; i++) {
         for (let j = 0; j < tempyAccessor.length; j++) {
           if (!tempData[i][tempyAccessor[j]]) tempData[i][tempyAccessor[j]] = 0;
         }
       }
+
       console.log(
         '[RN CategoricalGraph.js] Generated data: ',
         JSON.stringify(tempData),
       );
-      setProcessedData(tempData);
+
+      setProcessedData(() => (filteredDataNum === 0 ? [] : tempData));
       setMaxData(max);
       setYAccessor(tempyAccessor);
       setLabel(
@@ -122,8 +132,8 @@ export default function CategoricalGraph({
   }, [data, dataField, dataType, timeRange, date]);
 
   useEffect(() => {
-    if ((data.length > 0 && processedData.length > 0) || zeroFlag)
-      setLoading(false);
+    console.log(data.length, processedData.length, zeroFlag);
+    if (data.length > 0 || zeroFlag) setLoading(false);
   }, [data, processedData, zeroFlag]);
 
   const AlertBox = (title, msg) => {
