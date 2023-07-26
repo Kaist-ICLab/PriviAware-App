@@ -22,6 +22,7 @@ import RegisterPage from './src/pages/RegisterPage';
 import OverviewPage from './src/pages/OverviewPage';
 import SettingPage from './src/pages/SettingPage';
 import {LightTheme, DarkTheme} from './src/constants/Colors';
+import WelcomePage from './src/pages/WelcomePage';
 
 function App() {
   const PermissionAlertBox = (title, msg) => {
@@ -74,8 +75,9 @@ function App() {
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <NavigationContainer theme={isDarkMode ? DarkTheme : LightTheme}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          {/* <Stack.Screen name="Login" component={LoginPage} />
-          <Stack.Screen name="Register" component={RegisterPage} /> */}
+          <Stack.Screen name="Welcome" component={WelcomePage} />
+          <Stack.Screen name="Login" component={LoginPage} />
+          <Stack.Screen name="Register" component={RegisterPage} />
           <Stack.Screen name="Overview" component={OverviewPage} />
           <Stack.Screen name="Setting" component={SettingPage} />
         </Stack.Navigator>

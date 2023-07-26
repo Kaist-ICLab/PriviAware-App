@@ -28,16 +28,11 @@ export default function NumericGraph({
     setLoading(true);
   }, [data, dataField, timeRange, date]);
 
-  //for the development, the after the date changed, new data will be fetched.
-  //but this is mock data, so the data will not be changed.
-  //I include date at useEffect's dependency array to make sure the data will be fetched again.
-  //after attach the normal api, you should remove the date from the dependency array.
-
   useEffect(() => {
     if ((data.length > 0 && processedData.length > 0) || zeroFlag) {
       setLoading(false);
     }
-  }, [data, processedData, zeroFlag, date]);
+  }, [data, processedData, zeroFlag]);
 
   const axisName = `${dataType} ${dataField.name}`;
 
