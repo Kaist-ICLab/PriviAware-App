@@ -12,7 +12,7 @@ if __name__ == "__main__":
     db = client.abc
     collection = db.datum #users
 
-datatype = "APP_USAGE_EVENT"
+datatype = "WIFI"
 
 hour=60*60*1000
 day=60*60*1000*24
@@ -31,7 +31,7 @@ query = {
 all_data = collection.find_one(query)
 res = list(collection.find(query))
 
-print('all data', res[:100])
+print('all data', res[:5])
 
 # df = pd.json_normalize(all_data)
 # print('normalized')

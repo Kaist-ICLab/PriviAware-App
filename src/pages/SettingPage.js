@@ -36,6 +36,7 @@ import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 import {appUsageData, batteryData, locationData} from '../mocks/graphdata';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import wifiInfo from '../mocks/wifiInfo';
 
 dayjs.extend(utc);
 
@@ -336,32 +337,6 @@ export default function SettingPage({route}) {
             <></>
           )}
           <View style={{height: 240, marginTop: 20}}>
-            {/* <NumericGraph
-              data={batteryData}
-              dataType={convertDataType(route.params.dt.name)}
-              dataField={dataField}
-              timeRange={timeRange}
-              date={date}
-              zeroFlag={zeroFlag}
-            /> */}
-
-            {/* <LocationGraph
-              data={locationData}
-              timeRange={timeRange}
-              date={date}
-              zeroFlag={zeroFlag}
-            /> */}
-
-            <CategoricalGraph
-              data={appUsageData}
-              dataField={dataField}
-              dataType={route.params.dt.name}
-              timeRange={timeRange}
-              date={date}
-              zeroFlag={zeroFlag}
-            />
-
-            {/* 
             {status === 'off' ? (
               <View style={{justifyContent: 'center', flex: 1}}>
                 <Text
@@ -371,14 +346,15 @@ export default function SettingPage({route}) {
               </View>
             ) : route.params.dt.name === 'location' ? (
               <LocationGraph
-                data={data}
+                data={locationData} //data
                 timeRange={timeRange}
                 date={date}
                 zeroFlag={zeroFlag}
               />
             ) : dataField.type === 'num' ? (
               <NumericGraph
-                data={data}
+                data={batteryData} //data
+                dataType={convertDataType(route.params.dt.name)}
                 dataField={dataField}
                 timeRange={timeRange}
                 date={date}
@@ -386,7 +362,7 @@ export default function SettingPage({route}) {
               />
             ) : dataField.type === 'cat' ? (
               <CategoricalGraph
-                data={data}
+                data={appUsageData} //data
                 dataField={dataField}
                 dataType={route.params.dt.name}
                 timeRange={timeRange}
@@ -395,13 +371,14 @@ export default function SettingPage({route}) {
               />
             ) : (
               <CountGraph
-                data={data}
+                data={wifiInfo} //data
                 dataField={dataField}
                 timeRange={timeRange}
                 date={date}
                 zeroFlag={zeroFlag}
+                dataType={convertDataType(route.params.dt.name)}
               />
-            )} */}
+            )}
           </View>
         </View>
         <Text style={styles.listTitle}>Contextual Filtering</Text>
