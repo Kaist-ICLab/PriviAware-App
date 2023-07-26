@@ -241,7 +241,7 @@ function FilteringInfo({
                       opacity={0.5}
                       strokeColor={colorSet.primary}
                       fillColor={'#5A54921A'}
-                      radius={parseFloat(radius)}
+                      radius={parseFloat(radius) ?? 0}
                     />
                   </MapView>
                   <FakeMarker

@@ -14,9 +14,14 @@ import {COLOURS} from '../constants/Constant';
 import YAxisName from './YAxisName';
 import {
   convertDataType,
+  dateToTimestamp,
   timestampToFullHoursConverter,
   timestampToHoursWithUnitConverter,
 } from '../utils';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
 
 const CORRECTION_VALUE = 5;
 
@@ -34,8 +39,6 @@ export default function CategoricalGraph({
   const [label, setLabel] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  console.log('tRange', timeRange);
-
   useEffect(() => {
     if (data.length > 0 && dataField) {
       let tempData = [];
@@ -43,25 +46,22 @@ export default function CategoricalGraph({
       let max = 0;
       let tempyAccessor = [];
       let tempTSArray = [];
-      for (let i = timeRange[0]; i < timeRange[1]; i = i + 60 * 60 * 1000) {
-        // const currentData = data.filter(
-        //   d =>
-        //     d.timestamp >= date + i && d.timestamp < date + i + 60 * 60 * 1000,
-        // );
 
-        data.map(d => {
-          console.log(
-            'd.timestamp',
-            d.timestamp,
-            'date',
-            date,
-            'i',
-            i,
-            d.timestamp >= date + i && d.timestamp < date + i + 60 * 60 * 1000,
-          );
-        });
+      const startDay = new Date(dayjs(date).utc().startOf('day'));
+      const startTimestamp =
+        dateToTimestamp(timeRange[0]) - dateToTimestamp(startDay);
+      const endTimestamp =
+        dateToTimestamp(timeRange[1]) - dateToTimestamp(startDay);
 
-        const currentData = data;
+      for (let i = startTimestamp; i < endTimestamp; i = i + 60 * 60 * 1000) {
+        const dateTimeStamp = parseInt(dateToTimestamp(date), 10) + i;
+
+        const currentData = data.filter(
+          d =>
+            d.timestamp >= dateTimeStamp &&
+            d.timestamp < dateTimeStamp + 60 * 60 * 1000,
+        );
+
         if (dataType === 'physical_activity' && dataField.name === 'type') {
           tempObj = data.reduce(
             (acc, obj) => {

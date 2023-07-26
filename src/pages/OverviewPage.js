@@ -23,9 +23,9 @@ import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
 import {globalStyles} from '../styles/global';
 
 const collectionStatus = {
-  FILTERING: '#DC7700',
-  ON: '#128300',
-  OFF: '#3D3D3D',
+  FILTERING: '#5A5492',
+  ON: '#ACA9C8',
+  OFF: '#D9D9D9',
 };
 
 export default function OverviewPage({route}) {
