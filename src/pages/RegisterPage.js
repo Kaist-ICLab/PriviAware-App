@@ -105,7 +105,7 @@ export default function RegisterPage() {
             fontSize: 25,
             marginBottom: 40,
           }}>
-          Registration
+          Sign Up
         </Text>
         <View style={{backgroundColor: '#DBDBDB', marginHorizontal: 40}}>
           <Text

@@ -7,13 +7,16 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
 
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
 
 export default function LoginPage() {
+  const {colors} = useTheme();
+
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [emailValidity, setEmailValidity] = useState(false);
@@ -76,7 +79,11 @@ export default function LoginPage() {
 
   return (
     <SafeAreaView
-      style={{backgroundColor: '#FEFFBE', flex: 1, justifyContent: 'center'}}>
+      style={{
+        backgroundColor: colors.background,
+        flex: 1,
+        justifyContent: 'center',
+      }}>
       <View
         style={{justifyContent: 'space-around', opacity: loading ? 0.3 : 1}}>
         <Text
@@ -86,39 +93,30 @@ export default function LoginPage() {
             fontSize: 40,
             marginBottom: 40,
           }}>
-          Privacy-Viz
+          Sign In
         </Text>
-        <View style={{backgroundColor: '#DBDBDB', marginHorizontal: 40}}>
+        <View style={{marginHorizontal: 40}}>
           <Text
             style={{
               marginTop: 10,
-              marginLeft: 20,
               color: '#000000',
               fontSize: 17,
             }}>
             Gmail
           </Text>
           <TextInput
-            style={{
-              backgroundColor: '#F3F2F2',
-              marginHorizontal: 20,
-              height: 30,
-              paddingVertical: 0,
-            }}
+            style={styles.textInput}
             keyboardType="email-address"
             onChangeText={value => handleEmail(value)}
           />
           {emailValidity ? (
             <></>
           ) : (
-            <Text style={{color: '#ff0000', marginLeft: 20}}>
-              Invalid Email
-            </Text>
+            <Text style={{color: '#ff0000'}}>Invalid Email</Text>
           )}
           <Text
             style={{
               marginTop: 10,
-              marginLeft: 20,
               color: '#000000',
               fontSize: 17,
             }}>
@@ -126,8 +124,8 @@ export default function LoginPage() {
           </Text>
           <View
             style={{
+              ...styles.textInput,
               flexDirection: 'row',
-              marginHorizontal: 20,
               height: 30,
               marginBottom: 20,
               backgroundColor: '#F3F2F2',
@@ -146,35 +144,25 @@ export default function LoginPage() {
               )}
             </TouchableOpacity>
           </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
+          <View
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-around',
+            }}>
+            <TouchableOpacity style={styles.button} onPress={login}>
+              <Text style={styles.buttonText}>Login</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={{
-                backgroundColor: '#F3F2F2',
-                flex: 1,
+                flexDirection: 'row',
+                marginTop: 10,
                 justifyContent: 'center',
               }}
               onPress={register}>
-              <Text
-                style={{
-                  alignSelf: 'center',
-                  color: '#000000',
-                  fontSize: 15,
-                  marginVertical: 8,
-                }}>
-                Register
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#E9EE02',
-                flex: 1,
-                justifyContent: 'center',
-              }}
-              onPress={login}>
-              <Text
-                style={{alignSelf: 'center', color: '#000000', fontSize: 15}}>
-                Login
-              </Text>
+              <Text> Don't have an account? </Text>
+              <Text style={styles.signUp}> Sign Up</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -198,3 +186,41 @@ export default function LoginPage() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  innerContainer: {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'space-around',
+  },
+  button: {
+    display: 'flex',
+    borderRadius: 25,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    backgroundColor: '#5A5492',
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+
+  signUp: {
+    fontWeight: 'bold',
+  },
+  textInput: {
+    backgroundColor: '#F3F2F2',
+    height: 30,
+    paddingVertical: 0,
+    borderRadius: 8,
+    borderColor: '#AEAEAE33',
+    borderWidth: 2,
+  },
+});
