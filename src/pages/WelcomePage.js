@@ -13,11 +13,11 @@ export default function WelcomePage() {
   const navigation = useNavigation();
 
   const signIn = () => {
-    navigation.reset('Login');
+    navigation.replace('Login');
   };
 
   const signUp = () => {
-    navigation.reset('Register');
+    navigation.replace('Register');
   };
 
   return (
@@ -26,7 +26,7 @@ export default function WelcomePage() {
       style={styles.container}
       start={{x: 0, y: 0}}
       end={{x: 1, y: 1}}>
-      <SafeAreaView>
+      <SafeAreaView style={styles.innerContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>PRIVIZ</Text>
 
@@ -52,22 +52,26 @@ export default function WelcomePage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+  },
+  innerContainer: {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'space-around',
   },
   title: {
     fontSize: 60,
     fontWeight: 'bold',
-    marginBottom: 20,
     textAlign: 'center',
     color: '#FFFFFF',
   },
   description: {
+    textAlign: 'center',
     alignItems: 'center',
     justifyContent: 'center',
     color: '#F2C2B6',
     fontSize: 16,
-    maxWidth: '80%',
+    paddingHorizontal: '20%',
   },
   button: {
     display: 'flex',
@@ -83,9 +87,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  textContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    alignContent: 'center',
+  },
   buttonContainer: {
-    justifyContent: 'flex-end',
-    flex: 1,
-    marginBottom: 42,
+    display: 'flex',
+    flexDirection: 'column',
+    paddingHorizontal: '10%',
+    justifyContent: 'space-around',
   },
 });
