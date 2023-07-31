@@ -36,7 +36,7 @@ const Decorator = ({x, y, data}) => {
 
 export default function LineGraph({loading, processedData, axisName, maxData}) {
   const colorScheme = useColorScheme();
-  const theme = colorScheme !== 'dark' ? 'black' : '#DEDDE966';
+  const theme = colorScheme !== 'dark' ? '#AEAEAE' : '#DEDDE966';
 
   return (
     <View style={{flex: 1}}>

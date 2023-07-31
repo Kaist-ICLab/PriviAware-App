@@ -100,10 +100,10 @@ function FilteringInfo({
   const blockName = [];
 
   if (keys.includes('locationFiltering')) {
-    blockName.push('Location');
+    blockName.push('Location Filter');
   }
   if (keys.includes('timeFiltering')) {
-    blockName.push('Time');
+    blockName.push('Time Filter');
   }
 
   return (
@@ -119,7 +119,7 @@ function FilteringInfo({
           setIsCollapsed(() => !isCollapsed);
         }}>
         <Text>
-          {blockName.length === 0 ? 'New Filter' : blockName.join(' + ')}
+          {blockName.length === 0 ? 'New Filter' : blockName.join(' , ')}
         </Text>
         {isNew ? (
           <View style={styles.dotButton}>
@@ -248,7 +248,9 @@ function FilteringInfo({
                       opacity={0.5}
                       strokeColor={colorSet.primary}
                       fillColor={'#5A54921A'}
-                      radius={parseFloat(radius) ?? 0}
+                      radius={
+                        isNaN(parseFloat(radius)) ? 0 : parseFloat(radius)
+                      }
                     />
                   </MapView>
                   <FakeMarker

@@ -176,7 +176,7 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
   };
 
   const handleRadius = value => {
-    setRadius(value);
+    setRadius(value ?? 0);
   };
 
   const applyLocationSetting = () => {

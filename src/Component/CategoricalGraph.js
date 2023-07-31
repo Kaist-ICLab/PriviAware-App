@@ -42,7 +42,7 @@ export default function CategoricalGraph({
   const [loading, setLoading] = useState(false);
   const colorScheme = useColorScheme();
 
-  const theme = colorScheme !== 'dark' ? '#000000' : '#DEDDE966';
+  const theme = colorScheme !== 'dark' ? '#AEAEAE' : '#DEDDE966';
   const graphColorSet = colorScheme === 'dark' ? COLORS_SET1 : COLOURS;
 
   useEffect(() => {
@@ -137,7 +137,6 @@ export default function CategoricalGraph({
   }, [data, dataField, dataType, timeRange, date]);
 
   useEffect(() => {
-    console.log(data.length, processedData.length, zeroFlag);
     if (data.length > 0 || zeroFlag) setLoading(false);
   }, [data, processedData, zeroFlag]);
 
