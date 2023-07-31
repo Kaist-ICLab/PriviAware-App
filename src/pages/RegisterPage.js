@@ -112,6 +112,8 @@ export default function RegisterPage() {
             style={styles.textInput}
             keyboardType="email-address"
             onChangeText={value => handleEmail(value)}
+            placeholder="example@gmail.com"
+            placeholderTextColor="#AEAEAE"
           />
         </View>
 
@@ -134,11 +136,11 @@ export default function RegisterPage() {
               onChangeText={value => handlePassword1(value)}
             />
             <TouchableOpacity onPress={handleShowPW1}>
-              {showPW1 ? (
-                <Entypo name="eye-with-line" size={20}></Entypo>
-              ) : (
-                <Entypo name="eye" size={20}></Entypo>
-              )}
+              <Entypo
+                name={showPW1 ? 'eye-with-line' : 'eye'}
+                size={20}
+                color="#AEAEAE"
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -157,11 +159,11 @@ export default function RegisterPage() {
               onChangeText={value => handlePassword2(value)}
             />
             <TouchableOpacity onPress={handleShowPW2}>
-              {showPW2 ? (
-                <Entypo name="eye-with-line" size={20}></Entypo>
-              ) : (
-                <Entypo name="eye" size={20}></Entypo>
-              )}
+              <Entypo
+                name={showPW2 ? 'eye-with-line' : 'eye'}
+                size={20}
+                color="#AEAEAE"
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -243,6 +245,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F2F2',
     height: 30,
     padding: 0,
+    color: '#000000',
   },
   textInputWrapper: {
     borderRadius: 8,

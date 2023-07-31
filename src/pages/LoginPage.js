@@ -101,6 +101,7 @@ export default function LoginPage() {
             keyboardType="email-address"
             onChangeText={value => handleEmail(value)}
             placeholder="example@gmail.com"
+            placeholderTextColor="#AEAEAE"
           />
         </View>
 
@@ -128,11 +129,11 @@ export default function LoginPage() {
               onChangeText={value => handlePassword(value)}
             />
             <TouchableOpacity onPress={handleShowPW}>
-              {showPW ? (
-                <Entypo name="eye-with-line" size={20}></Entypo>
-              ) : (
-                <Entypo name="eye" size={20}></Entypo>
-              )}
+              <Entypo
+                name={showPW ? 'eye-with-line' : 'eye'}
+                size={20}
+                color="#AEAEAE"
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -214,6 +215,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F3F2F2',
     height: 30,
     padding: 0,
+    color: '#000000',
   },
   textInputWrapper: {
     borderRadius: 8,
