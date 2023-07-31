@@ -85,9 +85,19 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
     setShowTimePicker1(!showTimePicker1);
   };
 
+  const validateTimeRange = (startDate, endDate) => {
+    if (startDate.getTime() > endDate.getTime()) {
+      AlertBox('Error', 'Starting time cannot be later than ending time');
+      return false;
+    }
+    return true;
+  };
+
   const handleTimePicker1Confirm = date => {
-    setTimePicker1(date);
-    handleShowTimePicker1();
+    if (validateTimeRange(date, timePicker2)) {
+      setTimePicker1(date);
+      handleShowTimePicker1();
+    }
   };
 
   const handleShowTimePicker2 = () => {
@@ -95,8 +105,10 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
   };
 
   const handleTimePicker2Confirm = date => {
-    setTimePicker2(date);
-    handleShowTimePicker2();
+    if (validateTimeRange(timePicker1, date)) {
+      setTimePicker2(date);
+      handleShowTimePicker2();
+    }
   };
 
   const applyTimeSetting = () => {
@@ -119,7 +131,7 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
       });
       return;
     }
-    if (timePicker1 > timePicker2) {
+    if (timePicker1.getTime() > timePicker2.getTime()) {
       AlertBox('Error', 'Starting time cannot be earlier than ending time');
       setShowTimeSetting(false);
       setTimeToggleStatus(false);

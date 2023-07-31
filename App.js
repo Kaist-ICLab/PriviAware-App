@@ -75,9 +75,9 @@ function App() {
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <NavigationContainer theme={isDarkMode ? DarkTheme : LightTheme}>
         <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="Welcome" component={WelcomePage} />
+          {/* <Stack.Screen name="Welcome" component={WelcomePage} />
           <Stack.Screen name="Login" component={LoginPage} />
-          <Stack.Screen name="Register" component={RegisterPage} />
+          <Stack.Screen name="Register" component={RegisterPage} /> */}
           <Stack.Screen name="Overview" component={OverviewPage} />
           <Stack.Screen name="Setting" component={SettingPage} />
         </Stack.Navigator>

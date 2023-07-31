@@ -57,7 +57,7 @@ export default function SettingPage({route}) {
   // TODO: load filter List data from server, here is a mock data
   const [filterInfo, setFilterInfo] = useState(filterList);
 
-  // data visualisation related
+  // data visualization related
   const [timeRange, setTimeRange] = useState([
     new Date(startToday),
     new Date(endToday),
@@ -70,6 +70,14 @@ export default function SettingPage({route}) {
   const [zeroFlag, setZeroFlag] = useState(false);
   // data record related
   const [data, setData] = useState([]);
+
+  const validateTimeRange = (startDate, endDate) => {
+    if (startDate.getTime() > endDate.getTime()) {
+      AlertBox('Error', 'Starting time cannot be later than ending time');
+      return false;
+    }
+    return true;
+  };
 
   const AlertBox = (title, msg) => {
     Alert.alert(title, msg, [
@@ -213,9 +221,13 @@ export default function SettingPage({route}) {
     // the value got from the picker is local time, need to convert to UTC time
     const convertedDate = convertLocalToUTCDate(value);
     if (index === 0) {
-      setTimeRange(prev => [convertedDate, prev[1]]);
+      if (validateTimeRange(convertedDate, timeRange[1])) {
+        setTimeRange(prev => [convertedDate, prev[1]]);
+      }
     } else {
-      setTimeRange(prev => [prev[0], convertedDate]);
+      if (validateTimeRange(timeRange[0], convertedDate)) {
+        setTimeRange(prev => [prev[0], convertedDate]);
+      }
     }
   };
 
