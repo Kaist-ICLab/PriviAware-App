@@ -7,13 +7,16 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
 
-import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
+import {SERVER_IP_ADDR} from '@env';
 
 export default function RegisterPage() {
+  const {colors} = useTheme();
+
   const navigation = useNavigation();
   const [showPW1, setShowPW1] = useState(false);
   const [showPW2, setShowPW2] = useState(false);
@@ -92,67 +95,41 @@ export default function RegisterPage() {
 
   return (
     <SafeAreaView
-      style={{backgroundColor: '#FEFFBE', flex: 1, justifyContent: 'center'}}>
-      <View
-        style={{justifyContent: 'space-around', opacity: loading ? 0.3 : 1}}>
-        <Text style={{alignSelf: 'center', color: '#000000', fontSize: 40}}>
-          Privacy-Viz
-        </Text>
-        <Text
-          style={{
-            alignSelf: 'center',
-            color: '#000000',
-            fontSize: 25,
-            marginBottom: 40,
-          }}>
-          Sign Up
-        </Text>
-        <View style={{backgroundColor: '#DBDBDB', marginHorizontal: 40}}>
-          <Text
-            style={{
-              marginTop: 10,
-              marginLeft: 20,
-              color: '#000000',
-              fontSize: 17,
-            }}>
-            Gmail
-          </Text>
+      style={{
+        backgroundColor: colors.background,
+        ...styles.container,
+        opacity: loading ? 0.3 : 1,
+      }}>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Sign Up</Text>
+      </View>
+
+      <View stype={styles.formContainer}>
+        <Text style={styles.textInputTitle}>Gmail</Text>
+
+        <View style={styles.textInputWrapper}>
           <TextInput
-            style={{
-              backgroundColor: '#F3F2F2',
-              marginHorizontal: 20,
-              height: 30,
-              paddingVertical: 0,
-            }}
+            style={styles.textInput}
             keyboardType="email-address"
             onChangeText={value => handleEmail(value)}
           />
-          {emailValidity ? (
-            <></>
-          ) : (
-            <Text style={{color: '#ff0000', marginLeft: 20}}>
-              Invalid Email
-            </Text>
-          )}
-          <Text
-            style={{
-              marginTop: 10,
-              marginLeft: 20,
-              color: '#000000',
-              fontSize: 17,
-            }}>
-            Password
-          </Text>
+        </View>
+
+        {emailValidity ? (
+          <></>
+        ) : (
+          <Text style={{color: '#ff0000'}}>Invalid Email</Text>
+        )}
+        <Text style={styles.textInputTitle}>Password</Text>
+
+        <View style={styles.textInputWrapper}>
           <View
             style={{
               flexDirection: 'row',
-              marginHorizontal: 20,
-              height: 30,
-              backgroundColor: '#F3F2F2',
               alignItems: 'center',
             }}>
             <TextInput
-              style={{paddingVertical: 0, width: '88%'}}
+              style={{...styles.textInput, width: '88%'}}
               secureTextEntry={!showPW1}
               onChangeText={value => handlePassword1(value)}
             />
@@ -164,26 +141,18 @@ export default function RegisterPage() {
               )}
             </TouchableOpacity>
           </View>
-          <Text
-            style={{
-              marginTop: 10,
-              marginLeft: 20,
-              color: '#000000',
-              fontSize: 17,
-            }}>
-            Confirm Password
-          </Text>
+        </View>
+
+        <Text style={styles.textInputTitle}>Confirm Password</Text>
+
+        <View style={styles.textInputWrapper}>
           <View
             style={{
               flexDirection: 'row',
-              marginHorizontal: 20,
-              height: 30,
-              marginBottom: 20,
-              backgroundColor: '#F3F2F2',
               alignItems: 'center',
             }}>
             <TextInput
-              style={{paddingVertical: 0, width: '88%'}}
+              style={{...styles.textInput, width: '88%'}}
               secureTextEntry={!showPW2}
               onChangeText={value => handlePassword2(value)}
             />
@@ -195,39 +164,26 @@ export default function RegisterPage() {
               )}
             </TouchableOpacity>
           </View>
-          <View style={{flexDirection: 'row', justifyContent: 'space-around'}}>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#F3F2F2',
-                flex: 1,
-                justifyContent: 'center',
-              }}
-              onPress={cancel}>
-              <Text
-                style={{
-                  alignSelf: 'center',
-                  color: '#000000',
-                  fontSize: 15,
-                  marginVertical: 8,
-                }}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                backgroundColor: '#E9EE02',
-                flex: 1,
-                justifyContent: 'center',
-              }}
-              onPress={submit}>
-              <Text
-                style={{alignSelf: 'center', color: '#000000', fontSize: 15}}>
-                Submit
-              </Text>
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={submit}>
+          <Text style={styles.buttonText}> Submit</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+            marginTop: 10,
+            justifyContent: 'center',
+          }}
+          onPress={cancel}>
+          <Text> Already have an account?</Text>
+          <Text style={styles.signUp}> Sign In</Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
         <View
           style={{
@@ -247,3 +203,60 @@ export default function RegisterPage() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    display: 'flex',
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingHorizontal: 40,
+  },
+  titleContainer: {
+    flex: 1,
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
+  formContainer: {
+    flex: 2,
+  },
+  buttonContainer: {
+    marginTop: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+  },
+  button: {
+    display: 'flex',
+    borderRadius: 25,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+    backgroundColor: '#5A5492',
+  },
+  buttonText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  textInput: {
+    backgroundColor: '#F3F2F2',
+    height: 30,
+    padding: 0,
+  },
+  textInputWrapper: {
+    borderRadius: 8,
+    borderColor: '#AEAEAE33',
+    borderWidth: 2,
+    backgroundColor: '#F3F2F2',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  title: {
+    fontSize: 34,
+  },
+  textInputTitle: {
+    marginTop: 10,
+    fontSize: 17,
+  },
+});
