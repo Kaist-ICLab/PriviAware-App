@@ -63,3 +63,6 @@ yarn-error.log
 .metro-health-check*
 
 .env
+
+#mock data may contain sensitive information(e.g. mac address)
+src/mocks

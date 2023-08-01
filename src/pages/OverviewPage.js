@@ -8,19 +8,31 @@ import {
   Alert,
   PermissionsAndroid,
   ActivityIndicator,
+  StyleSheet,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useTheme} from '@react-navigation/native';
 import BackgroundTimer from 'react-native-background-timer';
 import Geolocation from 'react-native-geolocation-service';
 import RNExitApp from 'react-native-exit-app';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from './Constant';
-import {DATATYPE_DESCRIPTION} from './DataTypeDescription';
+import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '../constants/Constant';
+import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
 import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
+import {globalStyles} from '../styles/global';
+
+const collectionStatus = {
+  FILTERING: '#5A5492',
+  ON: '#ACA9C8',
+  OFF: '#D9D9D9',
+};
 
 export default function OverviewPage({route}) {
-  const {email} = route.params;
+  const {colors} = useTheme();
+
+  // const {email} = route.params;
+  const email = 'test@test.com';
   const navigation = useNavigation();
   const [status, setStatus] = useState({});
   const [loading, setLoading] = useState(true);
@@ -140,131 +152,108 @@ export default function OverviewPage({route}) {
   };
 
   return (
-    <SafeAreaView style={{backgroundColor: '#FEFFBE', flex: 1}}>
+    <SafeAreaView
+      style={[globalStyles.container, {backgroundColor: colors.background}]}>
       <View style={{opacity: loading ? 0.3 : 1, flex: 1}}>
-        <Text style={{fontSize: 18, margin: 15, color: '#000000'}}>
-          Logged in as: {email}
-        </Text>
+        <Text style={globalStyles.header}>Data Types</Text>
+        <Text style={styles.loginInfo}>Logged in as: {email}</Text>
+
         <ScrollView>
-          <Text
-            style={{
-              marginHorizontal: 15,
-              marginVertical: 10,
-              color: '#b10000',
-              fontSize: 15,
-              fontWeight: 'bold',
-            }}>
-            Sensitive Data
-          </Text>
-          {SENSITIVE_DATATYPE.map((dt, i) => {
-            return (
-              <View
-                key={i}
-                style={{
-                  backgroundColor: i % 2 ? '#D9D9D9' : '#F3F2F2',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{flexDirection: 'row'}}>
-                  <TouchableOpacity
-                    style={{marginHorizontal: 15, marginVertical: 13}}
-                    onPress={() => navToSetting(dt)}>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        textDecorationLine: 'underline',
-                        color: '#b10000',
-                        fontWeight: 'bold',
-                      }}>
-                      {dt.name.charAt(0).toUpperCase() +
-                        dt.name.slice(1).replaceAll('_', ' ')}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{alignSelf: 'center'}}
-                    onPress={() => showInfo(dt)}>
-                    <AntDesign name="questioncircleo" size={15} />
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: 9,
-                    alignSelf: 'center',
-                    marginRight: 20,
-                    backgroundColor:
-                      status[dt.name] === 'on'
-                        ? '#128300'
-                        : status[dt.name] === 'off'
-                        ? '#3D3D3D'
-                        : '#DC7700',
-                  }}
+          <Text style={styles.listTitle}>Sensitive</Text>
+          {SENSITIVE_DATATYPE.map((dt, i) => (
+            <View key={i} style={styles.listContent}>
+              <View style={styles.row}>
+                <MaterialCommunityIcons
+                  name={dt.icon}
+                  size={20}
+                  style={styles.icon}
                 />
+                <TouchableOpacity
+                  style={{marginEnd: 10, marginVertical: 13}}
+                  onPress={() => navToSetting(dt)}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                    }}>
+                    {dt.name.charAt(0).toUpperCase() +
+                      dt.name.slice(1).replaceAll('_', ' ')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{alignSelf: 'center'}}
+                  onPress={() => showInfo(dt)}>
+                  <AntDesign name="questioncircleo" size={15} />
+                </TouchableOpacity>
               </View>
-            );
-          })}
-          <Text
-            style={{
-              marginHorizontal: 15,
-              marginVertical: 10,
-              color: '#000000',
-              fontSize: 15,
-            }}>
-            Other Data
-          </Text>
-          {NORMAL_DATATYPE.map((dt, i) => {
-            return (
               <View
-                key={i}
                 style={{
-                  backgroundColor: i % 2 ? '#D9D9D9' : '#F3F2F2',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                }}>
-                <View style={{flexDirection: 'row'}}>
-                  <TouchableOpacity
-                    style={{marginHorizontal: 15, marginVertical: 13}}
-                    onPress={() => navToSetting(dt)}>
-                    <Text
-                      style={{
-                        fontSize: 15,
-                        textDecorationLine: 'underline',
-                        color: '#000000',
-                        fontWeight: 'normal',
-                      }}>
-                      {dt.name.charAt(0).toUpperCase() +
-                        dt.name.slice(1).replaceAll('_', ' ')}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={{alignSelf: 'center'}}
-                    onPress={() => showInfo(dt)}>
-                    <AntDesign name="questioncircleo" size={15} />
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    width: 18,
-                    height: 18,
-                    borderRadius: 9,
-                    alignSelf: 'center',
-                    marginRight: 20,
-                    backgroundColor:
-                      status[dt.name] === 'on'
-                        ? '#128300'
-                        : status[dt.name] === 'off'
-                        ? '#3D3D3D'
-                        : '#DC7700',
-                  }}
+                  ...styles.dotStatus,
+                  backgroundColor:
+                    status[dt.name] === 'on'
+                      ? collectionStatus.ON
+                      : status[dt.name] === 'off'
+                      ? collectionStatus.OFF
+                      : collectionStatus.FILTERING,
+                }}
+              />
+            </View>
+          ))}
+          <Text style={styles.listTitle}>Not Sensitive</Text>
+          {NORMAL_DATATYPE.map((dt, i) => (
+            <View key={i} style={styles.listContent}>
+              <View style={styles.row}>
+                <MaterialCommunityIcons
+                  name={dt.icon}
+                  size={20}
+                  style={styles.icon}
                 />
+                <TouchableOpacity
+                  style={{marginEnd: 10, marginVertical: 13}}
+                  onPress={() => navToSetting(dt)}>
+                  <Text
+                    style={{
+                      fontSize: 16,
+                    }}>
+                    {dt.name.charAt(0).toUpperCase() +
+                      dt.name.slice(1).replaceAll('_', ' ')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{alignSelf: 'center'}}
+                  onPress={() => showInfo(dt)}>
+                  <AntDesign name="questioncircleo" size={15} />
+                </TouchableOpacity>
               </View>
-            );
-          })}
+              <View
+                style={{
+                  ...styles.dotStatus,
+                  backgroundColor:
+                    status[dt.name] === 'on'
+                      ? collectionStatus.ON
+                      : status[dt.name] === 'off'
+                      ? collectionStatus.OFF
+                      : collectionStatus.FILTERING,
+                }}
+              />
+            </View>
+          ))}
         </ScrollView>
-        <View style={{marginHorizontal: 15, marginTop: 5}}>
-          <Text>Status dot colour:</Text>
-          <Text>Green: on, Orange: on with filtering, Grey: off</Text>
+        <View style={styles.extraInformation}>
+          {Object.keys(collectionStatus).map(s => (
+            <View style={styles.row} key={s}>
+              <View
+                style={{
+                  ...styles.dotStatus,
+                  backgroundColor: collectionStatus[s],
+                }}
+              />
+              <Text>
+                {s === 'FILTERING'
+                  ? `Data Collection ON / Filtering ON`
+                  : `Data Collection ${s} / Filtering OFF`}
+              </Text>
+            </View>
+          ))}
         </View>
         <View style={{marginTop: 20, marginBottom: 20, alignSelf: 'center'}}>
           <TouchableOpacity
@@ -298,3 +287,28 @@ export default function OverviewPage({route}) {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  listTitle: {
+    fontSize: 22,
+    marginTop: 20,
+    marginBottom: 5,
+  },
+  listContent: {
+    borderColor: '#E8E8E8',
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  icon: {marginHorizontal: 4, marginVertical: 13},
+  dotStatus: {
+    width: 16,
+    height: 16,
+    borderRadius: 9,
+    alignSelf: 'center',
+    marginRight: 20,
+  },
+  loginInfo: {fontSize: 15, color: '#000000'},
+  row: {flexDirection: 'row'},
+  extraInformation: {marginTop: 10},
+});

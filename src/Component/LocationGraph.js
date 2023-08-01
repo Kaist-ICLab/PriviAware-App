@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, ActivityIndicator} from 'react-native';
 import MapView from 'react-native-maps';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Marker, Callout} from 'react-native-maps';
 
 export default function LocationGraph({data, timeRange, date, zeroFlag}) {
@@ -87,7 +88,8 @@ export default function LocationGraph({data, timeRange, date, zeroFlag}) {
             return (
               <Marker
                 key={i}
-                coordinate={{latitude: loc.latitude, longitude: loc.longitude}}>
+                coordinate={{latitude: loc.latitude, longitude: loc.longitude}}
+                icon={require('../assets/images/pin.png')}>
                 <Callout>
                   <View>
                     <Text
@@ -100,7 +102,11 @@ export default function LocationGraph({data, timeRange, date, zeroFlag}) {
                     </Text>
                     {loc.timestamp.map((ts, i) => {
                       return (
-                        <Text key={i}>
+                        <Text
+                          style={{
+                            color: '#000000',
+                          }}
+                          key={i}>
                           {'Timestamp: ' +
                             localTimestampToHoursConverter(ts) +
                             ', Altitude: ' +

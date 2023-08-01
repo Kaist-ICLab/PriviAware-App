@@ -6,11 +6,26 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
+  useColorScheme,
 } from 'react-native';
 import {StackedBarChart, Grid, XAxis, YAxis} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 
-import {COLOURS} from './Constant';
+import {COLORS_SET1, COLOURS} from '../constants/Constant';
+import YAxisName from './YAxisName';
+import {
+  convertDataType,
+  dateToTimestamp,
+  timestampToFullHoursConverter,
+  timestampToHoursWithUnitConverter,
+} from '../utils';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+
+const CORRECTION_VALUE = 5;
+const HOUR_MILLISECONDS = 60 * 60 * 1000;
 
 export default function CategoricalGraph({
   data,
@@ -24,7 +39,11 @@ export default function CategoricalGraph({
   const [maxData, setMaxData] = useState(0);
   const [yAccessor, setYAccessor] = useState([]);
   const [label, setLabel] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const colorScheme = useColorScheme();
+
+  const theme = colorScheme !== 'dark' ? '#AEAEAE' : '#DEDDE966';
+  const graphColorSet = colorScheme === 'dark' ? COLORS_SET1 : COLOURS;
 
   useEffect(() => {
     if (data.length > 0 && dataField) {
@@ -32,12 +51,29 @@ export default function CategoricalGraph({
       let tempObj = {};
       let max = 0;
       let tempyAccessor = [];
-      let tempTSArray = [];
-      for (let i = timeRange[0]; i < timeRange[1]; i = i + 60 * 60 * 1000) {
+      let filteredDataNum = 0;
+
+      const startDay = new Date(dayjs(date).utc().startOf('day'));
+      const startTimestamp =
+        dateToTimestamp(timeRange[0]) - dateToTimestamp(startDay);
+      const endTimestamp =
+        dateToTimestamp(timeRange[1]) - dateToTimestamp(startDay);
+
+      for (
+        let i = startTimestamp;
+        i < endTimestamp;
+        i = i + HOUR_MILLISECONDS
+      ) {
+        const dateTimeStamp = parseInt(dateToTimestamp(date), 10) + i;
+
         const currentData = data.filter(
           d =>
-            d.timestamp >= date + i && d.timestamp < date + i + 60 * 60 * 1000,
+            d.timestamp >= dateTimeStamp &&
+            d.timestamp < dateTimeStamp + HOUR_MILLISECONDS,
         );
+
+        filteredDataNum += currentData.length;
+
         if (dataType === 'physical_activity' && dataField.name === 'type') {
           tempObj = data.reduce(
             (acc, obj) => {
@@ -59,10 +95,10 @@ export default function CategoricalGraph({
             },
             {timestamp: i},
           );
+          tempData.push(tempObj);
         }
-        tempData.push(tempObj);
-        tempTSArray.push({timestamp: i, value: 0});
       }
+
       for (let i = 0; i < tempData.length; i++) {
         const keys = Object.keys(tempData[i]).filter(
           key => key !== 'timestamp',
@@ -73,21 +109,24 @@ export default function CategoricalGraph({
         if (count > max) max = count;
         tempyAccessor = [...new Set([...tempyAccessor, ...keys])];
       }
+
       for (let i = 0; i < tempData.length; i++) {
         for (let j = 0; j < tempyAccessor.length; j++) {
           if (!tempData[i][tempyAccessor[j]]) tempData[i][tempyAccessor[j]] = 0;
         }
       }
+
       console.log(
         '[RN CategoricalGraph.js] Generated data: ',
         JSON.stringify(tempData),
       );
-      setProcessedData(tempData);
+
+      setProcessedData(() => (filteredDataNum === 0 ? [] : tempData));
       setMaxData(max);
       setYAccessor(tempyAccessor);
       setLabel(
         tempyAccessor.map((k, i) => {
-          return {key: k, color: COLOURS[i]};
+          return {key: k, color: graphColorSet[i]};
         }),
       );
     } else setProcessedData([]);
@@ -98,8 +137,7 @@ export default function CategoricalGraph({
   }, [data, dataField, dataType, timeRange, date]);
 
   useEffect(() => {
-    if ((data.length > 0 && processedData.length > 0) || zeroFlag)
-      setLoading(false);
+    if (data.length > 0 || zeroFlag) setLoading(false);
   }, [data, processedData, zeroFlag]);
 
   const AlertBox = (title, msg) => {
@@ -109,28 +147,6 @@ export default function CategoricalGraph({
         style: 'cancel',
       },
     ]);
-  };
-
-  const timestampToHoursConverter = ts => {
-    const date = new Date(ts);
-    const hour = date.getUTCHours();
-    if (hour === 0) return String(date.getUTCHours()) + 'mn';
-    if (hour > 0 && hour < 12) return String(date.getUTCHours()) + 'am';
-    if (hour === 12) return String(date.getUTCHours()) + 'nn';
-    if (hour > 12) return String(date.getUTCHours() - 12) + 'pm';
-  };
-
-  const timestampToFullHoursConverter = ts => {
-    const date = new Date(ts);
-    return (
-      String(date.getHours()).padStart(2, '0') +
-      ':' +
-      String(date.getMinutes()).padStart(2, '0') +
-      ':' +
-      String(date.getSeconds()).padStart(2, '0') +
-      '.' +
-      String(date.getMilliseconds()).padStart(3, '0')
-    );
   };
 
   const showFewEntries = key => {
@@ -184,6 +200,8 @@ export default function CategoricalGraph({
     );
   };
 
+  const axisName = `${convertDataType(dataType)}`;
+
   return (
     <View style={{flex: 1}}>
       {loading ? (
@@ -193,23 +211,11 @@ export default function CategoricalGraph({
       ) : processedData.length > 0 ? (
         <View style={{flex: 1}}>
           <View style={{flex: 1, flexDirection: 'row'}}>
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: -10,
-                marginRight: -7,
-              }}>
-              <Text
-                style={{
-                  fontSize: 9,
-                  color: '#000000',
-                  transform: [{rotate: '-90deg'}],
-                }}>
-                Count
-              </Text>
-            </View>
+            <YAxisName
+              textHeight={10}
+              textLength={axisName.length * CORRECTION_VALUE}
+              name={axisName}
+            />
             <View style={{flex: 11, flexDirection: 'row'}}>
               <View style={{flex: 1}}>
                 <YAxis
@@ -218,7 +224,7 @@ export default function CategoricalGraph({
                   yAccessor={() => yAccessor}
                   min={0}
                   max={maxData}
-                  svg={{fontSize: 10, fill: 'black'}}
+                  svg={{fontSize: 10, fill: theme}}
                   contentInset={{top: 8, bottom: 8, left: 10, right: 10}}
                 />
                 <View style={{flex: 1}}></View>
@@ -228,14 +234,14 @@ export default function CategoricalGraph({
                   style={{height: '100%', flex: 19}}
                   keys={yAccessor}
                   data={processedData}
-                  colors={COLOURS}
+                  colors={graphColorSet}
                   yMin={0}
                   yMax={maxData}
                   yAccessor={() => yAccessor}
                   xAccessor={d => d.item.timestamp}
                   spacingInner={0.5}
                   contentInset={{top: 8, bottom: 8, left: 10, right: 10}}>
-                  <Grid svg={{strokeOpacity: 0.5}} />
+                  <Grid svg={{strokeOpacity: 0.5, stroke: theme}} />
                 </StackedBarChart>
                 <XAxis
                   style={{flex: 1, height: '100%'}}
@@ -243,9 +249,10 @@ export default function CategoricalGraph({
                   xAccessor={d => d.item.timestamp}
                   scale={scale.scaleBand}
                   formatLabel={(value, i) => {
-                    if (!(i % 2)) return timestampToHoursConverter(value);
+                    if (!(i % 2))
+                      return timestampToHoursWithUnitConverter(value);
                   }}
-                  svg={{fontSize: 10, fill: 'black'}}
+                  svg={{fontSize: 10, fill: theme}}
                   spacingInner={0.5}
                   contentInset={{top: 8, bottom: 8, left: 10, right: 10}}
                 />
@@ -288,9 +295,7 @@ export default function CategoricalGraph({
         </View>
       ) : (
         <View style={{justifyContent: 'center', flex: 1}}>
-          <Text style={{alignSelf: 'center', color: '#000000', fontSize: 50}}>
-            No Data
-          </Text>
+          <Text style={{alignSelf: 'center', fontSize: 50}}>No Data</Text>
         </View>
       )}
     </View>
