@@ -86,8 +86,8 @@ export default function RegisterPage() {
     });
     const data = await res.json();
     console.log('[RN App.js] Received: ' + JSON.stringify(data));
+    setLoading(false);
     if (data.result) {
-      setLoading(false);
       AlertBox('Success', 'Account created!');
       navigation.navigate('Login');
     } else AlertBox('Error', 'Email is registered');

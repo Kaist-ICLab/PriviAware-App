@@ -65,9 +65,9 @@ export default function LoginPage() {
     });
     const data = await res.json();
     console.log('[RN App.js] Received: ' + JSON.stringify(data));
+    setLoading(false);
     if (!data.result) AlertBox('Error', 'Incorrect email or password');
     else {
-      setLoading(false);
       navigation.navigate('Overview', {email: email});
     }
   };

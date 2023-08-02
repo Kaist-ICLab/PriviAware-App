@@ -14,7 +14,7 @@ import {useNavigation, useTheme} from '@react-navigation/native';
 import {Picker} from '@react-native-picker/picker';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
-import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
+import {SERVER_IP_ADDR} from '@env';
 import LocationGraph from '../Component/LocationGraph';
 import NumericGraph from '../Component/NumericGraph';
 import CategoricalGraph from '../Component/CategoricalGraph';
@@ -22,7 +22,6 @@ import CountGraph from '../Component/CountGraph';
 import {globalStyles} from '../styles/global';
 import {colorSet} from '../constants/Colors';
 import FilteringInfo from '../Component/FilteringInfo';
-import filterList from '../mocks/filterInfo';
 import {
   dateToString,
   dateToTimeString,
@@ -32,10 +31,8 @@ import {
   convertDataType,
 } from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
-import {appUsageData, batteryData, locationData} from '../mocks/graphdata';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import wifiInfo from '../mocks/wifiInfo';
 
 dayjs.extend(utc);
 
@@ -54,8 +51,7 @@ export default function SettingPage({route}) {
     route.params.status !== 'off',
   );
 
-  // TODO: load filter List data from server, here is a mock data
-  const [filterInfo, setFilterInfo] = useState(filterList);
+  const [filterInfo, setFilterInfo] = useState([]);
 
   // data visualization related
   const [timeRange, setTimeRange] = useState([
@@ -65,7 +61,6 @@ export default function SettingPage({route}) {
 
   const [date, setDate] = useState(today);
 
-  const [allDate, setAllDate] = useState([]);
   const [dataField, setDataField] = useState(route.params.dt.field[0]);
   const [zeroFlag, setZeroFlag] = useState(false);
   // data record related
@@ -97,49 +92,36 @@ export default function SettingPage({route}) {
         body: JSON.stringify({email: route.params.email}),
       });
       const data = await res.json();
-      console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+
+      console.log(
+        '[RN SettingPage.js] Filter Received: ' + JSON.stringify(data),
+      );
+
+      setFilterInfo(data.filtering[route.params.dt.name]);
     };
     fetchFilteringSetting();
   }, [route.params.status, route.params.email, route.params.dt]);
 
   useEffect(() => {
-    const dates = [];
-    const current = Date.now();
-    const since = new Date(2023, 4, 24).getTime();
-    for (let i = since; i < current; i = i + 24 * 60 * 60 * 1000) {
-      const dateTemp = new Date(i);
-      dates.push({
-        label:
-          String(dateTemp.getDate()).padStart(2, '0') +
-          '-' +
-          String(dateTemp.getMonth() + 1).padStart(2, '0') +
-          '-' +
-          String(dateTemp.getFullYear()),
-        value: i,
-      });
-    }
-    setAllDate(dates);
-  }, [route.params.dt]);
-
-  useEffect(() => {
     const fetchDataFromDB = async () => {
       if (route.params.email && route.params.dt.name && date && timeRange) {
+        const timeRangetoTimestamp = [
+          dateToTimestamp(timeRange[0]),
+          dateToTimestamp(timeRange[1]),
+        ];
+
         console.log(
           '[RN SettingPage.js] Fetch data from DB with param user:',
           route.params.email,
           'datatype:',
           route.params.dt.name,
           'date:',
-          date,
+          dateToTimestamp(date),
           'timeRange[0]:',
-          timeRange[0],
+          timeRangetoTimestamp[0],
           'timeRange[1]:',
-          timeRange[1],
+          timeRangetoTimestamp[1],
         );
-        const timeRangeasTimestamp = [
-          dateToTimestamp(timeRange[0]),
-          dateToTimestamp(timeRange[1]),
-        ];
 
         const res = await fetch(SERVER_IP_ADDR + '/data', {
           method: 'POST',
@@ -147,12 +129,14 @@ export default function SettingPage({route}) {
           body: JSON.stringify({
             email: route.params.email,
             dataType: route.params.dt.name,
-            date: date,
-            timeRange: timeRangeasTimestamp,
+            date: dateToTimestamp(date),
+            timeRange: timeRangetoTimestamp,
           }),
         });
+
         const data = await res.json();
-        console.log('[RN SettingPage.js] Received: ' + data.res.length);
+
+        console.log('[RN SettingPage.js] Data Received: ' + data.res.length);
         if (data.res.length === 0) setZeroFlag(true);
         else setZeroFlag(false);
         setData(data.res);
@@ -198,13 +182,12 @@ export default function SettingPage({route}) {
     }
   };
 
+  // Change date1's hour, minute, second to date2's
   const changeDate = (date1, date2) => {
     const newDate = new Date(date1);
-
     newDate.setUTCHours(date2.getUTCHours());
     newDate.setMinutes(date2.getMinutes());
     newDate.setSeconds(date2.getSeconds());
-
     return newDate;
   };
 
@@ -373,14 +356,14 @@ export default function SettingPage({route}) {
               </View>
             ) : route.params.dt.name === 'location' ? (
               <LocationGraph
-                data={locationData} //data
+                data={data}
                 timeRange={timeRange}
                 date={date}
                 zeroFlag={zeroFlag}
               />
             ) : dataField.type === 'num' ? (
               <NumericGraph
-                data={batteryData} //data
+                data={data} //data
                 dataType={convertDataType(route.params.dt.name)}
                 dataField={dataField}
                 timeRange={timeRange}
@@ -389,7 +372,7 @@ export default function SettingPage({route}) {
               />
             ) : dataField.type === 'cat' ? (
               <CategoricalGraph
-                data={appUsageData} //data
+                data={data} //data
                 dataField={dataField}
                 dataType={route.params.dt.name}
                 timeRange={timeRange}
@@ -398,7 +381,7 @@ export default function SettingPage({route}) {
               />
             ) : (
               <CountGraph
-                data={wifiInfo} //data
+                data={data} //data
                 dataField={dataField}
                 timeRange={timeRange}
                 date={date}

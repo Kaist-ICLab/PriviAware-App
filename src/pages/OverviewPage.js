@@ -19,7 +19,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '../constants/Constant';
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
-import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
+import {SERVER_IP_ADDR} from '@env';
 import {globalStyles} from '../styles/global';
 
 const collectionStatus = {
@@ -31,8 +31,7 @@ const collectionStatus = {
 export default function OverviewPage({route}) {
   const {colors} = useTheme();
 
-  // const {email} = route.params;
-  const email = 'test@test.com';
+  const {email} = route.params;
   const navigation = useNavigation();
   const [status, setStatus] = useState({});
   const [loading, setLoading] = useState(true);
