@@ -1,3 +1,8 @@
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+
 const timestampToHoursConverter = ts => {
   const date = new Date(ts);
   return (
@@ -60,6 +65,12 @@ const dateToTimestamp = date => {
   return date.getTime();
 };
 
+const dateToTimestampWithoutDate = date => {
+  const dateStart = new Date(dayjs(date).utc().startOf('day'));
+
+  return date.getTime() - dateStart.getTime();
+};
+
 /**
  * if the number is too large, convert it to a short string with a unit(k, m)
  */
@@ -101,6 +112,7 @@ export {
   timestampToHoursConverter,
   timestampToHoursWithUnitConverter,
   timestampToFullHoursConverter,
+  dateToTimestampWithoutDate,
   dateToString,
   dateToTimeString,
   convertUTCToLocalDate,

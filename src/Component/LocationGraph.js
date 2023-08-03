@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, ActivityIndicator} from 'react-native';
 import MapView from 'react-native-maps';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Marker, Callout} from 'react-native-maps';
 
 export default function LocationGraph({data, timeRange, date, zeroFlag}) {

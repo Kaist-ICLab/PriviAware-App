@@ -54,20 +54,36 @@ export default function OverviewPage({route}) {
         BackgroundTimer.runBackgroundTimer(() => {
           Geolocation.getCurrentPosition(pos => {
             try {
+              console.log(
+                'longitude:',
+                pos.coords.longitude,
+                'latitude:',
+                pos.coords.latitude,
+              );
               fetch(SERVER_IP_ADDR + '/locationrecord', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
+                  email: email,
                   locationRecord: {
-                    email: email,
                     longitude: pos.coords.longitude,
                     latitude: pos.coords.latitude,
                     timestamp: Date.now(),
                   },
                 }),
               });
+              console.log(
+                JSON.stringify({
+                  email: email,
+                  locationRecord: {
+                    longitude: pos.coords.longitude,
+                    latitude: pos.coords.latitude,
+                    timestamp: Date.now(),
+                  },
+                }),
+              );
             } catch (err) {
-              console.log(err);
+              console.log('err occured', err);
             }
           });
         }, 600000);

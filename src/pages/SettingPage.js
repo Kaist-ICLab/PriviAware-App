@@ -29,6 +29,7 @@ import {
   convertLocalToUTCDate,
   dateToTimestamp,
   convertDataType,
+  dateToTimestampWithoutDate,
 } from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 import dayjs from 'dayjs';
@@ -105,9 +106,11 @@ export default function SettingPage({route}) {
   useEffect(() => {
     const fetchDataFromDB = async () => {
       if (route.params.email && route.params.dt.name && date && timeRange) {
+        const startDate = new Date(dayjs(date).utc().startOf('day'));
+
         const timeRangetoTimestamp = [
-          dateToTimestamp(timeRange[0]),
-          dateToTimestamp(timeRange[1]),
+          dateToTimestampWithoutDate(timeRange[0]),
+          dateToTimestampWithoutDate(timeRange[1]),
         ];
 
         console.log(
@@ -116,7 +119,7 @@ export default function SettingPage({route}) {
           'datatype:',
           route.params.dt.name,
           'date:',
-          dateToTimestamp(date),
+          dateToTimestamp(startDate),
           'timeRange[0]:',
           timeRangetoTimestamp[0],
           'timeRange[1]:',
@@ -129,7 +132,7 @@ export default function SettingPage({route}) {
           body: JSON.stringify({
             email: route.params.email,
             dataType: route.params.dt.name,
-            date: dateToTimestamp(date),
+            date: dateToTimestamp(startDate),
             timeRange: timeRangetoTimestamp,
           }),
         });
