@@ -156,6 +156,63 @@ export default function SettingPage({route}) {
     if (!data.result) AlertBox('Error', 'Error in updating setting');
   };
 
+  const addFilteringDB = async (dataType, condition) => {
+    console.log('[RN SettingPage.js] addFilteringDB: ', dataType, condition);
+    const res = await fetch(SERVER_IP_ADDR + '/setfiltering', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: email,
+        dt: dataType,
+        condition: condition,
+      }),
+    });
+    const data = await res.json();
+    console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+    if (!data.result) AlertBox('Error', 'Error in appending filtering');
+  };
+
+  const updateFilteringDB = async (
+    dataType,
+    originalCondition,
+    newCondition,
+  ) => {
+    console.log(
+      '[RN SettingPage.js] updateFilteringDB: ',
+      dataType,
+      originalCondition,
+      newCondition,
+    );
+    const res = await fetch(SERVER_IP_ADDR + '/updatefiltering', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: email,
+        dt: dataType,
+        original: originalCondition,
+        new: newCondition,
+      }),
+    });
+    const data = await res.json();
+    console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+    if (!data.result) AlertBox('Error', 'Error in updating filtering');
+  };
+
+  const deleteFilteringDB = async (dataType, condition) => {
+    const res = await fetch(SERVER_IP_ADDR + '/delfiltering', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: email,
+        dt: dataType,
+        condition: condition,
+      }),
+    });
+    const data = await res.json();
+    console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+    if (!data.result) AlertBox('Error', 'Error in deleting filtering');
+  };
+
   const showInfo = () => {
     const name =
       dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll('_', ' ');
@@ -400,6 +457,9 @@ export default function SettingPage({route}) {
             filter={filter}
             setToggleStatus={setToggleStatus}
             updateToDB={updateToDB}
+            addFiltering={addFilteringDB}
+            updateFiltering={updateFilteringDB}
+            deleteFiltering={deleteFilteringDB}
             dt={dt}
             filterStatus={route.params.status}
           />
@@ -408,6 +468,9 @@ export default function SettingPage({route}) {
           isNew={true}
           setToggleStatus={setToggleStatus}
           updateToDB={updateToDB}
+          addFiltering={addFilteringDB}
+          updateFiltering={updateFilteringDB}
+          deleteFiltering={deleteFilteringDB}
           dt={dt}
           filterStatus={route.params.status}
         />
