@@ -120,6 +120,9 @@ const useFilter = (
   };
 
   const validateTimeSetting = () => {
+    if (!showTimeSetting) {
+      return false;
+    }
     // reject all impossible cases
     if (!timePicker1 || !timePicker2) {
       AlertBox('Error', 'Please enter both starting time and ending time');
@@ -172,6 +175,10 @@ const useFilter = (
 
   const validateLocationSetting = () => {
     Keyboard.dismiss();
+
+    if (!showLocationSetting) {
+      return false;
+    }
     // reject all impossible cases
     if (!radius || !pickedLocation || !pickedLocationDelta) {
       AlertBox('Error', 'Please enter the distance');
@@ -231,7 +238,6 @@ const useFilter = (
         ['applyTS']: timeStamp,
       };
     }
-
     return null;
   };
 

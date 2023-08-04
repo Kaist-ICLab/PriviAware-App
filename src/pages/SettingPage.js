@@ -84,22 +84,20 @@ export default function SettingPage({route}) {
     ]);
   };
 
+  const fetchFilteringSetting = async () => {
+    const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: route.params.email}),
+    });
+    const data = await res.json();
+
+    console.log('[RN SettingPage.js] Filter Received: ' + JSON.stringify(data));
+
+    setFilterInfo(data.filtering[route.params.dt.name]);
+  };
+
   useEffect(() => {
-    const fetchFilteringSetting = async () => {
-      // TODO fetch filter data as list format from server
-      const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({email: route.params.email}),
-      });
-      const data = await res.json();
-
-      console.log(
-        '[RN SettingPage.js] Filter Received: ' + JSON.stringify(data),
-      );
-
-      setFilterInfo(data.filtering[route.params.dt.name]);
-    };
     fetchFilteringSetting();
   }, [route.params.status, route.params.email, route.params.dt]);
 
@@ -145,6 +143,7 @@ export default function SettingPage({route}) {
         setData(data.res);
       }
     };
+
     fetchDataFromDB();
   }, [route.params.email, route.params.dt.name, date, timeRange]);
 
@@ -172,6 +171,7 @@ export default function SettingPage({route}) {
     });
     const data = await res.json();
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+    fetchFilteringSetting();
     if (!data.result) AlertBox('Error', 'Error in appending filtering');
   };
 
@@ -198,6 +198,8 @@ export default function SettingPage({route}) {
     });
     const data = await res.json();
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+
+    fetchFilteringSetting();
     if (!data.result) AlertBox('Error', 'Error in updating filtering');
   };
 
@@ -213,6 +215,7 @@ export default function SettingPage({route}) {
     });
     const data = await res.json();
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+    fetchFilteringSetting();
     if (!data.result) AlertBox('Error', 'Error in deleting filtering');
   };
 
