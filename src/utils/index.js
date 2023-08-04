@@ -66,9 +66,9 @@ const dateToTimestamp = date => {
 };
 
 const dateToTimestampWithoutDate = date => {
+  const dateTimeStamp = date.getTime();
   const dateStart = new Date(dayjs(date).utc().startOf('day'));
-
-  return date.getTime() - dateStart.getTime();
+  return dateTimeStamp - dateStart.getTime();
 };
 
 /**

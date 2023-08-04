@@ -60,7 +60,7 @@ export default function SettingPage({route}) {
     new Date(endToday),
   ]);
 
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(new Date(startToday));
 
   const [dataField, setDataField] = useState(route.params.dt.field[0]);
   const [zeroFlag, setZeroFlag] = useState(false);

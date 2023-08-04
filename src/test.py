@@ -12,7 +12,7 @@ if __name__ == "__main__":
     db = client.abc
     collection = db.datum #users
 
-datatype = "LOCATION"
+datatype = "APP_USAGE_EVENT"
 
 hour=60*60*1000
 day=60*60*1000*24
@@ -24,8 +24,8 @@ query = {
             "subject.email": 'emily@kse.kaist.ac.kr',
             "datumType": datatype
         },  
-        {"timestamp": {"$gt": 1691020800763}}, 
-        {"timestamp": {"$lt": 1691107199763}}
+        {"timestamp": {"$gt": 1691107200000}}, 
+        {"timestamp": {"$lt": (1691107200000+86399999)}}
             ]
         }
 

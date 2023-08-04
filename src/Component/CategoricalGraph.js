@@ -16,6 +16,7 @@ import YAxisName from './YAxisName';
 import {
   convertDataType,
   dateToTimestamp,
+  dateToTimestampWithoutDate,
   timestampToFullHoursConverter,
   timestampToHoursWithUnitConverter,
 } from '../utils';
@@ -53,11 +54,16 @@ export default function CategoricalGraph({
       let tempyAccessor = [];
       let filteredDataNum = 0;
 
-      const startDay = new Date(dayjs(date).utc().startOf('day'));
-      const startTimestamp =
-        dateToTimestamp(timeRange[0]) - dateToTimestamp(startDay);
-      const endTimestamp =
-        dateToTimestamp(timeRange[1]) - dateToTimestamp(startDay);
+      const startTimestamp = dateToTimestampWithoutDate(timeRange[0]);
+      const endTimestamp = dateToTimestampWithoutDate(timeRange[1]);
+
+      console.log(
+        'start,',
+        startTimestamp,
+        'end,',
+        endTimestamp,
+        dateToTimestamp(timeRange[1]),
+      );
 
       for (
         let i = startTimestamp;
@@ -72,7 +78,16 @@ export default function CategoricalGraph({
             d.timestamp < dateTimeStamp + HOUR_MILLISECONDS,
         );
 
+        console.log(
+          'start,',
+          dateTimeStamp,
+          'end,',
+          dateTimeStamp + HOUR_MILLISECONDS,
+        );
+
         filteredDataNum += currentData.length;
+
+        console.log(i);
 
         if (dataType === 'physical_activity' && dataField.name === 'type') {
           tempObj = data.reduce(
