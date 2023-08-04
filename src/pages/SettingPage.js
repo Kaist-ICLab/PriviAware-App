@@ -93,8 +93,21 @@ export default function SettingPage({route}) {
     const data = await res.json();
 
     console.log('[RN SettingPage.js] Filter Received: ' + JSON.stringify(data));
+    const filterList = data.filtering[route.params.dt.name];
 
-    setFilterInfo(data.filtering[route.params.dt.name]);
+    if (filterList.length > 0 && toggleStatus) {
+      updateToDB({
+        ['status.' + dt.name]: 'filter',
+        ['offTS.' + dt.name]: 0,
+      });
+    } else if (filterList.length === 0 && toggleStatus) {
+      updateToDB({
+        ['status.' + dt.name]: 'on',
+        ['offTS.' + dt.name]: 0,
+      });
+    }
+
+    setFilterInfo(() => filterList);
   };
 
   useEffect(() => {
@@ -229,18 +242,24 @@ export default function SettingPage({route}) {
     if (status === 'off') {
       setStatus('on');
       setToggleStatus(true);
-      updateToDB({
-        ['status.' + dt.name]: 'on',
-        ['timeFiltering.' + dt.name]: {},
-        ['locationFiltering.' + dt.name]: {},
-      });
+      if (filterInfo.length > 0) {
+        updateToDB({
+          ['status.' + dt.name]: 'filter',
+          ['offTS.' + dt.name]: 0,
+        });
+      } else {
+        updateToDB({
+          ['status.' + dt.name]: 'on',
+          ['offTS.' + dt.name]: 0,
+        });
+      }
     } else {
+      const currentTimeStamp = dateToTimestamp(new Date());
       setStatus('off');
       setToggleStatus(false);
       updateToDB({
         ['status.' + dt.name]: 'off',
-        ['timeFiltering.' + dt.name]: {},
-        ['locationFiltering.' + dt.name]: {},
+        ['offTS.' + dt.name]: currentTimeStamp,
       });
     }
   };
@@ -307,7 +326,7 @@ export default function SettingPage({route}) {
           <View style={{margin: 15}}>
             <Switch
               trackColor={{
-                true: status === 'on' ? '#5A5492' : '#D9D9D9',
+                true: status === 'off' ? '#D9D9D9' : '#5A5492',
                 false: '#3D3D3D',
               }}
               thumbColor={'#F5F5F5'}

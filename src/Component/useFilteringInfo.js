@@ -78,10 +78,6 @@ const useFilter = (
       setStatus('on');
       setToggleStatus(true);
       setShowTimeSetting(false);
-      updateToDB({
-        ['status.' + dt.name]: 'on',
-        ['timeFiltering.' + dt.name]: {},
-      });
     } else {
       // Show time setting for user
       setShowTimeSetting(true);
@@ -147,10 +143,6 @@ const useFilter = (
       setStatus('on');
       setToggleStatus(true);
       setShowLocationSetting(false);
-      updateToDB({
-        ['status.' + dt.name]: 'on',
-        ['timeFiltering.' + dt.name]: {},
-      });
     } else {
       // Show location setting for user
       setShowLocationSetting(true);
@@ -238,6 +230,7 @@ const useFilter = (
         ['applyTS']: timeStamp,
       };
     }
+    AlertBox('Error', 'Please turn on Location or Time filter');
     return null;
   };
 
