@@ -21,11 +21,11 @@ start_timestamp = end_timestamp - day*2
 
 query = {
         "$and": [{
-            "subject.email": 'emily@kse.kaist.ac.kr',
+            "subject.email": 'priviztester02@gmail.com',
             "datumType": datatype
         },  
         {"timestamp": {"$gt": 1691107200000}}, 
-        {"timestamp": {"$lt": (1691107200000+86399999)}}
+        {"timestamp": {"$lt": 1691374306000}}
             ]
         }
 

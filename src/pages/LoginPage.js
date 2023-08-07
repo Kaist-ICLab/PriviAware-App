@@ -11,8 +11,7 @@ import {
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useNavigation, useTheme} from '@react-navigation/native';
-
-import {SERVER_IP_ADDR} from '@env';
+import Config from 'react-native-config';
 
 export default function LoginPage() {
   const {colors} = useTheme();
@@ -58,11 +57,13 @@ export default function LoginPage() {
       return;
     }
     setLoading(true);
-    const res = await fetch(SERVER_IP_ADDR + '/login', {
+
+    const res = await fetch(Config.SERVER_IP_ADDR + '/login', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({email: email, password: password}),
     });
+
     const data = await res.json();
     console.log('[RN App.js] Received: ' + JSON.stringify(data));
     setLoading(false);
