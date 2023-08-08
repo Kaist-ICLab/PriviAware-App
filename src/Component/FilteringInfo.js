@@ -334,13 +334,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 20,
     paddingVertical: 2,
     marginHorizontal: 5,
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 70,
+    width: '30%',
   },
   buttonText: {
     color: '#FFFFFF',

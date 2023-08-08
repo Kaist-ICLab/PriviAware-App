@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
+  ToastAndroid,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation, useTheme} from '@react-navigation/native';
@@ -187,7 +188,11 @@ export default function SettingPage({route}) {
     const data = await res.json();
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
     fetchFilteringSetting();
-    if (!data.result) AlertBox('Error', 'Error in appending filtering');
+    if (data.result) {
+      ToastAndroid.show('A filter was successfully added!', ToastAndroid.SHORT);
+    } else {
+      AlertBox('Error', 'Error in appending filtering');
+    }
   };
 
   const updateFilteringDB = async (
@@ -215,7 +220,11 @@ export default function SettingPage({route}) {
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
 
     fetchFilteringSetting();
-    if (!data.result) AlertBox('Error', 'Error in updating filtering');
+    if (data.result) {
+      ToastAndroid.show('saved', ToastAndroid.SHORT);
+    } else {
+      AlertBox('Error', 'Error in updating filtering');
+    }
   };
 
   const deleteFilteringDB = async (dataType, condition) => {
@@ -231,7 +240,11 @@ export default function SettingPage({route}) {
     const data = await res.json();
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
     fetchFilteringSetting();
-    if (!data.result) AlertBox('Error', 'Error in deleting filtering');
+    if (data.result) {
+      ToastAndroid.show('A filter was deleted', ToastAndroid.SHORT);
+    } else {
+      AlertBox('Error', 'Error in deleting filtering');
+    }
   };
 
   const showInfo = () => {
