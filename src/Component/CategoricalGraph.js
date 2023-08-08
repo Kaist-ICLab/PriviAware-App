@@ -57,14 +57,6 @@ export default function CategoricalGraph({
       const startTimestamp = dateToTimestampWithoutDate(timeRange[0]);
       const endTimestamp = dateToTimestampWithoutDate(timeRange[1]);
 
-      console.log(
-        'start,',
-        startTimestamp,
-        'end,',
-        endTimestamp,
-        dateToTimestamp(timeRange[1]),
-      );
-
       for (
         let i = startTimestamp;
         i < endTimestamp;
@@ -78,16 +70,7 @@ export default function CategoricalGraph({
             d.timestamp < dateTimeStamp + HOUR_MILLISECONDS,
         );
 
-        console.log(
-          'start,',
-          dateTimeStamp,
-          'end,',
-          dateTimeStamp + HOUR_MILLISECONDS,
-        );
-
         filteredDataNum += currentData.length;
-
-        console.log(i);
 
         if (dataType === 'physical_activity' && dataField.name === 'type') {
           tempObj = data.reduce(
