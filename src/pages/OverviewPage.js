@@ -16,11 +16,13 @@ import BackgroundTimer from 'react-native-background-timer';
 import Geolocation from 'react-native-geolocation-service';
 import RNExitApp from 'react-native-exit-app';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Config from 'react-native-config';
 
 import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '../constants/Constant';
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
-import {SERVER_IP_ADDR} from '@env';
 import {globalStyles} from '../styles/global';
+
+const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
 const collectionStatus = {
   FILTERING: '#5A5492',
