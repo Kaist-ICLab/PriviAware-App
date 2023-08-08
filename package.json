@@ -26,6 +26,7 @@
     "react-native": "0.71.4",
     "react-native-background-timer": "^2.4.1",
     "react-native-collapsible": "^1.6.1",
+    "react-native-config": "^1.5.1",
     "react-native-device-info": "^10.4.0",
     "react-native-dotenv": "^3.4.8",
     "react-native-exit-app": "^1.1.0",

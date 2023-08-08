@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {Keyboard, Alert} from 'react-native';
+import {dateToTimestamp} from '../utils';
 
 const INITIAL_COORDINATE = {
   latitude: 36.374228,
@@ -14,14 +15,21 @@ const INITIAL_COORDINATE_DELTA = {
 /**
  * a custom hook for filteringInfo component
  */
-const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
+const useFilter = (
+  setToggleStatus,
+  updateToDB,
+  addFiltering,
+  updateFiltering,
+  deleteFiltering,
+  dt,
+  filterStatus,
+  filter,
+) => {
   const [status, setStatus] = useState(filterStatus);
+
   let [isLocationOn, isTimeOn] =
     filter !== undefined
-      ? [
-          filter.locationFiltering !== undefined,
-          filter.timeFiltering !== undefined,
-        ]
+      ? [filter.type.indexOf('L') !== -1, filter.type.indexOf('T') !== -1]
       : [false, false];
 
   const [timeToggleStatus, setTimeToggleStatus] = useState(isTimeOn);
@@ -30,14 +38,14 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
 
   // time setting related
   const [showTimeSetting, setShowTimeSetting] = useState(isTimeOn);
-  const {startingTime, endingTime} = isTimeOn ? filter.timeFiltering : {};
+  const {startingTime, endingTime} = isTimeOn ? filter : {};
   const {
     radius: rad,
     latitude,
     longitude,
     latitudeDelta,
     longitudeDelta,
-  } = isLocationOn ? filter.locationFiltering : {};
+  } = isLocationOn ? filter : {};
 
   const [timePicker1, setTimePicker1] = useState(new Date(startingTime));
   const [timePicker2, setTimePicker2] = useState(new Date(endingTime));
@@ -70,10 +78,6 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
       setStatus('on');
       setToggleStatus(true);
       setShowTimeSetting(false);
-      updateToDB({
-        ['status.' + dt.name]: 'on',
-        ['timeFiltering.' + dt.name]: {},
-      });
     } else {
       // Show time setting for user
       setShowTimeSetting(true);
@@ -111,53 +115,27 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
     }
   };
 
-  const applyTimeSetting = () => {
+  const validateTimeSetting = () => {
+    if (!showTimeSetting) {
+      return false;
+    }
     // reject all impossible cases
     if (!timePicker1 || !timePicker2) {
       AlertBox('Error', 'Please enter both starting time and ending time');
       setShowTimeSetting(false);
       setTimeToggleStatus(false);
-      if (status === 'time') {
-        setStatus('on');
-        updateToDB({
-          ['status.' + dt.name]: 'on',
-          ['timeFiltering.' + dt.name]: {},
-        });
-        return;
-      }
-      updateToDB({
-        ['status.' + dt.name]: status,
-        ['timeFiltering.' + dt.name]: {},
-      });
-      return;
+      return false;
     }
     if (timePicker1.getTime() > timePicker2.getTime()) {
       AlertBox('Error', 'Starting time cannot be earlier than ending time');
       setShowTimeSetting(false);
       setTimeToggleStatus(false);
-      if (status === 'time') {
-        setStatus('on');
-        updateToDB({
-          ['status.' + dt.name]: 'on',
-          ['timeFiltering.' + dt.name]: {},
-        });
-        return;
-      }
-      updateToDB({
-        ['status.' + dt.name]: status,
-        ['timeFiltering.' + dt.name]: {},
-      });
-      return;
+      return false;
     }
     // set status as time filtering + update to PrivacyViz-Member DB
     setStatus('time');
     setToggleStatus(true);
-    updateToDB({
-      ['status.' + dt.name]: 'time',
-      ['timeFiltering.' + dt.name + '.startingTime']: timePicker1,
-      ['timeFiltering.' + dt.name + '.endingTime']: timePicker2,
-      ['timeFiltering.' + dt.name + '.applyTS']: Date.now(),
-    });
+    return true;
   };
 
   const handleLocationToggleStatus = () => {
@@ -165,10 +143,6 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
       setStatus('on');
       setToggleStatus(true);
       setShowLocationSetting(false);
-      updateToDB({
-        ['status.' + dt.name]: 'on',
-        ['timeFiltering.' + dt.name]: {},
-      });
     } else {
       // Show location setting for user
       setShowLocationSetting(true);
@@ -191,59 +165,93 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
     setRadius(value ?? 0);
   };
 
-  const applyLocationSetting = () => {
+  const validateLocationSetting = () => {
     Keyboard.dismiss();
+
+    if (!showLocationSetting) {
+      return false;
+    }
     // reject all impossible cases
     if (!radius || !pickedLocation || !pickedLocationDelta) {
       AlertBox('Error', 'Please enter the distance');
       setShowLocationSetting(false);
       setLocationToggleStatus(false);
-      if (status === 'location') {
-        setStatus('on');
-        updateToDB({
-          ['status.' + dt.name]: 'on',
-          ['locationFiltering.' + dt.name]: {},
-        });
-        return;
-      }
-      updateToDB({
-        ['status.' + dt.name]: status,
-        ['locationFiltering.' + dt.name]: {},
-      });
-      return;
+      return false;
     }
     const parsed = parseInt(radius);
     if (isNaN(parsed) || parsed < 0 || parsed > 500) {
       AlertBox('Error', 'Please enter an integer between 0 and 500');
       setShowLocationSetting(false);
       setLocationToggleStatus(false);
-      if (status === 'location') {
-        setStatus('on');
-        updateToDB({
-          ['status.' + dt.name]: 'on',
-          ['locationFiltering.' + dt.name]: {},
-        });
-        return;
-      }
-      updateToDB({
-        ['status.' + dt.name]: status,
-        ['locationFiltering.' + dt.name]: {},
-      });
-      return;
+      return false;
     }
     setStatus('location');
     setToggleStatus(true);
-    updateToDB({
-      ['status.' + dt.name]: 'location',
-      ['locationFiltering.' + dt.name + '.radius']: radius,
-      ['locationFiltering.' + dt.name + '.longitude']: pickedLocation.longitude,
-      ['locationFiltering.' + dt.name + '.latitude']: pickedLocation.latitude,
-      ['locationFiltering.' + dt.name + '.latitudeDelta']:
-        pickedLocationDelta.latitudeDelta,
-      ['locationFiltering.' + dt.name + '.longitudeDelta']:
-        pickedLocationDelta.longitudeDelta,
-      ['locationFiltering.' + dt.name + '.applyTS']: Date.now(),
-    });
+
+    return true;
+  };
+
+  const getCurrentFilter = () => {
+    const isLocationValid = validateLocationSetting();
+    const isTimeValid = validateTimeSetting();
+
+    const timeInfo = {
+      startingTime: dateToTimestamp(timePicker1),
+      endingTime: dateToTimestamp(timePicker2),
+    };
+
+    const locationInfo = {
+      radius: radius,
+      longitude: pickedLocation.longitude,
+      latitude: pickedLocation.latitude,
+      latitudeDelta: pickedLocationDelta.latitudeDelta,
+      longitudeDelta: pickedLocationDelta.longitudeDelta,
+    };
+
+    const timeStamp = Date.now();
+
+    if (isLocationValid && isTimeValid) {
+      return {
+        ['type']: 'LT',
+        ...timeInfo,
+        ...locationInfo,
+        ['applyTS']: timeStamp,
+      };
+    } else if (isLocationValid && !isTimeValid) {
+      return {
+        ['type']: 'L',
+        ...locationInfo,
+        ['applyTS']: timeStamp,
+      };
+    } else if (!isLocationValid && isTimeValid) {
+      return {
+        ['type']: 'T',
+        ...timeInfo,
+        ['applyTS']: timeStamp,
+      };
+    }
+    AlertBox('Error', 'Please turn on Location or Time filter');
+    return null;
+  };
+
+  const addFilter = () => {
+    const currentFilter = getCurrentFilter();
+
+    if (currentFilter !== null) {
+      addFiltering(dt.name, currentFilter);
+    }
+  };
+
+  const editFilter = () => {
+    const currentFilter = getCurrentFilter();
+
+    if (currentFilter !== null) {
+      updateFiltering(dt.name, filter, currentFilter);
+    }
+  };
+
+  const deleteFilter = () => {
+    deleteFiltering(dt.name, filter);
   };
 
   const handleFilterOptions = {
@@ -252,12 +260,13 @@ const useFilter = (setToggleStatus, updateToDB, dt, filterStatus, filter) => {
     handleTimeToggleStatus,
     handleTimePicker1Confirm,
     handleTimePicker2Confirm,
-    applyTimeSetting,
     handleLocationToggleStatus,
     handleOnPanDrag,
     handleRegionChange,
     handleRadius,
-    applyLocationSetting,
+    addFilter,
+    editFilter,
+    deleteFilter,
   };
 
   const filterValues = {

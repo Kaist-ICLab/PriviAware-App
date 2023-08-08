@@ -28,6 +28,9 @@ function FilteringInfo({
   isNew,
   filter,
   setToggleStatus,
+  addFiltering,
+  updateFiltering,
+  deleteFiltering,
   updateToDB,
   dt,
   filterStatus,
@@ -38,6 +41,9 @@ function FilteringInfo({
   const {handleFilterOptions, filterValues} = useFilter(
     setToggleStatus,
     updateToDB,
+    addFiltering,
+    updateFiltering,
+    deleteFiltering,
     dt,
     filterStatus,
     filter,
@@ -53,8 +59,9 @@ function FilteringInfo({
     handleOnPanDrag,
     handleRegionChange,
     handleRadius,
-    applyTimeSetting,
-    applyLocationSetting,
+    addFilter,
+    editFilter,
+    deleteFilter,
   } = handleFilterOptions;
 
   const {
@@ -96,16 +103,16 @@ function FilteringInfo({
     ],
   };
 
-  const keys = Object.keys(filter ?? {});
   const blockName = [];
 
-  if (keys.includes('locationFiltering')) {
-    blockName.push('Location Filter');
+  if (filter !== undefined) {
+    if (filter.type.includes('L')) {
+      blockName.push('Location Filter');
+    }
+    if (filter.type.includes('T')) {
+      blockName.push('Time Filter');
+    }
   }
-  if (keys.includes('timeFiltering')) {
-    blockName.push('Time Filter');
-  }
-
   return (
     <View
       style={{
@@ -265,17 +272,19 @@ function FilteringInfo({
           <View style={styles.centeredRow}>
             <TouchableOpacity
               style={{...styles.button, backgroundColor: colorSet.primary}}
-              onPress={() => {}}>
+              onPress={isNew ? addFilter : editFilter}>
               <Text style={styles.buttonText}>
                 {isNew ? BUTTON_TEXT.ADD : BUTTON_TEXT.SAVE}
               </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={{...styles.button, backgroundColor: colorSet.gray}}
-              onPress={() => {}}>
-              <Text style={styles.buttonText}>{BUTTON_TEXT.DELETE}</Text>
-            </TouchableOpacity>
+            {!isNew && (
+              <TouchableOpacity
+                style={{...styles.button, backgroundColor: colorSet.gray}}
+                onPress={deleteFilter}>
+                <Text style={styles.buttonText}>{BUTTON_TEXT.DELETE}</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </Collapsible>

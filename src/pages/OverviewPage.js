@@ -16,11 +16,13 @@ import BackgroundTimer from 'react-native-background-timer';
 import Geolocation from 'react-native-geolocation-service';
 import RNExitApp from 'react-native-exit-app';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import Config from 'react-native-config';
 
 import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '../constants/Constant';
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
-import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
 import {globalStyles} from '../styles/global';
+
+const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
 const collectionStatus = {
   FILTERING: '#5A5492',
@@ -31,8 +33,7 @@ const collectionStatus = {
 export default function OverviewPage({route}) {
   const {colors} = useTheme();
 
-  // const {email} = route.params;
-  const email = 'test@test.com';
+  const {email} = route.params;
   const navigation = useNavigation();
   const [status, setStatus] = useState({});
   const [loading, setLoading] = useState(true);
@@ -55,20 +56,36 @@ export default function OverviewPage({route}) {
         BackgroundTimer.runBackgroundTimer(() => {
           Geolocation.getCurrentPosition(pos => {
             try {
+              console.log(
+                'longitude:',
+                pos.coords.longitude,
+                'latitude:',
+                pos.coords.latitude,
+              );
               fetch(SERVER_IP_ADDR + '/locationrecord', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
+                  email: email,
                   locationRecord: {
-                    email: email,
                     longitude: pos.coords.longitude,
                     latitude: pos.coords.latitude,
                     timestamp: Date.now(),
                   },
                 }),
               });
+              console.log(
+                JSON.stringify({
+                  email: email,
+                  locationRecord: {
+                    longitude: pos.coords.longitude,
+                    latitude: pos.coords.latitude,
+                    timestamp: Date.now(),
+                  },
+                }),
+              );
             } catch (err) {
-              console.log(err);
+              console.log('err occured', err);
             }
           });
         }, 600000);

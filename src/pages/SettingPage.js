@@ -14,7 +14,8 @@ import {useNavigation, useTheme} from '@react-navigation/native';
 import {Picker} from '@react-native-picker/picker';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
-import {SERVER_IP_ADDR, SERVER_PORT} from '@env';
+import Config from 'react-native-config';
+
 import LocationGraph from '../Component/LocationGraph';
 import NumericGraph from '../Component/NumericGraph';
 import CategoricalGraph from '../Component/CategoricalGraph';
@@ -22,7 +23,6 @@ import CountGraph from '../Component/CountGraph';
 import {globalStyles} from '../styles/global';
 import {colorSet} from '../constants/Colors';
 import FilteringInfo from '../Component/FilteringInfo';
-import filterList from '../mocks/filterInfo';
 import {
   dateToString,
   dateToTimeString,
@@ -30,14 +30,14 @@ import {
   convertLocalToUTCDate,
   dateToTimestamp,
   convertDataType,
+  dateToTimestampWithoutDate,
 } from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
-import {appUsageData, batteryData, locationData} from '../mocks/graphdata';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import wifiInfo from '../mocks/wifiInfo';
 
 dayjs.extend(utc);
+const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
 export default function SettingPage({route}) {
   const {colors} = useTheme();
@@ -54,8 +54,7 @@ export default function SettingPage({route}) {
     route.params.status !== 'off',
   );
 
-  // TODO: load filter List data from server, here is a mock data
-  const [filterInfo, setFilterInfo] = useState(filterList);
+  const [filterInfo, setFilterInfo] = useState([]);
 
   // data visualization related
   const [timeRange, setTimeRange] = useState([
@@ -63,9 +62,8 @@ export default function SettingPage({route}) {
     new Date(endToday),
   ]);
 
-  const [date, setDate] = useState(today);
+  const [date, setDate] = useState(new Date(startToday));
 
-  const [allDate, setAllDate] = useState([]);
   const [dataField, setDataField] = useState(route.params.dt.field[0]);
   const [zeroFlag, setZeroFlag] = useState(false);
   // data record related
@@ -88,58 +86,58 @@ export default function SettingPage({route}) {
     ]);
   };
 
-  useEffect(() => {
-    const fetchFilteringSetting = async () => {
-      // TODO fetch filter data as list format from server
-      const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({email: route.params.email}),
+  const fetchFilteringSetting = async () => {
+    const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email: route.params.email}),
+    });
+    const data = await res.json();
+
+    console.log('[RN SettingPage.js] Filter Received: ' + JSON.stringify(data));
+    const filterList = data.filtering[route.params.dt.name];
+
+    if (filterList.length > 0 && toggleStatus) {
+      updateToDB({
+        ['status.' + dt.name]: 'filter',
+        ['offTS.' + dt.name]: 0,
       });
-      const data = await res.json();
-      console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
-    };
+    } else if (filterList.length === 0 && toggleStatus) {
+      updateToDB({
+        ['status.' + dt.name]: 'on',
+        ['offTS.' + dt.name]: 0,
+      });
+    }
+
+    setFilterInfo(() => filterList);
+  };
+
+  useEffect(() => {
     fetchFilteringSetting();
   }, [route.params.status, route.params.email, route.params.dt]);
 
   useEffect(() => {
-    const dates = [];
-    const current = Date.now();
-    const since = new Date(2023, 4, 24).getTime();
-    for (let i = since; i < current; i = i + 24 * 60 * 60 * 1000) {
-      const dateTemp = new Date(i);
-      dates.push({
-        label:
-          String(dateTemp.getDate()).padStart(2, '0') +
-          '-' +
-          String(dateTemp.getMonth() + 1).padStart(2, '0') +
-          '-' +
-          String(dateTemp.getFullYear()),
-        value: i,
-      });
-    }
-    setAllDate(dates);
-  }, [route.params.dt]);
-
-  useEffect(() => {
     const fetchDataFromDB = async () => {
       if (route.params.email && route.params.dt.name && date && timeRange) {
+        const startDate = new Date(dayjs(date).utc().startOf('day'));
+
+        const timeRangetoTimestamp = [
+          dateToTimestampWithoutDate(timeRange[0]),
+          dateToTimestampWithoutDate(timeRange[1]),
+        ];
+
         console.log(
           '[RN SettingPage.js] Fetch data from DB with param user:',
           route.params.email,
           'datatype:',
           route.params.dt.name,
           'date:',
-          date,
+          dateToTimestamp(startDate),
           'timeRange[0]:',
-          timeRange[0],
+          timeRangetoTimestamp[0],
           'timeRange[1]:',
-          timeRange[1],
+          timeRangetoTimestamp[1],
         );
-        const timeRangeasTimestamp = [
-          dateToTimestamp(timeRange[0]),
-          dateToTimestamp(timeRange[1]),
-        ];
 
         const res = await fetch(SERVER_IP_ADDR + '/data', {
           method: 'POST',
@@ -147,17 +145,20 @@ export default function SettingPage({route}) {
           body: JSON.stringify({
             email: route.params.email,
             dataType: route.params.dt.name,
-            date: date,
-            timeRange: timeRangeasTimestamp,
+            date: dateToTimestamp(startDate),
+            timeRange: timeRangetoTimestamp,
           }),
         });
+
         const data = await res.json();
-        console.log('[RN SettingPage.js] Received: ' + data.res.length);
+
+        console.log('[RN SettingPage.js] Data Received: ' + data.res.length);
         if (data.res.length === 0) setZeroFlag(true);
         else setZeroFlag(false);
         setData(data.res);
       }
     };
+
     fetchDataFromDB();
   }, [route.params.email, route.params.dt.name, date, timeRange]);
 
@@ -172,6 +173,67 @@ export default function SettingPage({route}) {
     if (!data.result) AlertBox('Error', 'Error in updating setting');
   };
 
+  const addFilteringDB = async (dataType, condition) => {
+    console.log('[RN SettingPage.js] addFilteringDB: ', dataType, condition);
+    const res = await fetch(SERVER_IP_ADDR + '/setfiltering', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: email,
+        dt: dataType,
+        condition: condition,
+      }),
+    });
+    const data = await res.json();
+    console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+    fetchFilteringSetting();
+    if (!data.result) AlertBox('Error', 'Error in appending filtering');
+  };
+
+  const updateFilteringDB = async (
+    dataType,
+    originalCondition,
+    newCondition,
+  ) => {
+    console.log(
+      '[RN SettingPage.js] updateFilteringDB: ',
+      dataType,
+      originalCondition,
+      newCondition,
+    );
+    const res = await fetch(SERVER_IP_ADDR + '/updatefiltering', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: email,
+        dt: dataType,
+        original: originalCondition,
+        new: newCondition,
+      }),
+    });
+    const data = await res.json();
+    console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+
+    fetchFilteringSetting();
+    if (!data.result) AlertBox('Error', 'Error in updating filtering');
+  };
+
+  const deleteFilteringDB = async (dataType, condition) => {
+    const res = await fetch(SERVER_IP_ADDR + '/delfiltering', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        email: email,
+        dt: dataType,
+        condition: condition,
+      }),
+    });
+    const data = await res.json();
+    console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
+    fetchFilteringSetting();
+    if (!data.result) AlertBox('Error', 'Error in deleting filtering');
+  };
+
   const showInfo = () => {
     const name =
       dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll('_', ' ');
@@ -182,29 +244,34 @@ export default function SettingPage({route}) {
     if (status === 'off') {
       setStatus('on');
       setToggleStatus(true);
-      updateToDB({
-        ['status.' + dt.name]: 'on',
-        ['timeFiltering.' + dt.name]: {},
-        ['locationFiltering.' + dt.name]: {},
-      });
+      if (filterInfo.length > 0) {
+        updateToDB({
+          ['status.' + dt.name]: 'filter',
+          ['offTS.' + dt.name]: 0,
+        });
+      } else {
+        updateToDB({
+          ['status.' + dt.name]: 'on',
+          ['offTS.' + dt.name]: 0,
+        });
+      }
     } else {
+      const currentTimeStamp = dateToTimestamp(new Date());
       setStatus('off');
       setToggleStatus(false);
       updateToDB({
         ['status.' + dt.name]: 'off',
-        ['timeFiltering.' + dt.name]: {},
-        ['locationFiltering.' + dt.name]: {},
+        ['offTS.' + dt.name]: currentTimeStamp,
       });
     }
   };
 
+  // Change date1's hour, minute, second to date2's
   const changeDate = (date1, date2) => {
     const newDate = new Date(date1);
-
     newDate.setUTCHours(date2.getUTCHours());
     newDate.setMinutes(date2.getMinutes());
     newDate.setSeconds(date2.getSeconds());
-
     return newDate;
   };
 
@@ -261,7 +328,7 @@ export default function SettingPage({route}) {
           <View style={{margin: 15}}>
             <Switch
               trackColor={{
-                true: status === 'on' ? '#5A5492' : '#D9D9D9',
+                true: status === 'off' ? '#D9D9D9' : '#5A5492',
                 false: '#3D3D3D',
               }}
               thumbColor={'#F5F5F5'}
@@ -373,14 +440,14 @@ export default function SettingPage({route}) {
               </View>
             ) : route.params.dt.name === 'location' ? (
               <LocationGraph
-                data={locationData} //data
+                data={data}
                 timeRange={timeRange}
                 date={date}
                 zeroFlag={zeroFlag}
               />
             ) : dataField.type === 'num' ? (
               <NumericGraph
-                data={batteryData} //data
+                data={data} //data
                 dataType={convertDataType(route.params.dt.name)}
                 dataField={dataField}
                 timeRange={timeRange}
@@ -389,7 +456,7 @@ export default function SettingPage({route}) {
               />
             ) : dataField.type === 'cat' ? (
               <CategoricalGraph
-                data={appUsageData} //data
+                data={data} //data
                 dataField={dataField}
                 dataType={route.params.dt.name}
                 timeRange={timeRange}
@@ -398,7 +465,7 @@ export default function SettingPage({route}) {
               />
             ) : (
               <CountGraph
-                data={wifiInfo} //data
+                data={data} //data
                 dataField={dataField}
                 timeRange={timeRange}
                 date={date}
@@ -417,6 +484,9 @@ export default function SettingPage({route}) {
             filter={filter}
             setToggleStatus={setToggleStatus}
             updateToDB={updateToDB}
+            addFiltering={addFilteringDB}
+            updateFiltering={updateFilteringDB}
+            deleteFiltering={deleteFilteringDB}
             dt={dt}
             filterStatus={route.params.status}
           />
@@ -425,6 +495,9 @@ export default function SettingPage({route}) {
           isNew={true}
           setToggleStatus={setToggleStatus}
           updateToDB={updateToDB}
+          addFiltering={addFilteringDB}
+          updateFiltering={updateFilteringDB}
+          deleteFiltering={deleteFilteringDB}
           dt={dt}
           filterStatus={route.params.status}
         />

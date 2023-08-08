@@ -11,8 +11,9 @@ import {
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useNavigation, useTheme} from '@react-navigation/native';
+import Config from 'react-native-config';
 
-import {SERVER_IP_ADDR} from '@env';
+const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
 export default function RegisterPage() {
   const {colors} = useTheme();
@@ -86,8 +87,8 @@ export default function RegisterPage() {
     });
     const data = await res.json();
     console.log('[RN App.js] Received: ' + JSON.stringify(data));
+    setLoading(false);
     if (data.result) {
-      setLoading(false);
       AlertBox('Success', 'Account created!');
       navigation.navigate('Login');
     } else AlertBox('Error', 'Email is registered');

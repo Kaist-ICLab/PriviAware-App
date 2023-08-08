@@ -12,19 +12,20 @@ if __name__ == "__main__":
     db = client.abc
     collection = db.datum #users
 
-datatype = "WIFI"
+datatype = "APP_USAGE_EVENT"
 
 hour=60*60*1000
 day=60*60*1000*24
 end_timestamp = time.time()*1000 
 start_timestamp = end_timestamp - day*2
+
 query = {
         "$and": [{
-            "subject.email": 'emily@kse.kaist.ac.kr',
+            "subject.email": 'priviztester02@gmail.com',
             "datumType": datatype
         },  
-        {"timestamp": {"$gt": 1680274832000}}, 
-        {"timestamp": {"$lt": 1689799821000}}
+        {"timestamp": {"$gt": 1691107200000}}, 
+        {"timestamp": {"$lt": 1691374306000}}
             ]
         }
 
