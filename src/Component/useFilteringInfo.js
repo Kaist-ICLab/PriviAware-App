@@ -120,16 +120,12 @@ const useFilter = (
       return false;
     }
     // reject all impossible cases
-    if (!timePicker1 || !timePicker2) {
+    if (isNaN(timePicker1) || isNaN(timePicker2)) {
       AlertBox('Error', 'Please enter both starting time and ending time');
-      setShowTimeSetting(false);
-      setTimeToggleStatus(false);
       return false;
     }
     if (timePicker1.getTime() > timePicker2.getTime()) {
       AlertBox('Error', 'Starting time cannot be earlier than ending time');
-      setShowTimeSetting(false);
-      setTimeToggleStatus(false);
       return false;
     }
     // set status as time filtering + update to PrivacyViz-Member DB
@@ -167,22 +163,17 @@ const useFilter = (
 
   const validateLocationSetting = () => {
     Keyboard.dismiss();
-
     if (!showLocationSetting) {
       return false;
     }
     // reject all impossible cases
     if (!radius || !pickedLocation || !pickedLocationDelta) {
       AlertBox('Error', 'Please enter the distance');
-      setShowLocationSetting(false);
-      setLocationToggleStatus(false);
       return false;
     }
     const parsed = parseInt(radius);
     if (isNaN(parsed) || parsed < 0 || parsed > 500) {
       AlertBox('Error', 'Please enter an integer between 0 and 500');
-      setShowLocationSetting(false);
-      setLocationToggleStatus(false);
       return false;
     }
     setStatus('location');
@@ -192,6 +183,11 @@ const useFilter = (
   };
 
   const getCurrentFilter = () => {
+    if (!showLocationSetting && !showTimeSetting) {
+      AlertBox('Error', 'Please turn on Location or Time filter');
+      return null;
+    }
+
     const isLocationValid = validateLocationSetting();
     const isTimeValid = validateTimeSetting();
 
@@ -230,7 +226,6 @@ const useFilter = (
         ['applyTS']: timeStamp,
       };
     }
-    AlertBox('Error', 'Please turn on Location or Time filter');
     return null;
   };
 
