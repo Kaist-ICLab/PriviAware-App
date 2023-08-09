@@ -27,25 +27,21 @@ import FilteringInfo from '../Component/FilteringInfo';
 import {
   dateToString,
   dateToTimeString,
-  convertUTCToLocalDate,
-  convertLocalToUTCDate,
   dateToTimestamp,
   convertDataType,
   dateToTimestampWithoutDate,
 } from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 
-dayjs.extend(utc);
 const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
 export default function SettingPage({route}) {
   const {colors} = useTheme();
   const today = new Date();
 
-  const startToday = dayjs(today).utc().startOf('day');
-  const endToday = dayjs(today).utc().endOf('day');
+  const startToday = dayjs(today).startOf('day');
+  const endToday = dayjs(today).endOf('day');
 
   const {dt, email} = route.params;
   const navigation = useNavigation();
@@ -120,7 +116,7 @@ export default function SettingPage({route}) {
   useEffect(() => {
     const fetchDataFromDB = async () => {
       if (route.params.email && route.params.dt.name && date && timeRange) {
-        const startDate = new Date(dayjs(date).utc().startOf('day'));
+        const startDate = new Date(dayjs(date).startOf('day'));
 
         const timeRangetoTimestamp = [
           dateToTimestampWithoutDate(timeRange[0]),
@@ -298,15 +294,13 @@ export default function SettingPage({route}) {
   };
 
   const handleTimeRange = (value, index) => {
-    // the value got from the picker is local time, need to convert to UTC time
-    const convertedDate = convertLocalToUTCDate(value);
     if (index === 0) {
-      if (validateTimeRange(convertedDate, timeRange[1])) {
-        setTimeRange(prev => [convertedDate, prev[1]]);
+      if (validateTimeRange(value, timeRange[1])) {
+        setTimeRange(prev => [value, prev[1]]);
       }
     } else {
-      if (validateTimeRange(timeRange[0], convertedDate)) {
-        setTimeRange(prev => [prev[0], convertedDate]);
+      if (validateTimeRange(timeRange[0], value)) {
+        setTimeRange(prev => [prev[0], value]);
       }
     }
   };
@@ -379,7 +373,7 @@ export default function SettingPage({route}) {
               <CustomDateTimepickerModal
                 mode="time"
                 // timeRange is UTC time but datetimepicker is using local time. So we need to convert UTC to local time
-                data={convertUTCToLocalDate(timeRange[0])}
+                data={timeRange[0]}
                 handleData={v => handleTimeRange(v, 0)}
                 textFormatter={dateToTimeString}
                 textStyle={[
@@ -399,7 +393,7 @@ export default function SettingPage({route}) {
             <View style={styles.timePickerInput}>
               <CustomDateTimepickerModal
                 mode="time"
-                data={convertUTCToLocalDate(timeRange[1])}
+                data={timeRange[1]}
                 handleData={v => handleTimeRange(v, 1)}
                 textFormatter={dateToTimeString}
                 textStyle={[

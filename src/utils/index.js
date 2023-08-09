@@ -65,9 +65,12 @@ const dateToTimestamp = date => {
   return date.getTime();
 };
 
+/**
+ * only return timestamp contain hour, minute, second information
+ */
 const dateToTimestampWithoutDate = date => {
   const dateTimeStamp = date.getTime();
-  const dateStart = new Date(dayjs(date).utc().startOf('day'));
+  const dateStart = new Date(dayjs(date).startOf('day'));
   return dateTimeStamp - dateStart.getTime();
 };
 
