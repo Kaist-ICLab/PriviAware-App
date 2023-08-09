@@ -87,7 +87,7 @@ const SENSITIVE_DATATYPE = DATATYPE.filter(dt => dt.sensitivity);
 const NORMAL_DATATYPE = DATATYPE.filter(dt => !dt.sensitivity);
 
 const D3_SCHEME_PASTEL1 = colors(
-  'fbb4aeb3cde3ccebc5decbe4fed9a6ffffcce5d8bdfddaecf2f2f2',
+  'fbb4aeb3cde3ccebc5decbe4fed9a6ffffcce5d8bdfddaecf2f2f2fbb4aeb3cde3ccebc5decbe4fed9a6ffffcce5d8bdfddaecf2f2f2',
 );
 
 const D3_SCHEME_SET1 = colors(

@@ -192,8 +192,8 @@ const useFilter = (
     const isTimeValid = validateTimeSetting();
 
     const timeInfo = {
-      startingTime: dateToTimestamp(timePicker1),
-      endingTime: dateToTimestamp(timePicker2),
+      startingTime: `${timePicker1.toISOString()}`,
+      endingTime: `${timePicker2.toISOString()}`,
     };
 
     const locationInfo = {
