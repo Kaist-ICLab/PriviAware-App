@@ -6,9 +6,9 @@ dayjs.extend(utc);
 const timestampToHoursConverter = ts => {
   const date = new Date(ts);
   return (
-    String(date.getUTCHours()).padStart(2, '0') +
+    String(date.getHours()).padStart(2, '0') +
     ':' +
-    String(date.getUTCMinutes()).padStart(2, '0')
+    String(date.getMinutes()).padStart(2, '0')
   );
 };
 
