@@ -20,10 +20,6 @@ import {
   timestampToFullHoursConverter,
   timestampToHoursWithUnitConverter,
 } from '../utils';
-import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-
-dayjs.extend(utc);
 
 const CORRECTION_VALUE = 5;
 const HOUR_MILLISECONDS = 60 * 60 * 1000;
