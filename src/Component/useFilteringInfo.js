@@ -1,6 +1,5 @@
 import {useState} from 'react';
 import {Keyboard, Alert} from 'react-native';
-import {dateToTimestamp} from '../utils';
 
 const INITIAL_COORDINATE = {
   latitude: 36.374228,
@@ -171,6 +170,7 @@ const useFilter = (
       AlertBox('Error', 'Please enter the distance');
       return false;
     }
+
     const parsed = parseInt(radius);
     if (isNaN(parsed) || parsed < 0 || parsed > 500) {
       AlertBox('Error', 'Please enter an integer between 0 and 500');
@@ -191,42 +191,37 @@ const useFilter = (
     const isLocationValid = validateLocationSetting();
     const isTimeValid = validateTimeSetting();
 
-    const timeInfo = {
-      startingTime: `${timePicker1.toISOString()}`,
-      endingTime: `${timePicker2.toISOString()}`,
-    };
+    if (!isLocationValid && !isTimeValid) {
+      return null;
+    }
 
-    const locationInfo = {
-      radius: radius,
-      longitude: pickedLocation.longitude,
-      latitude: pickedLocation.latitude,
-      latitudeDelta: pickedLocationDelta.latitudeDelta,
-      longitudeDelta: pickedLocationDelta.longitudeDelta,
-    };
+    const timeInfo = isTimeValid
+      ? {
+          startingTime: `${timePicker1.toISOString()}`,
+          endingTime: `${timePicker2.toISOString()}`,
+        }
+      : {};
 
+    const locationInfo = isLocationValid
+      ? {
+          radius: radius,
+          longitude: pickedLocation.longitude,
+          latitude: pickedLocation.latitude,
+          latitudeDelta: pickedLocationDelta.latitudeDelta,
+          longitudeDelta: pickedLocationDelta.longitudeDelta,
+        }
+      : {};
+
+    const filterType =
+      isLocationValid && isTimeValid ? 'LT' : isLocationValid ? 'L' : 'T';
     const timeStamp = Date.now();
 
-    if (isLocationValid && isTimeValid) {
-      return {
-        ['type']: 'LT',
-        ...timeInfo,
-        ...locationInfo,
-        ['applyTS']: timeStamp,
-      };
-    } else if (isLocationValid && !isTimeValid) {
-      return {
-        ['type']: 'L',
-        ...locationInfo,
-        ['applyTS']: timeStamp,
-      };
-    } else if (!isLocationValid && isTimeValid) {
-      return {
-        ['type']: 'T',
-        ...timeInfo,
-        ['applyTS']: timeStamp,
-      };
-    }
-    return null;
+    return {
+      ['type']: filterType,
+      ...timeInfo,
+      ...locationInfo,
+      ['applyTS']: timeStamp,
+    };
   };
 
   const addFilter = () => {
