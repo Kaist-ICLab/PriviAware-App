@@ -28,7 +28,7 @@ export default function WelcomePage() {
       end={{x: 1, y: 1}}>
       <SafeAreaView style={styles.innerContainer}>
         <View style={styles.textContainer}>
-          <Text style={styles.title}>PRIVIZ</Text>
+          <Text style={styles.title}>PrivyAware</Text>
 
           <Text style={styles.description}>
             Privacy Data Management with Visualization Support
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   title: {
-    fontSize: 60,
+    fontSize: 56,
     fontWeight: 'bold',
     textAlign: 'center',
     color: '#FFFFFF',

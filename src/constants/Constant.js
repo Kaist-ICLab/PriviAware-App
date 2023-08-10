@@ -91,7 +91,7 @@ const D3_SCHEME_PASTEL1 = colors(
 );
 
 const D3_SCHEME_SET1 = colors(
-  'e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999',
+  'e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999',
 );
 
 const COLOURS = D3_SCHEME_PASTEL1.concat(D3_SCHEME_PASTEL1); // double the colorset, considering not enough color case
