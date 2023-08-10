@@ -487,6 +487,7 @@ export default function SettingPage({route}) {
         {filterInfo.map((filter, i) => (
           <FilteringInfo
             key={i}
+            index={i}
             isNew={false}
             filter={filter}
             setToggleStatus={setToggleStatus}

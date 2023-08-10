@@ -25,6 +25,7 @@ const BUTTON_TEXT = {
 };
 
 function FilteringInfo({
+  index,
   isNew,
   filter,
   setToggleStatus,
@@ -126,7 +127,9 @@ function FilteringInfo({
           setIsCollapsed(() => !isCollapsed);
         }}>
         <Text>
-          {blockName.length === 0 ? 'New Filter' : blockName.join(' , ')}
+          {blockName.length === 0
+            ? 'New Filter'
+            : `${index + 1}. ${blockName.join(' , ')}`}
         </Text>
         {isNew ? (
           <View style={styles.dotButton}>
