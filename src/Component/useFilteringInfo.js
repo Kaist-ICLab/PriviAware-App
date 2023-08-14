@@ -32,10 +32,6 @@ const useFilter = (
       : [false, false];
 
   const [timeToggleStatus, setTimeToggleStatus] = useState(isTimeOn);
-  const [locationToggleStatus, setLocationToggleStatus] =
-    useState(isLocationOn);
-
-  // time setting related
   const [showTimeSetting, setShowTimeSetting] = useState(isTimeOn);
   const {startingTime, endingTime} = isTimeOn ? filter : {};
   const {
@@ -45,14 +41,14 @@ const useFilter = (
     latitudeDelta,
     longitudeDelta,
   } = isLocationOn ? filter : {};
-
   const [timePicker1, setTimePicker1] = useState(new Date(startingTime));
   const [timePicker2, setTimePicker2] = useState(new Date(endingTime));
-
+  // related to show modals
   const [showTimePicker1, setShowTimePicker1] = useState(false);
   const [showTimePicker2, setShowTimePicker2] = useState(false);
 
-  // location setting related
+  const [locationToggleStatus, setLocationToggleStatus] =
+    useState(isLocationOn);
   const [showLocationSetting, setShowLocationSetting] = useState(isLocationOn);
   const [dragging, setDragging] = useState(false);
   const [pickedLocation, setPickedLocation] = useState(
@@ -61,7 +57,7 @@ const useFilter = (
   const [pickedLocationDelta, setPickedLocationDelta] = useState(
     isLocationOn ? {latitudeDelta, longitudeDelta} : INITIAL_COORDINATE_DELTA,
   );
-  const [radius, setRadius] = useState(rad);
+  const [radius, setRadius] = useState(rad ?? '150');
 
   const AlertBox = (title, msg) => {
     Alert.alert(title, msg, [
@@ -157,7 +153,7 @@ const useFilter = (
   };
 
   const handleRadius = value => {
-    setRadius(value ?? 0);
+    setRadius(value ?? '0');
   };
 
   const validateLocationSetting = () => {
@@ -187,21 +183,18 @@ const useFilter = (
       AlertBox('Error', 'Please turn on Location or Time filter');
       return null;
     }
-
     const isLocationValid = validateLocationSetting();
     const isTimeValid = validateTimeSetting();
 
     if (!isLocationValid && !isTimeValid) {
       return null;
     }
-
     const timeInfo = isTimeValid
       ? {
           startingTime: `${timePicker1.toISOString()}`,
           endingTime: `${timePicker2.toISOString()}`,
         }
       : {};
-
     const locationInfo = isLocationValid
       ? {
           radius: radius,
@@ -211,7 +204,6 @@ const useFilter = (
           longitudeDelta: pickedLocationDelta.longitudeDelta,
         }
       : {};
-
     const filterType =
       isLocationValid && isTimeValid ? 'LT' : isLocationValid ? 'L' : 'T';
     const timeStamp = Date.now();
@@ -226,7 +218,6 @@ const useFilter = (
 
   const addFilter = () => {
     const currentFilter = getCurrentFilter();
-
     if (currentFilter !== null) {
       addFiltering(dt.name, currentFilter);
     }
@@ -234,7 +225,6 @@ const useFilter = (
 
   const editFilter = () => {
     const currentFilter = getCurrentFilter();
-
     if (currentFilter !== null) {
       updateFiltering(dt.name, filter, currentFilter);
     }

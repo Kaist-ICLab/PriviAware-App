@@ -164,12 +164,14 @@ function FilteringInfo({
                   style={{marginHorizontal: 10, alignSelf: 'center'}}
                   onPress={handleShowTimePicker1}>
                   <View style={styles.textInput}>
-                    {!isNaN(timePicker1) && (
+                    {!isNaN(timePicker1) ? (
                       <Text style={{alignSelf: 'center'}}>
                         {timePicker1.getHours().toString().padStart(2, '0') +
                           ':' +
                           timePicker1.getMinutes().toString().padStart(2, '0')}
                       </Text>
+                    ) : (
+                      <Text style={{alignSelf: 'center'}}>00:00</Text>
                     )}
                   </View>
                   <DateTimePickerModal
@@ -184,12 +186,14 @@ function FilteringInfo({
                   style={{marginHorizontal: 10, alignSelf: 'center'}}
                   onPress={handleShowTimePicker2}>
                   <View style={styles.textInput}>
-                    {!isNaN(timePicker2) && (
+                    {!isNaN(timePicker2) ? (
                       <Text style={{alignSelf: 'center'}}>
                         {timePicker2.getHours().toString().padStart(2, '0') +
                           ':' +
                           timePicker2.getMinutes().toString().padStart(2, '0')}
                       </Text>
+                    ) : (
+                      <Text style={{alignSelf: 'center'}}>00:00</Text>
                     )}
                   </View>
                   <DateTimePickerModal
