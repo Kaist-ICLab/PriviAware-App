@@ -25,8 +25,7 @@ import {globalStyles} from '../styles/global';
 const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
 const collectionStatus = {
-  FILTERING: '#5A5492',
-  ON: '#ACA9C8',
+  ON: '#5A5492',
   OFF: '#D9D9D9',
 };
 
@@ -202,17 +201,26 @@ export default function OverviewPage({route}) {
                   <AntDesign name="questioncircleo" size={15} />
                 </TouchableOpacity>
               </View>
-              <View
-                style={{
-                  ...styles.dotStatus,
-                  backgroundColor:
-                    status[dt.name] === 'on'
-                      ? collectionStatus.ON
-                      : status[dt.name] === 'off'
-                      ? collectionStatus.OFF
-                      : collectionStatus.FILTERING,
-                }}
-              />
+              <View style={styles.dotContainer}>
+                <View
+                  style={{
+                    ...styles.dotStatus,
+                    backgroundColor:
+                      status[dt.name] === 'off'
+                        ? collectionStatus.OFF
+                        : collectionStatus.ON,
+                  }}
+                />
+                <View
+                  style={{
+                    ...styles.dotStatus,
+                    backgroundColor:
+                      status[dt.name] === 'filter'
+                        ? collectionStatus.ON
+                        : collectionStatus.OFF,
+                  }}
+                />
+              </View>
             </View>
           ))}
           <Text style={styles.listTitle}>Not Sensitive</Text>
@@ -241,36 +249,53 @@ export default function OverviewPage({route}) {
                   <AntDesign name="questioncircleo" size={15} />
                 </TouchableOpacity>
               </View>
-              <View
-                style={{
-                  ...styles.dotStatus,
-                  backgroundColor:
-                    status[dt.name] === 'on'
-                      ? collectionStatus.ON
-                      : status[dt.name] === 'off'
-                      ? collectionStatus.OFF
-                      : collectionStatus.FILTERING,
-                }}
-              />
+
+              <View style={styles.dotContainer}>
+                <View
+                  style={{
+                    ...styles.dotStatus,
+                    backgroundColor:
+                      status[dt.name] === 'off'
+                        ? collectionStatus.OFF
+                        : collectionStatus.ON,
+                  }}
+                />
+                <View
+                  style={{
+                    ...styles.dotStatus,
+                    backgroundColor:
+                      status[dt.name] === 'filter'
+                        ? collectionStatus.ON
+                        : collectionStatus.OFF,
+                  }}
+                />
+              </View>
             </View>
           ))}
         </ScrollView>
         <View style={styles.extraInformation}>
-          {Object.keys(collectionStatus).map(s => (
-            <View style={styles.row} key={s}>
-              <View
-                style={{
-                  ...styles.dotStatus,
-                  backgroundColor: collectionStatus[s],
-                }}
-              />
-              <Text>
-                {s === 'FILTERING'
-                  ? `Data Collection ON / Filtering ON`
-                  : `Data Collection ${s} / Filtering OFF`}
-              </Text>
+          <View style={styles.dotContainer}>
+            <View
+              style={{
+                ...styles.largeDotStatus,
+                backgroundColor: collectionStatus.ON,
+              }}>
+              <Text style={[{color: '#ffffff'}, styles.statusText]}>ON</Text>
             </View>
-          ))}
+            <View
+              style={{
+                ...styles.largeDotStatus,
+                backgroundColor: collectionStatus.OFF,
+              }}>
+              <Text style={[{color: '#000000'}, styles.statusText]}>OFF</Text>
+            </View>
+          </View>
+          <View>
+            <Text styles={styles.row}>
+              left circle - data collection status
+            </Text>
+            <Text styles={styles.row}>right circle - filtering status</Text>
+          </View>
         </View>
         <View style={{marginTop: 20, marginBottom: 20, alignSelf: 'center'}}>
           <TouchableOpacity
@@ -323,9 +348,25 @@ const styles = StyleSheet.create({
     height: 16,
     borderRadius: 9,
     alignSelf: 'center',
-    marginRight: 20,
+    marginRight: 8,
+  },
+  largeDotStatus: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignSelf: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  statusText: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    alignSelf: 'center',
+  },
+  dotContainer: {
+    flexDirection: 'row',
   },
   loginInfo: {fontSize: 15, color: '#000000'},
   row: {flexDirection: 'row'},
-  extraInformation: {marginTop: 10},
+  extraInformation: {marginTop: 10, flexDirection: 'row'},
 });
