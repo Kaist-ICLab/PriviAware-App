@@ -21,6 +21,7 @@ import Config from 'react-native-config';
 import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '../constants/Constant';
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
 import {globalStyles} from '../styles/global';
+import {removeStorage} from '../utils/asyncStorage';
 
 const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
@@ -146,6 +147,7 @@ export default function OverviewPage({route}) {
   };
 
   const logoutAction = () => {
+    removeStorage('userEmail');
     navigation.navigate('Login');
     BackgroundTimer.stopBackgroundTimer();
   };

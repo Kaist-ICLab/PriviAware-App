@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   SafeAreaView,
   View,
@@ -12,6 +12,8 @@ import {
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import Config from 'react-native-config';
+import {getStorage, removeStorage, setStorage} from '../utils/asyncStorage';
+import CheckBox from '@react-native-community/checkbox';
 
 export default function LoginPage() {
   const {colors} = useTheme();
@@ -22,11 +24,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPW, setShowPW] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   const handleEmail = value => {
     if (value.includes('@')) setEmailValidity(true);
     else setEmailValidity(false);
     setEmail(value);
+  };
+
+  const handleCheckbox = value => {
+    if (value) {
+      setStorage('autoLogin', true);
+    } else {
+      removeStorage('autoLogin');
+    }
+    setToggleCheckBox(value);
   };
 
   const handlePassword = value => {
@@ -45,6 +57,18 @@ export default function LoginPage() {
       },
     ]);
   };
+
+  useEffect(() => {
+    getStorage('userEmail').then(userEmail => {
+      if (userEmail) {
+        getStorage('autoLogin').then(isLoggedIn => {
+          if (isLoggedIn) {
+            navigation.navigate('Overview', {email: userEmail});
+          }
+        });
+      }
+    });
+  }, []);
 
   const login = async () => {
     console.log('[RN LoginPage.js] Login func started');
@@ -69,6 +93,7 @@ export default function LoginPage() {
     setLoading(false);
     if (!data.result) AlertBox('Error', 'Incorrect email or password');
     else {
+      setStorage('userEmail', email);
       navigation.navigate('Overview', {email: email});
     }
   };
@@ -87,7 +112,6 @@ export default function LoginPage() {
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Sign In</Text>
       </View>
-
       <View stype={styles.formContainer}>
         <Text
           style={{
@@ -139,6 +163,14 @@ export default function LoginPage() {
           </View>
         </View>
       </View>
+      <View style={styles.row}>
+        <CheckBox
+          disabled={false}
+          value={toggleCheckBox}
+          onValueChange={handleCheckbox}
+        />
+        <Text> Remember ID </Text>
+      </View>
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={login}>
@@ -156,7 +188,6 @@ export default function LoginPage() {
           <Text style={styles.signUp}> Sign Up</Text>
         </TouchableOpacity>
       </View>
-
       {loading ? (
         <View
           style={{
@@ -229,6 +260,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 34,
   },
+  row: {flexDirection: 'row'},
   textInputTitle: {
     marginTop: 10,
     fontSize: 17,
