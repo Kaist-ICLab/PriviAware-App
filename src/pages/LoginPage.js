@@ -61,10 +61,13 @@ export default function LoginPage() {
 
   useEffect(() => {
     getStorage('userEmail').then(userEmail => {
+      console.log(userEmail, ' dd');
       if (userEmail) {
         getStorage('autoLogin').then(isLoggedIn => {
           if (isLoggedIn) {
-            navigation.navigate('Overview', {email: userEmail});
+            setEmail(() => userEmail);
+            handleEmail(userEmail);
+            setToggleCheckBox(() => true);
           }
         });
       }
@@ -125,7 +128,8 @@ export default function LoginPage() {
           <TextInput
             style={styles.textInput}
             keyboardType="email-address"
-            onChangeText={value => handleEmail(value)}
+            onChangeText={handleEmail}
+            value={email}
             placeholder="example@gmail.com"
             placeholderTextColor="#AEAEAE"
           />
