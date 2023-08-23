@@ -14,6 +14,7 @@ import {useNavigation, useTheme} from '@react-navigation/native';
 import Config from 'react-native-config';
 import {getStorage, removeStorage, setStorage} from '../utils/asyncStorage';
 import CheckBox from '@react-native-community/checkbox';
+import {colorSet} from '../constants/Colors';
 
 export default function LoginPage() {
   const {colors} = useTheme();
@@ -168,8 +169,14 @@ export default function LoginPage() {
           disabled={false}
           value={toggleCheckBox}
           onValueChange={handleCheckbox}
+          tintColors={{true: colorSet.primary}}
         />
-        <Text> Remember ID </Text>
+        <TouchableOpacity
+          style={styles.row}
+          activeOpacity={0.8}
+          onPress={() => handleCheckbox(!toggleCheckBox)}>
+          <Text style={styles.rememberIdText}> Remember ID </Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.buttonContainer}>
@@ -264,5 +271,8 @@ const styles = StyleSheet.create({
   textInputTitle: {
     marginTop: 10,
     fontSize: 17,
+  },
+  rememberIdText: {
+    textAlignVertical: 'center',
   },
 });
