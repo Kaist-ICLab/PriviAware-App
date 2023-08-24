@@ -1,4 +1,4 @@
-const RESEARCHER_CONTACT = 'nicol90820@kse.kaist.ac.kr';
+const RESEARCHER_CONTACT = 'hyunsoo.lee@kse.kaist.ac.kr';
 
 const ACCESS_DESCRIPTION = `Who can access?\nResearchers from ICLab, KAIST\n(${RESEARCHER_CONTACT})`;
 const COLLECTED_DATATYPE_TITLE = '무엇을 수집하나요?';
