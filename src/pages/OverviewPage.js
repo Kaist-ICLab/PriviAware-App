@@ -66,8 +66,8 @@ export default function OverviewPage({route}) {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
-                  email: email,
                   locationRecord: {
+                    email: email,
                     longitude: pos.coords.longitude,
                     latitude: pos.coords.latitude,
                     timestamp: Date.now(),
