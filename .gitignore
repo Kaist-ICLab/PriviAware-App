@@ -66,3 +66,4 @@ yarn-error.log
 
 #mock data may contain sensitive information(e.g. mac address)
 src/mocks
+/src/test.py
