@@ -28,7 +28,7 @@ export default function WelcomePage() {
       end={{x: 1, y: 1}}>
       <SafeAreaView style={styles.innerContainer}>
         <View style={styles.textContainer}>
-          <Text style={styles.title}>PrivyAware</Text>
+          <Text style={styles.title}>PriviAware</Text>
 
           <Text style={styles.description}>
             Privacy Data Management with Visualization Support
