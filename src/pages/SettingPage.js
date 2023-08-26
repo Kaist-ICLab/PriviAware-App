@@ -278,7 +278,7 @@ export default function SettingPage({route}) {
   // Change date1's hour, minute, second to date2's
   const changeDate = (date1, date2) => {
     const newDate = new Date(date1);
-    newDate.setUTCHours(date2.getUTCHours());
+    newDate.setHours(date2.getHours());
     newDate.setMinutes(date2.getMinutes());
     newDate.setSeconds(date2.getSeconds());
     return newDate;
@@ -286,6 +286,13 @@ export default function SettingPage({route}) {
 
   const handleDate = value => {
     setDate(value);
+    console.log(
+      value,
+      'newDate1',
+      changeDate(value, timeRange[0]),
+      'newDate2',
+      changeDate(value, timeRange[1]),
+    );
 
     setTimeRange(prev => [
       changeDate(value, prev[0]),
@@ -294,6 +301,7 @@ export default function SettingPage({route}) {
   };
 
   const handleTimeRange = (value, index) => {
+    console.log('now timerange', timeRange);
     if (index === 0) {
       if (validateTimeRange(value, timeRange[1])) {
         setTimeRange(prev => [value, prev[1]]);
