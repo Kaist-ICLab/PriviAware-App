@@ -490,33 +490,6 @@ export default function SettingPage({route}) {
             )}
           </View>
         </View>
-        <Text style={styles.listTitle}>Contextual Filtering</Text>
-
-        {filterInfo.map((filter, i) => (
-          <FilteringInfo
-            key={i}
-            index={i}
-            isNew={false}
-            filter={filter}
-            setToggleStatus={setToggleStatus}
-            updateToDB={updateToDB}
-            addFiltering={addFilteringDB}
-            updateFiltering={updateFilteringDB}
-            deleteFiltering={deleteFilteringDB}
-            dt={dt}
-            filterStatus={route.params.status}
-          />
-        ))}
-        <FilteringInfo
-          isNew={true}
-          setToggleStatus={setToggleStatus}
-          updateToDB={updateToDB}
-          addFiltering={addFilteringDB}
-          updateFiltering={updateFilteringDB}
-          deleteFiltering={deleteFilteringDB}
-          dt={dt}
-          filterStatus={route.params.status}
-        />
       </ScrollView>
     </KeyboardAvoidingView>
   );

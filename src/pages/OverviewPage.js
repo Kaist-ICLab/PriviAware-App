@@ -213,15 +213,6 @@ export default function OverviewPage({route}) {
                         : collectionStatus.ON,
                   }}
                 />
-                <View
-                  style={{
-                    ...styles.dotStatus,
-                    backgroundColor:
-                      status[dt.name] === 'filter'
-                        ? collectionStatus.ON
-                        : collectionStatus.OFF,
-                  }}
-                />
               </View>
             </View>
           ))}
@@ -262,15 +253,6 @@ export default function OverviewPage({route}) {
                         : collectionStatus.ON,
                   }}
                 />
-                <View
-                  style={{
-                    ...styles.dotStatus,
-                    backgroundColor:
-                      status[dt.name] === 'filter'
-                        ? collectionStatus.ON
-                        : collectionStatus.OFF,
-                  }}
-                />
               </View>
             </View>
           ))}
@@ -293,10 +275,7 @@ export default function OverviewPage({route}) {
             </View>
           </View>
           <View>
-            <Text styles={styles.row}>
-              left circle - data collection status
-            </Text>
-            <Text styles={styles.row}>right circle - filtering status</Text>
+            <Text styles={styles.row}>data collection status</Text>
           </View>
         </View>
         <View style={{marginTop: 20, marginBottom: 20, alignSelf: 'center'}}>
