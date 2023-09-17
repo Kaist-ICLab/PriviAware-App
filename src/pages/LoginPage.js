@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useNavigation, useTheme} from '@react-navigation/native';
-import Config from 'react-native-config';
 import {getStorage, removeStorage, setStorage} from '../utils/asyncStorage';
 import CheckBox from '@react-native-community/checkbox';
 import {colorSet} from '../constants/Colors';
+import {signIn} from '../apis';
 
 export default function LoginPage() {
   const {colors} = useTheme();
@@ -61,7 +61,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     getStorage('userEmail').then(userEmail => {
-      console.log(userEmail, ' dd');
       if (userEmail) {
         getStorage('autoLogin').then(isLoggedIn => {
           if (isLoggedIn) {
@@ -86,13 +85,8 @@ export default function LoginPage() {
     }
     setLoading(true);
 
-    const res = await fetch(Config.SERVER_IP_ADDR + '/login', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: email, password: password}),
-    });
+    const data = await signIn(email, password);
 
-    const data = await res.json();
     console.log('[RN App.js] Received: ' + JSON.stringify(data));
     setLoading(false);
     if (!data.result) AlertBox('Error', 'Incorrect email or password');

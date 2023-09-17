@@ -22,6 +22,7 @@ import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '../constants/Constant';
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
 import {globalStyles} from '../styles/global';
 import {removeStorage} from '../utils/asyncStorage';
+import {getFilteringStatus} from '../apis';
 
 const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
@@ -101,12 +102,7 @@ export default function OverviewPage({route}) {
 
   const getStatus = async () => {
     setLoading(true);
-    const res = await fetch(SERVER_IP_ADDR + '/status', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: email}),
-    });
-    const data = await res.json();
+    const data = await getFilteringStatus(email);
     console.log('[RN OverviewPage.js] Received: ' + JSON.stringify(data));
     setStatus(data);
   };

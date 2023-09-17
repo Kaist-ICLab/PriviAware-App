@@ -15,7 +15,6 @@ import {useNavigation, useTheme} from '@react-navigation/native';
 import {Picker} from '@react-native-picker/picker';
 
 import {DATATYPE_DESCRIPTION} from '../constants/DataTypeDescription';
-import Config from 'react-native-config';
 
 import LocationGraph from '../Component/LocationGraph';
 import NumericGraph from '../Component/NumericGraph';
@@ -40,7 +39,7 @@ import {
   setFilteringList,
   setFilteringStatus,
   updateFilteringList,
-} from '../apis/status';
+} from '../apis';
 
 export default function SettingPage({route}) {
   const {colors} = useTheme();

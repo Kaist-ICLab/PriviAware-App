@@ -11,9 +11,7 @@ import {
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useNavigation, useTheme} from '@react-navigation/native';
-import Config from 'react-native-config';
-
-const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
+import {signUp} from '../apis';
 
 export default function RegisterPage() {
   const {colors} = useTheme();
@@ -67,26 +65,14 @@ export default function RegisterPage() {
       AlertBox('Error', 'Please fill in every field correctly');
       return;
     }
-    console.log(
-      '[RN LoginPage.js] Email: ' +
-        email +
-        ' Password1: ' +
-        password1 +
-        ' Password2: ' +
-        password2,
-    );
     if (password1 !== password2) {
       AlertBox('Error', 'Passwords do not match');
       return;
     }
     setLoading(true);
-    const res = await fetch(SERVER_IP_ADDR + '/createuser', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: email, password: password1}),
-    });
-    const data = await res.json();
-    console.log('[RN App.js] Received: ' + JSON.stringify(data));
+
+    const data = await signUp(email, password1);
+
     setLoading(false);
     if (data.result) {
       AlertBox('Success', 'Account created!');
