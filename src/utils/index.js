@@ -26,41 +26,6 @@ const dateToTimeString = date => {
   return hours + ':' + minutes;
 };
 
-const convertUTCToLocalDate = date => {
-  if (!date) {
-    return date;
-  }
-
-  const convertedDate = new Date(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate(),
-    date.getUTCHours(),
-    date.getUTCMinutes(),
-    date.getUTCSeconds(),
-  );
-
-  return convertedDate;
-};
-
-const convertLocalToUTCDate = date => {
-  if (!date) {
-    return date;
-  }
-  date = new Date(date);
-  date = new Date(
-    Date.UTC(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds(),
-    ),
-  );
-  return date;
-};
-
 const dateToTimestamp = date => {
   return date.getTime();
 };
@@ -118,8 +83,6 @@ export {
   dateToTimestampWithoutDate,
   dateToString,
   dateToTimeString,
-  convertUTCToLocalDate,
-  convertLocalToUTCDate,
   dateToTimestamp,
   formatNumber,
   convertDataType,

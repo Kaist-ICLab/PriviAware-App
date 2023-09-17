@@ -17,12 +17,12 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import RNExitApp from 'react-native-exit-app';
 
-import LoginPage from './src/pages/LoginPage';
-import RegisterPage from './src/pages/RegisterPage';
 import OverviewPage from './src/pages/OverviewPage';
 import SettingPage from './src/pages/SettingPage';
 import {LightTheme, DarkTheme} from './src/constants/Colors';
 import WelcomePage from './src/pages/WelcomePage';
+import {LoginPage} from './src/pages/LoginPage';
+import {RegisterPage} from './src/pages/RegisterPage';
 
 function App() {
   const PermissionAlertBox = (title, msg) => {

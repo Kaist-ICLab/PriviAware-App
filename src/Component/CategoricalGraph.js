@@ -11,7 +11,6 @@ import {
 import {StackedBarChart, Grid, XAxis, YAxis} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 
-import {COLORS_SET1, COLOURS} from '../constants/Constant';
 import YAxisName from './YAxisName';
 import {
   convertDataType,
@@ -20,6 +19,7 @@ import {
   timestampToFullHoursConverter,
   timestampToHoursWithUnitConverter,
 } from '../utils';
+import {PASTEL_COLORS, BRIGHT_COLORS} from '../constants/Colors';
 
 const CORRECTION_VALUE = 5;
 const HOUR_MILLISECONDS = 60 * 60 * 1000;
@@ -40,7 +40,7 @@ export default function CategoricalGraph({
   const colorScheme = useColorScheme();
 
   const theme = colorScheme !== 'dark' ? '#AEAEAE' : '#DEDDE966';
-  const graphColorSet = colorScheme === 'dark' ? COLORS_SET1 : COLOURS;
+  const graphColorSet = colorScheme === 'dark' ? BRIGHT_COLORS : PASTEL_COLORS;
 
   useEffect(() => {
     if (data.length > 0 && dataField) {

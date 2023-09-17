@@ -1,105 +1,34 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {useNavigation, useTheme} from '@react-navigation/native';
-import {getStorage, removeStorage, setStorage} from '../utils/asyncStorage';
+import {useTheme} from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox';
-import {colorSet} from '../constants/Colors';
-import {signIn} from '../apis';
+import {colorSet} from '../../constants/Colors';
+import {useLogin} from './useLogin';
 
-export default function LoginPage() {
+export function LoginPage() {
   const {colors} = useTheme();
-
-  const navigation = useNavigation();
-  const [email, setEmail] = useState('');
-  const [emailValidity, setEmailValidity] = useState(false);
-  const [password, setPassword] = useState('');
-  const [showPW, setShowPW] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [toggleCheckBox, setToggleCheckBox] = useState(false);
-
-  const handleEmail = value => {
-    if (value.includes('@')) setEmailValidity(true);
-    else setEmailValidity(false);
-    setEmail(value);
-  };
-
-  const handleCheckbox = value => {
-    if (value) {
-      setStorage('autoLogin', true);
-    } else {
-      removeStorage('autoLogin');
-    }
-    setToggleCheckBox(value);
-  };
-
-  const handlePassword = value => {
-    setPassword(value);
-  };
-
-  const handleShowPW = () => {
-    setShowPW(!showPW);
-  };
-
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
-
-  useEffect(() => {
-    getStorage('userEmail').then(userEmail => {
-      if (userEmail) {
-        getStorage('autoLogin').then(isLoggedIn => {
-          if (isLoggedIn) {
-            setEmail(() => userEmail);
-            handleEmail(userEmail);
-            setToggleCheckBox(() => true);
-          }
-        });
-      }
-    });
-  }, []);
-
-  const login = async () => {
-    console.log('[RN LoginPage.js] Login func started');
-    if (!emailValidity) {
-      AlertBox('Error', 'Please enter your email correctly');
-      return;
-    }
-    if (password.length === 0) {
-      AlertBox('Error', 'Please enter your password');
-      return;
-    }
-    setLoading(true);
-
-    const data = await signIn(email, password);
-
-    console.log('[RN App.js] Received: ' + JSON.stringify(data));
-    setLoading(false);
-    if (!data.result) AlertBox('Error', 'Incorrect email or password');
-    else {
-      setStorage('userEmail', email);
-      navigation.navigate('Overview', {email: email});
-    }
-  };
-
-  const register = () => {
-    console.log('[RN LoginPage.js] Navigate to Register Page');
-    navigation.navigate('Register');
-  };
+  const {
+    register,
+    login,
+    handleEmail,
+    email,
+    emailValidity,
+    handlePassword,
+    handleShowPW,
+    showPW,
+    handleCheckbox,
+    toggleCheckBox,
+    loading,
+  } = useLogin();
 
   return (
     <SafeAreaView
@@ -110,14 +39,9 @@ export default function LoginPage() {
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Sign In</Text>
       </View>
+
       <View stype={styles.formContainer}>
-        <Text
-          style={{
-            marginTop: 10,
-            fontSize: 17,
-          }}>
-          Gmail
-        </Text>
+        <Text style={styles.textfieldTitle}>Gmail</Text>
         <View style={styles.textInputWrapper}>
           <TextInput
             style={styles.textInput}
@@ -128,27 +52,17 @@ export default function LoginPage() {
             placeholderTextColor="#AEAEAE"
           />
         </View>
-
         {emailValidity ? (
           <></>
         ) : (
-          <Text style={{color: '#ff0000'}}>Invalid Email</Text>
+          <Text style={styles.invalidText}>Invalid Email</Text>
         )}
-        <Text
-          style={{
-            marginTop: 10,
-            fontSize: 17,
-          }}>
-          Password
-        </Text>
+
+        <Text style={styles.textfieldTitle}>Password</Text>
         <View style={styles.textInputWrapper}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
+          <View style={styles.centeredRow}>
             <TextInput
-              style={{...styles.textInput, width: '88%'}}
+              style={[styles.textInput, {width: '88%'}]}
               secureTextEntry={!showPW}
               onChangeText={value => handlePassword(value)}
             />
@@ -162,6 +76,7 @@ export default function LoginPage() {
           </View>
         </View>
       </View>
+
       <View style={styles.row}>
         <CheckBox
           disabled={false}
@@ -181,29 +96,14 @@ export default function LoginPage() {
         <TouchableOpacity style={styles.button} onPress={login}>
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{
-            flexDirection: 'row',
-            marginTop: 10,
-            justifyContent: 'center',
-          }}
-          onPress={register}>
+        <TouchableOpacity style={styles.signUpGuideText} onPress={register}>
           <Text> Don't have an account? </Text>
           <Text style={styles.signUp}> Sign Up</Text>
         </TouchableOpacity>
       </View>
+
       {loading ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-          }}>
+        <View style={styles.loadingWrapper}>
           <ActivityIndicator size="large" />
         </View>
       ) : (
@@ -266,6 +166,10 @@ const styles = StyleSheet.create({
     fontSize: 34,
   },
   row: {flexDirection: 'row'},
+  centeredRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   textInputTitle: {
     marginTop: 10,
     fontSize: 17,
@@ -273,4 +177,23 @@ const styles = StyleSheet.create({
   rememberIdText: {
     textAlignVertical: 'center',
   },
+  textfieldTitle: {
+    marginTop: 10,
+    fontSize: 17,
+  },
+  signUpGuideText: {
+    flexDirection: 'row',
+    marginTop: 10,
+    justifyContent: 'center',
+  },
+  loadingWrapper: {
+    flex: 1,
+    justifyContent: 'center',
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  invalidText: {color: '#ff0000'},
 });
