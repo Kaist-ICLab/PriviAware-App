@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text} from 'react-native';
-import {colorSet} from '../constants/Colors';
+import {colorSet} from '../../constants/Colors';
 
 function YAxisName({textHeight, textLength, name, fontSize}) {
   const OFFSET = textLength / 2 - textHeight / 2;

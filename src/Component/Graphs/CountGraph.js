@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import LineGraph from './LineGraph';
 
-export default function CountGraph({
+export function CountGraph({
   data,
   dataField,
   timeRange,

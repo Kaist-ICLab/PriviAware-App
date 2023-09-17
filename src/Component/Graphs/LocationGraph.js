@@ -3,7 +3,7 @@ import {View, Text, ActivityIndicator} from 'react-native';
 import MapView from 'react-native-maps';
 import {Marker, Callout} from 'react-native-maps';
 
-export default function LocationGraph({data, timeRange, date, zeroFlag}) {
+export function LocationGraph({data, timeRange, date, zeroFlag}) {
   const [processedLoc, setProcessedLoc] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,7 +88,7 @@ export default function LocationGraph({data, timeRange, date, zeroFlag}) {
               <Marker
                 key={i}
                 coordinate={{latitude: loc.latitude, longitude: loc.longitude}}
-                icon={require('../assets/images/pin.png')}>
+                icon={require('../../assets/images/pin.png')}>
                 <Callout>
                   <View>
                     <Text

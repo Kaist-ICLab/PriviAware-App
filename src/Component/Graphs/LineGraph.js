@@ -4,8 +4,8 @@ import {LineChart, XAxis, YAxis, Grid} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 import {Circle} from 'react-native-svg';
 
-import {formatNumber, timestampToHoursConverter} from '../utils';
-import {colorSet} from '../constants/Colors';
+import {formatNumber, timestampToHoursConverter} from '../../utils';
+import {colorSet} from '../../constants/Colors';
 import YAxisName from './YAxisName';
 
 const flexRatio = {
@@ -34,7 +34,7 @@ const Decorator = ({x, y, data}) => {
   });
 };
 
-export default function LineGraph({loading, processedData, axisName, maxData}) {
+export function LineGraph({loading, processedData, axisName, maxData}) {
   const colorScheme = useColorScheme();
   const theme = colorScheme !== 'dark' ? '#AEAEAE' : '#DEDDE966';
 

@@ -15,7 +15,7 @@ import {FakeMarker} from 'react-native-map-coordinate-picker';
 import Collapsible from 'react-native-collapsible';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {DarkTheme, LightTheme, colorSet} from '../constants/Colors';
+import {DarkTheme, LightTheme, colorSet} from '../../constants/Colors';
 import useFilter from './useFilteringInfo';
 
 const BUTTON_TEXT = {
@@ -269,7 +269,7 @@ function FilteringInfo({
                   </MapView>
                   <FakeMarker
                     dragging={dragging}
-                    icon={require('../assets/images/pin_resized.png')}
+                    icon={require('../../assets/images/pin_resized.png')}
                   />
                 </View>
               </>

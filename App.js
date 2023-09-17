@@ -17,8 +17,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import RNExitApp from 'react-native-exit-app';
 
-import OverviewPage from './src/pages/OverviewPage';
-import SettingPage from './src/pages/SettingPage';
+import OverviewPage from './src/pages/OverviewPage/OverviewPage';
+import SettingPage from './src/pages/SettingPage/SettingPage';
 import {LightTheme, DarkTheme} from './src/constants/Colors';
 import WelcomePage from './src/pages/WelcomePage';
 import {LoginPage} from './src/pages/LoginPage';
