@@ -33,8 +33,14 @@ import {
 } from '../utils';
 import CustomDateTimepickerModal from '../Component/CustomDateTimepickerModal';
 import dayjs from 'dayjs';
-
-const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
+import {
+  deleteFilteringList,
+  getData,
+  getFilteringList,
+  setFilteringList,
+  setFilteringStatus,
+  updateFilteringList,
+} from '../apis/status';
 
 export default function SettingPage({route}) {
   const {colors} = useTheme();
@@ -84,12 +90,7 @@ export default function SettingPage({route}) {
   };
 
   const fetchFilteringSetting = async () => {
-    const res = await fetch(SERVER_IP_ADDR + '/getfiltering', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: route.params.email}),
-    });
-    const data = await res.json();
+    const data = await getFilteringList(route.params.email);
 
     console.log('[RN SettingPage.js] Filter Received: ' + JSON.stringify(data));
     const filterList = data.filtering[route.params.dt.name];
@@ -136,18 +137,12 @@ export default function SettingPage({route}) {
           timeRangetoTimestamp[1],
         );
 
-        const res = await fetch(SERVER_IP_ADDR + '/data', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({
-            email: route.params.email,
-            dataType: route.params.dt.name,
-            date: dateToTimestamp(startDate),
-            timeRange: timeRangetoTimestamp,
-          }),
-        });
-
-        const data = await res.json();
+        const data = await getData(
+          route.params.email,
+          route.params.dt.name,
+          dateToTimestamp(startDate),
+          timeRangetoTimestamp,
+        );
 
         console.log('[RN SettingPage.js] Data Received: ' + data.res.length);
         if (data.res.length === 0) setZeroFlag(true);
@@ -160,28 +155,15 @@ export default function SettingPage({route}) {
   }, [route.params.email, route.params.dt.name, date, timeRange]);
 
   const updateToDB = async newStatus => {
-    const res = await fetch(SERVER_IP_ADDR + '/setstatus', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: email, newStatus: newStatus}),
-    });
-    const data = await res.json();
+    const data = await setFilteringStatus(email, newStatus);
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
     if (!data.result) AlertBox('Error', 'Error in updating setting');
   };
 
   const addFilteringDB = async (dataType, condition) => {
     console.log('[RN SettingPage.js] addFilteringDB: ', dataType, condition);
-    const res = await fetch(SERVER_IP_ADDR + '/setfiltering', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: email,
-        dt: dataType,
-        condition: condition,
-      }),
-    });
-    const data = await res.json();
+    const data = await setFilteringList(email, dataType, condition);
+
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
     fetchFilteringSetting();
     if (data.result) {
@@ -202,17 +184,12 @@ export default function SettingPage({route}) {
       originalCondition,
       newCondition,
     );
-    const res = await fetch(SERVER_IP_ADDR + '/updatefiltering', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: email,
-        dt: dataType,
-        original: originalCondition,
-        new: newCondition,
-      }),
-    });
-    const data = await res.json();
+    const data = updateFilteringList(
+      email,
+      dataType,
+      originalCondition,
+      newCondition,
+    );
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
 
     fetchFilteringSetting();
@@ -224,16 +201,7 @@ export default function SettingPage({route}) {
   };
 
   const deleteFilteringDB = async (dataType, condition) => {
-    const res = await fetch(SERVER_IP_ADDR + '/delfiltering', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        email: email,
-        dt: dataType,
-        condition: condition,
-      }),
-    });
-    const data = await res.json();
+    const data = await deleteFilteringList(email, dataType, condition);
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
     fetchFilteringSetting();
     if (data.result) {
