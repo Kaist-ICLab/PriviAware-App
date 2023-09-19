@@ -5,7 +5,7 @@ const POST = 'POST';
 const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
 /** now, all of api's method is POST. for further using, you may have to give options for other methods*/
-export const apiPayload = body => {
+const apiPayload = body => {
   return {
     method: POST,
     headers: HEADER,

@@ -18,8 +18,8 @@ import {
   dateToTimestampWithoutDate,
   timestampToFullHoursConverter,
   timestampToHoursWithUnitConverter,
-} from '../../utils';
-import {PASTEL_COLORS, BRIGHT_COLORS} from '../../constants/Colors';
+} from '@utils';
+import {PASTEL_COLORS, BRIGHT_COLORS} from '@constants/Colors';
 
 const CORRECTION_VALUE = 5;
 const HOUR_MILLISECONDS = 60 * 60 * 1000;

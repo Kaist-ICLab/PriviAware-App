@@ -11,7 +11,7 @@ import {
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useTheme} from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox';
-import {colorSet} from '../../constants/Colors';
+import {colorSet} from '@constants/Colors';
 import {useLogin} from './useLogin';
 
 export function LoginPage() {

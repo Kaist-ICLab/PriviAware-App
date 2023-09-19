@@ -13,21 +13,26 @@ import {
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {Picker} from '@react-native-picker/picker';
+import dayjs from 'dayjs';
 
-import {DATATYPE_DESCRIPTION} from '../../constants/DataTypeDescription';
+import {DATATYPE_DESCRIPTION} from '@constants/DataTypeDescription';
+import {colorSet} from '@constants/Colors';
 
-import {globalStyles} from '../../styles/global';
-import {colorSet} from '../../constants/Colors';
-import FilteringInfo from '../../Component/Filtering/FilteringInfo';
 import {
   dateToString,
   dateToTimeString,
   dateToTimestamp,
   convertDataType,
   dateToTimestampWithoutDate,
-} from '../../utils';
-import CustomDateTimepickerModal from '../../Component/Common/CustomDateTimepickerModal';
-import dayjs from 'dayjs';
+} from '@utils';
+import FilteringInfo from '@components/Filtering/FilteringInfo';
+import CustomDateTimepickerModal from '@components/Common/CustomDateTimepickerModal';
+import {
+  CategoricalGraph,
+  CountGraph,
+  LocationGraph,
+  NumericGraph,
+} from '@components/Graphs';
 import {
   deleteFilteringList,
   getData,
@@ -35,13 +40,8 @@ import {
   setFilteringList,
   setFilteringStatus,
   updateFilteringList,
-} from '../../apis';
-import {
-  CategoricalGraph,
-  CountGraph,
-  LocationGraph,
-  NumericGraph,
-} from '../../Component/Graphs';
+} from '@apis';
+import {globalStyles} from '@styles/global';
 
 export default function SettingPage({route}) {
   const {colors} = useTheme();

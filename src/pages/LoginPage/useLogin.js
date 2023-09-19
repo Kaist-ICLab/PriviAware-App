@@ -2,9 +2,9 @@ import {useEffect, useState} from 'react';
 import {Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
-import {getStorage, removeStorage, setStorage} from '../../utils/asyncStorage';
-import {signIn} from '../../apis';
-import {ALERTBOX_MSG} from '../../constants/Messages';
+import {getStorage, removeStorage, setStorage} from '@utils/asyncStorage';
+import {ALERTBOX_MSG} from '@constants/Messages';
+import {signIn} from '@apis';
 
 export const useLogin = () => {
   const navigation = useNavigation();
@@ -73,17 +73,22 @@ export const useLogin = () => {
       AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.EMPTY_PASSWORD);
       return;
     }
-
     setLoading(true);
-    const data = await signIn(email, password);
-    setLoading(false);
 
-    if (!data.result) {
-      AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.WRONG_INFORMATION);
-      return;
+    try {
+      const data = await signIn(email, password);
+      setLoading(false);
+
+      if (!data.result) {
+        AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.WRONG_INFORMATION);
+        return;
+      }
+      setStorage('userEmail', email);
+      navigation.navigate('Overview', {email: email});
+    } catch (e) {
+      setLoading(false);
+      AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.SIGN_IN_FAILED);
     }
-    setStorage('userEmail', email);
-    navigation.navigate('Overview', {email: email});
   };
 
   const register = () => {

@@ -8,4 +8,5 @@ export const ALERTBOX_MSG = {
   DUPLICATED_EMAIL: 'This email has been used',
   INVALID_EMAIL: 'Please enter your email correctly',
   WRONG_INFORMATION: 'Incorrect email or password',
+  SIGN_IN_FAILED: 'Sign in failed. Please try again',
 };

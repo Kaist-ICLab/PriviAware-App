@@ -2,8 +2,8 @@ import {useState} from 'react';
 import {Alert} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-import {signUp} from '../../apis';
-import {ALERTBOX_MSG} from '../../constants/Messages';
+import {signUp} from '@apis';
+import {ALERTBOX_MSG} from '@constants/Messages';
 
 export const useRegister = () => {
   const navigation = useNavigation();

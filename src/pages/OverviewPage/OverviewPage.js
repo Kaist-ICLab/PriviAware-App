@@ -18,11 +18,11 @@ import RNExitApp from 'react-native-exit-app';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Config from 'react-native-config';
 
-import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '../../constants/Constant';
-import {DATATYPE_DESCRIPTION} from '../../constants/DataTypeDescription';
-import {globalStyles} from '../../styles/global';
-import {removeStorage} from '../../utils/asyncStorage';
-import {getFilteringStatus} from '../../apis';
+import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '@constants/DataType';
+import {DATATYPE_DESCRIPTION} from '@constants/DataTypeDescription';
+import {globalStyles} from '@styles/global';
+import {removeStorage} from '@utils/asyncStorage';
+import {getFilteringStatus} from '@apis';
 
 const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
