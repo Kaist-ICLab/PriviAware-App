@@ -1,9 +1,9 @@
 import {useState} from 'react';
-import {Alert} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {signUp} from '@apis';
 import {ALERTBOX_MSG} from '@constants/Messages';
+import {alertError, alertSuccess} from '@utils/alert';
 
 export const useRegister = () => {
   const navigation = useNavigation();
@@ -37,26 +37,17 @@ export const useRegister = () => {
     setShowPW2(!showPW2);
   };
 
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
-
   const cancel = () => {
     navigation.navigate('Login');
   };
 
   const submit = async () => {
     if (!emailValidity || !password1 || !password2) {
-      AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.EMPTY_FIELD);
+      alertError(ALERTBOX_MSG.EMPTY_FIELD);
       return;
     }
     if (password1 !== password2) {
-      AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.WRONG_PASSWORD);
+      alertError(ALERTBOX_MSG.WRONG_PASSWORD);
       return;
     }
     setLoading(true);
@@ -65,10 +56,10 @@ export const useRegister = () => {
 
     setLoading(false);
     if (data.result) {
-      AlertBox(ALERTBOX_MSG.SUCCESS, ALERTBOX_MSG.SUCCESSFUL_SIGNUP);
+      alertSuccess(ALERTBOX_MSG.SUCCESSFUL_SIGNUP);
       navigation.navigate('Login');
     } else {
-      AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.DUPLICATED_EMAIL);
+      alertError(ALERTBOX_MSG.DUPLICATED_EMAIL);
     }
   };
 

@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   useColorScheme,
 } from 'react-native';
@@ -20,6 +19,7 @@ import {
   timestampToHoursWithUnitConverter,
 } from '@utils';
 import {PASTEL_COLORS, BRIGHT_COLORS} from '@constants/Colors';
+import {AlertBox} from '@utils/alert';
 
 const CORRECTION_VALUE = 5;
 const HOUR_MILLISECONDS = 60 * 60 * 1000;
@@ -133,15 +133,6 @@ export function CategoricalGraph({
   useEffect(() => {
     if (data.length > 0 || zeroFlag) setLoading(false);
   }, [data, processedData, zeroFlag]);
-
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
 
   const showFewEntries = key => {
     let description = '';

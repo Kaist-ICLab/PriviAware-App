@@ -14,7 +14,6 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import {useNavigation, useTheme} from '@react-navigation/native';
 import BackgroundTimer from 'react-native-background-timer';
 import Geolocation from 'react-native-geolocation-service';
-import RNExitApp from 'react-native-exit-app';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Config from 'react-native-config';
 
@@ -23,6 +22,8 @@ import {DATATYPE_DESCRIPTION} from '@constants/DataTypeDescription';
 import {globalStyles} from '@styles/global';
 import {removeStorage} from '@utils/asyncStorage';
 import {getFilteringStatus} from '@apis';
+import {PERMISSION_MSG} from '@constants/Messages';
+import {PermissionAlertBox, AlertBox} from '@utils/alert';
 
 const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
 
@@ -38,15 +39,6 @@ export default function OverviewPage({route}) {
   const navigation = useNavigation();
   const [status, setStatus] = useState({});
   const [loading, setLoading] = useState(true);
-
-  const PermissionAlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        onPress: RNExitApp.exitApp,
-      },
-    ]);
-  };
 
   useEffect(() => {
     const getInitGPSPermission = async () => {
@@ -92,8 +84,8 @@ export default function OverviewPage({route}) {
         }, 600000);
       } else {
         PermissionAlertBox(
-          'Warning',
-          'Functions in this application require your location data. Some of the functions might not be accessble if you do not provide location data to this application.\n*You can always update this permission in Setting (Allow all the time).',
+          PERMISSION_MSG.WARNING,
+          PERMISSION_MSG.WARN_LOCATION_PERMISSION,
         );
       }
     };
@@ -119,15 +111,6 @@ export default function OverviewPage({route}) {
     return focusHandler;
   }, [navigation]);
 
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
-
   const navToSetting = dt => {
     navigation.navigate('Setting', {
       dt: dt,
@@ -150,8 +133,8 @@ export default function OverviewPage({route}) {
 
   const logout = () => {
     Alert.alert(
-      'Warning',
-      'Logging out will stop the location detecting in this application.\nLocation filtering setting might not be working as expected.\nAre you sure you want to logout?',
+      PERMISSION_MSG.WARNING,
+      PERMISSION_MSG.WARN_LOGOUT_CAUSE_LOCATION_FILTER_DOES_NOT_WORK,
       [
         {
           text: 'Cancel',

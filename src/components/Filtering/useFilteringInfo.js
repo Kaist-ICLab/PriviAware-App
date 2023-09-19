@@ -1,5 +1,6 @@
 import {useState} from 'react';
-import {Keyboard, Alert} from 'react-native';
+import {Keyboard} from 'react-native';
+import {alertError} from '@utils/alert';
 
 const INITIAL_COORDINATE = {
   latitude: 36.374228,
@@ -59,15 +60,6 @@ const useFilter = (
   );
   const [radius, setRadius] = useState(rad ?? '150');
 
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
-
   const handleTimeToggleStatus = () => {
     if (timeToggleStatus) {
       setStatus('on');
@@ -86,7 +78,7 @@ const useFilter = (
 
   const validateTimeRange = (startDate, endDate) => {
     if (startDate.getTime() > endDate.getTime()) {
-      AlertBox('Error', 'Starting time cannot be later than ending time');
+      alertError('Starting time cannot be later than ending time');
       return false;
     }
     return true;
@@ -116,11 +108,11 @@ const useFilter = (
     }
     // reject all impossible cases
     if (isNaN(timePicker1) || isNaN(timePicker2)) {
-      AlertBox('Error', 'Please enter both starting time and ending time');
+      alertError('Please enter both starting time and ending time');
       return false;
     }
     if (timePicker1.getTime() > timePicker2.getTime()) {
-      AlertBox('Error', 'Starting time cannot be earlier than ending time');
+      alertError('Starting time cannot be earlier than ending time');
       return false;
     }
     // set status as time filtering + update to PrivacyViz-Member DB
@@ -163,13 +155,13 @@ const useFilter = (
     }
     // reject all impossible cases
     if (!radius || !pickedLocation || !pickedLocationDelta) {
-      AlertBox('Error', 'Please enter the distance');
+      alertError('Please enter the distance');
       return false;
     }
 
     const parsed = parseInt(radius);
     if (isNaN(parsed) || parsed < 0 || parsed > 500) {
-      AlertBox('Error', 'Please enter an integer between 0 and 500');
+      alertError('Please enter an integer between 0 and 500');
       return false;
     }
     setStatus('location');
@@ -180,7 +172,7 @@ const useFilter = (
 
   const getCurrentFilter = () => {
     if (!showLocationSetting && !showTimeSetting) {
-      AlertBox('Error', 'Please turn on Location or Time filter');
+      alertError('Please turn on Location or Time filter');
       return null;
     }
     const isLocationValid = validateLocationSetting();

@@ -11,11 +11,9 @@ import {
   StatusBar,
   useColorScheme,
   PermissionsAndroid,
-  Alert,
 } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import RNExitApp from 'react-native-exit-app';
 
 import OverviewPage from './src/pages/OverviewPage/OverviewPage';
 import SettingPage from './src/pages/SettingPage/SettingPage';
@@ -23,17 +21,10 @@ import {LightTheme, DarkTheme} from './src/constants/Colors';
 import WelcomePage from './src/pages/WelcomePage';
 import {LoginPage} from './src/pages/LoginPage';
 import {RegisterPage} from './src/pages/RegisterPage';
+import {PERMISSION_MSG} from './src/constants/Messages';
+import {PermissionAlertBox} from './src/utils/alert';
 
 function App() {
-  const PermissionAlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        onPress: RNExitApp.exitApp,
-      },
-    ]);
-  };
-
   const requestLocationPermission = async () => {
     try {
       const perm = await PermissionsAndroid.check(
@@ -53,11 +44,12 @@ function App() {
   useEffect(() => {
     const loginAction = async () => {
       const temp = await requestLocationPermission();
-      if (!temp)
+      if (!temp) {
         PermissionAlertBox(
-          'Warning',
-          'Functions in this application require your location data. Some of the functions might not be accessble if you do not provide location data to this application.\n*You can always update this permission in Setting (Allow all the time).',
+          PERMISSION_MSG.WARNING,
+          PERMISSION_MSG.WARN_LOCATION_PERMISSION,
         );
+      }
     };
     loginAction();
   }, []);

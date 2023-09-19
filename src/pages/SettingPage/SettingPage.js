@@ -3,7 +3,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   Switch,
   KeyboardAvoidingView,
   ScrollView,
@@ -42,6 +41,7 @@ import {
   updateFilteringList,
 } from '@apis';
 import {globalStyles} from '@styles/global';
+import {AlertBox, alertError} from '@utils/alert';
 
 export default function SettingPage({route}) {
   const {colors} = useTheme();
@@ -75,19 +75,10 @@ export default function SettingPage({route}) {
 
   const validateTimeRange = (startDate, endDate) => {
     if (startDate.getTime() > endDate.getTime()) {
-      AlertBox('Error', 'Starting time cannot be later than ending time');
+      alertError('Starting time cannot be later than ending time');
       return false;
     }
     return true;
-  };
-
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
   };
 
   const fetchFilteringSetting = async () => {
@@ -158,7 +149,7 @@ export default function SettingPage({route}) {
   const updateToDB = async newStatus => {
     const data = await setFilteringStatus(email, newStatus);
     console.log('[RN SettingPage.js] Received: ' + JSON.stringify(data));
-    if (!data.result) AlertBox('Error', 'Error in updating setting');
+    if (!data.result) alertError('Error in updating setting');
   };
 
   const addFilteringDB = async (dataType, condition) => {
@@ -170,7 +161,7 @@ export default function SettingPage({route}) {
     if (data.result) {
       ToastAndroid.show('A filter was successfully added!', ToastAndroid.SHORT);
     } else {
-      AlertBox('Error', 'Error in appending filtering');
+      alertError('Error in appending filtering');
     }
   };
 
@@ -197,7 +188,7 @@ export default function SettingPage({route}) {
     if (data.result) {
       ToastAndroid.show('saved', ToastAndroid.SHORT);
     } else {
-      AlertBox('Error', 'Error in updating filtering');
+      alertError('Error in updating filtering');
     }
   };
 
@@ -208,7 +199,7 @@ export default function SettingPage({route}) {
     if (data.result) {
       ToastAndroid.show('A filter was deleted', ToastAndroid.SHORT);
     } else {
-      AlertBox('Error', 'Error in deleting filtering');
+      alertError('Error in deleting filtering');
     }
   };
 

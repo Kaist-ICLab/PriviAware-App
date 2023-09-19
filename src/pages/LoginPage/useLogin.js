@@ -1,10 +1,10 @@
 import {useEffect, useState} from 'react';
-import {Alert} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {getStorage, removeStorage, setStorage} from '@utils/asyncStorage';
 import {ALERTBOX_MSG} from '@constants/Messages';
 import {signIn} from '@apis';
+import {alertError} from '@utils/alert';
 
 export const useLogin = () => {
   const navigation = useNavigation();
@@ -41,15 +41,6 @@ export const useLogin = () => {
     setShowPW(!showPW);
   };
 
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
-
   useEffect(() => {
     getStorage('userEmail').then(userEmail => {
       if (userEmail) {
@@ -66,11 +57,11 @@ export const useLogin = () => {
 
   const login = async () => {
     if (!emailValidity) {
-      AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.INVALID_EMAIL);
+      alertError(ALERTBOX_MSG.INVALID_EMAIL);
       return;
     }
     if (password.length === 0) {
-      AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.EMPTY_PASSWORD);
+      alertError(ALERTBOX_MSG.EMPTY_PASSWORD);
       return;
     }
     setLoading(true);
@@ -80,14 +71,14 @@ export const useLogin = () => {
       setLoading(false);
 
       if (!data.result) {
-        AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.WRONG_INFORMATION);
+        alertError(ALERTBOX_MSG.WRONG_INFORMATION);
         return;
       }
       setStorage('userEmail', email);
       navigation.navigate('Overview', {email: email});
     } catch (e) {
       setLoading(false);
-      AlertBox(ALERTBOX_MSG.ERROR, ALERTBOX_MSG.SIGN_IN_FAILED);
+      alertError(ALERTBOX_MSG.SIGN_IN_FAILED);
     }
   };
 
