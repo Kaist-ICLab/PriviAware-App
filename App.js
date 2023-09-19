@@ -15,14 +15,11 @@ import {
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import OverviewPage from './src/pages/OverviewPage/OverviewPage';
-import SettingPage from './src/pages/SettingPage/SettingPage';
 import {LightTheme, DarkTheme} from './src/constants/Colors';
-import WelcomePage from './src/pages/WelcomePage';
-import {LoginPage} from './src/pages/LoginPage';
-import {RegisterPage} from './src/pages/RegisterPage';
 import {PERMISSION_MSG} from './src/constants/Messages';
 import {PermissionAlertBox} from './src/utils/alert';
+import {LoginPage, OverviewPage, RegisterPage, WelcomePage} from './src/pages';
+import {SettingPage} from './src/pages/SettingPage';
 
 function App() {
   const requestLocationPermission = async () => {

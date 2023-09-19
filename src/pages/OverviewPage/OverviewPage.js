@@ -1,152 +1,31 @@
-import React, {useState, useEffect} from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   TouchableOpacity,
   ScrollView,
-  Alert,
-  PermissionsAndroid,
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
 import AntDesign from 'react-native-vector-icons/AntDesign';
-import {useNavigation, useTheme} from '@react-navigation/native';
-import BackgroundTimer from 'react-native-background-timer';
-import Geolocation from 'react-native-geolocation-service';
+import {useTheme} from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Config from 'react-native-config';
 
 import {SENSITIVE_DATATYPE, NORMAL_DATATYPE} from '@constants/DataType';
-import {DATATYPE_DESCRIPTION} from '@constants/DataTypeDescription';
 import {globalStyles} from '@styles/global';
-import {removeStorage} from '@utils/asyncStorage';
-import {getFilteringStatus} from '@apis';
-import {PERMISSION_MSG} from '@constants/Messages';
-import {PermissionAlertBox, AlertBox} from '@utils/alert';
-
-const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
+import {useOverview} from './useOverview';
+import {convertUpperCaseWithBlank} from '@utils/common';
 
 const collectionStatus = {
   ON: '#5A5492',
   OFF: '#D9D9D9',
 };
 
-export default function OverviewPage({route}) {
+export function OverviewPage({route}) {
   const {colors} = useTheme();
-
   const {email} = route.params;
-  const navigation = useNavigation();
-  const [status, setStatus] = useState({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const getInitGPSPermission = async () => {
-      const res = await PermissionsAndroid.check(
-        PermissionsAndroid.PERMISSIONS.ACCESS_BACKGROUND_LOCATION,
-      );
-      if (res) {
-        BackgroundTimer.runBackgroundTimer(() => {
-          Geolocation.getCurrentPosition(pos => {
-            try {
-              console.log(
-                'longitude:',
-                pos.coords.longitude,
-                'latitude:',
-                pos.coords.latitude,
-              );
-              fetch(SERVER_IP_ADDR + '/locationrecord', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                  locationRecord: {
-                    email: email,
-                    longitude: pos.coords.longitude,
-                    latitude: pos.coords.latitude,
-                    timestamp: Date.now(),
-                  },
-                }),
-              });
-              console.log(
-                JSON.stringify({
-                  email: email,
-                  locationRecord: {
-                    longitude: pos.coords.longitude,
-                    latitude: pos.coords.latitude,
-                    timestamp: Date.now(),
-                  },
-                }),
-              );
-            } catch (err) {
-              console.log('err occured', err);
-            }
-          });
-        }, 600000);
-      } else {
-        PermissionAlertBox(
-          PERMISSION_MSG.WARNING,
-          PERMISSION_MSG.WARN_LOCATION_PERMISSION,
-        );
-      }
-    };
-    getInitGPSPermission();
-  }, []);
-
-  const getStatus = async () => {
-    setLoading(true);
-    const data = await getFilteringStatus(email);
-    console.log('[RN OverviewPage.js] Received: ' + JSON.stringify(data));
-    setStatus(data);
-  };
-
-  useEffect(() => {
-    setLoading(false);
-  }, [status]);
-
-  // run once this page is loaded
-  useEffect(() => {
-    const focusHandler = navigation.addListener('focus', () => {
-      getStatus();
-    });
-    return focusHandler;
-  }, [navigation]);
-
-  const navToSetting = dt => {
-    navigation.navigate('Setting', {
-      dt: dt,
-      status: status[dt.name],
-      email: email,
-    });
-  };
-
-  const showInfo = dt => {
-    const name =
-      dt.name.charAt(0).toUpperCase() + dt.name.slice(1).replaceAll('_', ' ');
-    AlertBox(name, DATATYPE_DESCRIPTION[dt.name].description);
-  };
-
-  const logoutAction = () => {
-    removeStorage('userEmail');
-    navigation.navigate('Login');
-    BackgroundTimer.stopBackgroundTimer();
-  };
-
-  const logout = () => {
-    Alert.alert(
-      PERMISSION_MSG.WARNING,
-      PERMISSION_MSG.WARN_LOGOUT_CAUSE_LOCATION_FILTER_DOES_NOT_WORK,
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: logoutAction,
-        },
-      ],
-    );
-  };
+  const {status, loading, navToSetting, showInfo, logout} = useOverview(email);
 
   return (
     <SafeAreaView
@@ -172,8 +51,7 @@ export default function OverviewPage({route}) {
                     style={{
                       fontSize: 16,
                     }}>
-                    {dt.name.charAt(0).toUpperCase() +
-                      dt.name.slice(1).replaceAll('_', ' ')}
+                    {convertUpperCaseWithBlank(dt.name)}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -220,8 +98,7 @@ export default function OverviewPage({route}) {
                     style={{
                       fontSize: 16,
                     }}>
-                    {dt.name.charAt(0).toUpperCase() +
-                      dt.name.slice(1).replaceAll('_', ' ')}
+                    {convertUpperCaseWithBlank(dt.name)}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity

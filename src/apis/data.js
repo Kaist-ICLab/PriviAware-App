@@ -11,3 +11,17 @@ export const getData = async (email, datatype, date, timeRange) => {
     '/data',
   );
 };
+
+export const addLocationData = async (email, pos) => {
+  return await apiRequest(
+    {
+      locationRecord: {
+        email: email,
+        longitude: pos.coords.longitude,
+        latitude: pos.coords.latitude,
+        timestamp: Date.now(),
+      },
+    },
+    '/locationrecord',
+  );
+};

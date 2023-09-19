@@ -17,7 +17,7 @@ import {
   dateToTimestampWithoutDate,
   timestampToFullHoursConverter,
   timestampToHoursWithUnitConverter,
-} from '@utils';
+} from '@utils/common';
 import {PASTEL_COLORS, BRIGHT_COLORS} from '@constants/Colors';
 import {AlertBox} from '@utils/alert';
 

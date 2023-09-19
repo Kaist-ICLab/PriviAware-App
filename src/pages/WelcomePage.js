@@ -9,7 +9,7 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
 
-export default function WelcomePage() {
+export function WelcomePage() {
   const navigation = useNavigation();
 
   const signIn = () => {

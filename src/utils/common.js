@@ -3,6 +3,13 @@ import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
 
+/** get rid of underscore and change first character to upper case
+@example example_name to Example name
+*/
+const convertUpperCaseWithBlank = str => {
+  return `${str.charAt(0).toUpperCase() + str.slice(1).replaceAll('_', ' ')}`;
+};
+
 const timestampToHoursConverter = ts => {
   const date = new Date(ts);
   return (
@@ -86,4 +93,5 @@ export {
   dateToTimestamp,
   formatNumber,
   convertDataType,
+  convertUpperCaseWithBlank,
 };
