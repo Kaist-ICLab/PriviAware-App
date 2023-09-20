@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
+import {globalStyles} from '../styles/global';
 
 export function WelcomePage() {
   const navigation = useNavigation();
@@ -36,11 +37,11 @@ export function WelcomePage() {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={signIn}>
-            <Text style={styles.buttonText}> Sign In </Text>
+            <Text style={globalStyles.buttonText}> Sign In </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={signUp}>
-            <Text style={styles.buttonText}> Sign Up </Text>
+            <Text style={globalStyles.buttonText}> Sign Up </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -80,11 +81,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20,
     backgroundColor: '#F2C2B6CC',
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   textContainer: {
     display: 'flex',

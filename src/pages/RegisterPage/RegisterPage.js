@@ -11,6 +11,7 @@ import {
 import Entypo from 'react-native-vector-icons/Entypo';
 import {useTheme} from '@react-navigation/native';
 import {useRegister} from './useRegister';
+import {globalStyles} from '../../styles/global';
 
 export function RegisterPage() {
   const {colors} = useTheme();
@@ -62,7 +63,7 @@ export function RegisterPage() {
         <Text style={styles.textInputTitle}>Password</Text>
 
         <View style={styles.textInputWrapper}>
-          <View style={styles.centeredRow}>
+          <View style={globalStyles.centeredRow}>
             <TextInput
               style={{...styles.textInput, width: '88%'}}
               secureTextEntry={!showPW1}
@@ -81,7 +82,7 @@ export function RegisterPage() {
         <Text style={styles.textInputTitle}>Confirm Password</Text>
 
         <View style={styles.textInputWrapper}>
-          <View style={styles.centeredRow}>
+          <View style={globalStyles.centeredRow}>
             <TextInput
               style={{...styles.textInput, width: '88%'}}
               secureTextEntry={!showPW2}
@@ -100,7 +101,7 @@ export function RegisterPage() {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={submit}>
-          <Text style={styles.buttonText}> Submit</Text>
+          <Text style={globalStyles.buttonText}> Submit</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.signInGuideText} onPress={cancel}>
@@ -110,7 +111,7 @@ export function RegisterPage() {
       </View>
 
       {loading ? (
-        <View style={styles.loadingWrapper}>
+        <View style={globalStyles.loadingContainer}>
           <ActivityIndicator size="large" />
         </View>
       ) : (
@@ -150,11 +151,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#5A5492',
   },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
   textInput: {
     backgroundColor: '#F3F2F2',
     height: 30,
@@ -181,18 +177,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     justifyContent: 'center',
   },
-  loadingWrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
   invalidText: {color: '#ff0000'},
-  centeredRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
 });

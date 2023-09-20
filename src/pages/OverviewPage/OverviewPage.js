@@ -38,7 +38,7 @@ export function OverviewPage({route}) {
           <Text style={styles.listTitle}>Sensitive</Text>
           {SENSITIVE_DATATYPE.map((dt, i) => (
             <View key={i} style={styles.listContent}>
-              <View style={styles.row}>
+              <View style={globalStyles.row}>
                 <MaterialCommunityIcons
                   name={dt.icon}
                   size={20}
@@ -85,7 +85,7 @@ export function OverviewPage({route}) {
           <Text style={styles.listTitle}>Not Sensitive</Text>
           {NORMAL_DATATYPE.map((dt, i) => (
             <View key={i} style={styles.listContent}>
-              <View style={styles.row}>
+              <View style={globalStyles.row}>
                 <MaterialCommunityIcons
                   name={dt.icon}
                   size={20}
@@ -149,10 +149,12 @@ export function OverviewPage({route}) {
             </View>
           </View>
           <View>
-            <Text styles={styles.row}>
+            <Text styles={globalStyles.row}>
               left circle - data collection status
             </Text>
-            <Text styles={styles.row}>right circle - filtering status</Text>
+            <Text styles={globalStyles.row}>
+              right circle - filtering status
+            </Text>
           </View>
         </View>
         <View style={{marginTop: 20, marginBottom: 20, alignSelf: 'center'}}>
@@ -169,16 +171,7 @@ export function OverviewPage({route}) {
         </View>
       </View>
       {loading ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-          }}>
+        <View style={globalStyles.loadingContainer}>
           <ActivityIndicator size="large" />
         </View>
       ) : (
@@ -225,6 +218,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   loginInfo: {fontSize: 15, color: '#000000'},
-  row: {flexDirection: 'row'},
   extraInformation: {marginTop: 10, flexDirection: 'row'},
 });

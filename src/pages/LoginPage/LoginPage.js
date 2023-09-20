@@ -13,6 +13,7 @@ import {useTheme} from '@react-navigation/native';
 import CheckBox from '@react-native-community/checkbox';
 import {colorSet} from '@constants/Colors';
 import {useLogin} from './useLogin';
+import {globalStyles} from '../../styles/global';
 
 export function LoginPage() {
   const {colors} = useTheme();
@@ -60,7 +61,7 @@ export function LoginPage() {
 
         <Text style={styles.textfieldTitle}>Password</Text>
         <View style={styles.textInputWrapper}>
-          <View style={styles.centeredRow}>
+          <View style={globalStyles.centeredRow}>
             <TextInput
               style={[styles.textInput, {width: '88%'}]}
               secureTextEntry={!showPW}
@@ -77,7 +78,7 @@ export function LoginPage() {
         </View>
       </View>
 
-      <View style={styles.row}>
+      <View style={globalStyles.row}>
         <CheckBox
           disabled={false}
           value={toggleCheckBox}
@@ -85,7 +86,7 @@ export function LoginPage() {
           tintColors={{true: colorSet.primary}}
         />
         <TouchableOpacity
-          style={styles.row}
+          style={globalStyles.row}
           activeOpacity={0.8}
           onPress={() => handleCheckbox(!toggleCheckBox)}>
           <Text style={styles.rememberIdText}> Remember ID </Text>
@@ -94,7 +95,7 @@ export function LoginPage() {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={login}>
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={globalStyles.buttonText}>Login</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.signUpGuideText} onPress={register}>
           <Text> Don't have an account? </Text>
@@ -103,7 +104,7 @@ export function LoginPage() {
       </View>
 
       {loading ? (
-        <View style={styles.loadingWrapper}>
+        <View style={globalStyles.loadingContainer}>
           <ActivityIndicator size="large" />
         </View>
       ) : (
@@ -143,11 +144,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#5A5492',
   },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
   textInput: {
     backgroundColor: '#F3F2F2',
     height: 30,
@@ -165,11 +161,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 34,
   },
-  row: {flexDirection: 'row'},
-  centeredRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   textInputTitle: {
     marginTop: 10,
     fontSize: 17,
@@ -186,14 +177,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     justifyContent: 'center',
   },
-  loadingWrapper: {
-    flex: 1,
-    justifyContent: 'center',
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
+
   invalidText: {color: '#ff0000'},
 });
