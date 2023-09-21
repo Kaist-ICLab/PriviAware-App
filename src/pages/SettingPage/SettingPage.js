@@ -49,7 +49,6 @@ export function SettingPage({route}) {
     updateFilteringDB,
     deleteFilteringDB,
     setToggleStatus,
-    updateToDB,
     dataType,
   } = useSetting(email, dt, savedStatus);
 
@@ -233,7 +232,6 @@ export function SettingPage({route}) {
             isNew={false}
             filter={filter}
             setToggleStatus={setToggleStatus}
-            updateToDB={updateToDB}
             addFiltering={addFilteringDB}
             updateFiltering={updateFilteringDB}
             deleteFiltering={deleteFilteringDB}
@@ -244,7 +242,6 @@ export function SettingPage({route}) {
         <FilteringInfo
           isNew={true}
           setToggleStatus={setToggleStatus}
-          updateToDB={updateToDB}
           addFiltering={addFilteringDB}
           updateFiltering={updateFilteringDB}
           deleteFiltering={deleteFilteringDB}

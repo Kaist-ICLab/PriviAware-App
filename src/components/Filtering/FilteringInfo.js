@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
-  Animated,
   StyleSheet,
   Switch,
   Text,
@@ -12,11 +11,10 @@ import {
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import MapView, {Circle} from 'react-native-maps';
 import {FakeMarker} from 'react-native-map-coordinate-picker';
-import Collapsible from 'react-native-collapsible';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {DarkTheme, LightTheme, colorSet} from '@constants/Colors';
 import useFilter from './useFilteringInfo';
+import CollapsedMenu from '../Common/CollapsedMenu';
 
 const BUTTON_TEXT = {
   SAVE: 'Save',
@@ -32,21 +30,17 @@ function FilteringInfo({
   addFiltering,
   updateFiltering,
   deleteFiltering,
-  updateToDB,
   dt,
-  filterStatus,
 }) {
   const colorScheme = useColorScheme();
   const theme = colorScheme === 'dark' ? DarkTheme.colors : LightTheme.colors;
 
   const {handleFilterOptions, filterValues} = useFilter(
     setToggleStatus,
-    updateToDB,
     addFiltering,
     updateFiltering,
     deleteFiltering,
     dt,
-    filterStatus,
     filter,
   );
 
@@ -80,30 +74,6 @@ function FilteringInfo({
     dragging,
   } = filterValues;
 
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const [rotateAnimation, setRotateAnimation] = useState(new Animated.Value(0));
-
-  const handleAnimation = () => {
-    Animated.timing(rotateAnimation, {
-      toValue: isCollapsed ? 1 : 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => {});
-  };
-
-  const cwRotating = rotateAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['180deg', '0deg'],
-  });
-
-  const animatedStyle = {
-    transform: [
-      {
-        rotate: cwRotating,
-      },
-    ],
-  };
-
   const blockName = [];
 
   if (filter !== undefined) {
@@ -114,38 +84,19 @@ function FilteringInfo({
       blockName.push('Time Filter');
     }
   }
+
+  const title =
+    blockName.length === 0
+      ? 'New Filter'
+      : `${index + 1}. ${blockName.join(' , ')}`;
+
   return (
     <View
       style={{
         ...styles.filteringInfoWrapper,
         backgroundColor: isNew ? theme.lightGray : theme.lightPurple,
       }}>
-      <TouchableOpacity
-        style={styles.filteringInfoRow}
-        onPress={async () => {
-          handleAnimation();
-          setIsCollapsed(() => !isCollapsed);
-        }}>
-        <Text>
-          {blockName.length === 0
-            ? 'New Filter'
-            : `${index + 1}. ${blockName.join(' , ')}`}
-        </Text>
-        {isNew ? (
-          <View style={styles.dotButton}>
-            <MaterialCommunityIcons name="plus" color="#ffffff" size={20} />
-          </View>
-        ) : (
-          <Animated.View style={[animatedStyle, styles.dotButton]}>
-            <MaterialCommunityIcons
-              name="chevron-up"
-              color="#ffffff"
-              size={22}
-            />
-          </Animated.View>
-        )}
-      </TouchableOpacity>
-      <Collapsible collapsed={isCollapsed}>
+      <CollapsedMenu isNew={false} title={title}>
         <View style={styles.filterDetail}>
           <View style={{marginBottom: 10}}>
             <View style={styles.spacedRow}>
@@ -165,13 +116,13 @@ function FilteringInfo({
                   onPress={handleShowTimePicker1}>
                   <View style={styles.textInput}>
                     {!isNaN(timePicker1) ? (
-                      <Text style={{alignSelf: 'center'}}>
+                      <Text style={styles.timePlaceholder}>
                         {timePicker1.getHours().toString().padStart(2, '0') +
                           ':' +
                           timePicker1.getMinutes().toString().padStart(2, '0')}
                       </Text>
                     ) : (
-                      <Text style={{alignSelf: 'center'}}>00:00</Text>
+                      <Text style={styles.timePlaceholder}>00:00</Text>
                     )}
                   </View>
                   <DateTimePickerModal
@@ -187,13 +138,13 @@ function FilteringInfo({
                   onPress={handleShowTimePicker2}>
                   <View style={styles.textInput}>
                     {!isNaN(timePicker2) ? (
-                      <Text style={{alignSelf: 'center'}}>
+                      <Text style={styles.timePlaceholder}>
                         {timePicker2.getHours().toString().padStart(2, '0') +
                           ':' +
                           timePicker2.getMinutes().toString().padStart(2, '0')}
                       </Text>
                     ) : (
-                      <Text style={{alignSelf: 'center'}}>00:00</Text>
+                      <Text style={styles.timePlaceholder}>00:00</Text>
                     )}
                   </View>
                   <DateTimePickerModal
@@ -294,7 +245,7 @@ function FilteringInfo({
             )}
           </View>
         </View>
-      </Collapsible>
+      </CollapsedMenu>
     </View>
   );
 }
@@ -309,20 +260,6 @@ const styles = StyleSheet.create({
     padding: 10,
     display: 'flex',
     justifyContent: 'space-between',
-  },
-  filteringInfoRow: {
-    alignSelf: 'stretch',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  dotButton: {
-    width: 25,
-    height: 25,
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colorSet.primary,
   },
   listContent: {
     borderColor: '#E8E8E8',
@@ -371,6 +308,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     alignSelf: 'center',
   },
+  timePlaceholder: {alignSelf: 'center'},
 });
 
 export default FilteringInfo;

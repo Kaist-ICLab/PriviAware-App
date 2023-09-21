@@ -17,16 +17,12 @@ const INITIAL_COORDINATE_DELTA = {
  */
 const useFilter = (
   setToggleStatus,
-  updateToDB,
   addFiltering,
   updateFiltering,
   deleteFiltering,
   dt,
-  filterStatus,
   filter,
 ) => {
-  const [status, setStatus] = useState(filterStatus);
-
   let [isLocationOn, isTimeOn] =
     filter !== undefined
       ? [filter.type.indexOf('L') !== -1, filter.type.indexOf('T') !== -1]
@@ -62,7 +58,6 @@ const useFilter = (
 
   const handleTimeToggleStatus = () => {
     if (timeToggleStatus) {
-      setStatus('on');
       setToggleStatus(true);
       setShowTimeSetting(false);
     } else {
@@ -116,14 +111,12 @@ const useFilter = (
       return false;
     }
     // set status as time filtering + update to PrivacyViz-Member DB
-    setStatus('time');
     setToggleStatus(true);
     return true;
   };
 
   const handleLocationToggleStatus = () => {
     if (locationToggleStatus) {
-      setStatus('on');
       setToggleStatus(true);
       setShowLocationSetting(false);
     } else {
@@ -164,7 +157,6 @@ const useFilter = (
       alertError('Please enter an integer between 0 and 500');
       return false;
     }
-    setStatus('location');
     setToggleStatus(true);
 
     return true;

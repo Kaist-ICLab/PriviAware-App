@@ -242,7 +242,6 @@ export const useSetting = (email, dt, savedStatus) => {
     updateFilteringDB,
     deleteFilteringDB,
     setToggleStatus,
-    updateToDB,
     dataType,
   };
 };
