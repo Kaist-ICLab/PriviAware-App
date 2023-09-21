@@ -1,6 +1,7 @@
 import {useState} from 'react';
 import {Keyboard} from 'react-native';
 import {alertError} from '@utils/alert';
+import {FILTER_MSG} from '@constants/Messages';
 
 const INITIAL_COORDINATE = {
   latitude: 36.374228,
@@ -12,6 +13,7 @@ const INITIAL_COORDINATE_DELTA = {
   longitudeDelta: 0.0122,
 };
 
+const DEFAULT_RADIUS = '150';
 /**
  * a custom hook for filteringInfo component
  */
@@ -54,7 +56,7 @@ const useFilter = (
   const [pickedLocationDelta, setPickedLocationDelta] = useState(
     isLocationOn ? {latitudeDelta, longitudeDelta} : INITIAL_COORDINATE_DELTA,
   );
-  const [radius, setRadius] = useState(rad ?? '150');
+  const [radius, setRadius] = useState(rad ?? DEFAULT_RADIUS);
 
   const handleTimeToggleStatus = () => {
     if (timeToggleStatus) {
@@ -73,7 +75,7 @@ const useFilter = (
 
   const validateTimeRange = (startDate, endDate) => {
     if (startDate.getTime() > endDate.getTime()) {
-      alertError('Starting time cannot be later than ending time');
+      alertError(FILTER_MSG.LATE_TIME_RANGE_ERROR);
       return false;
     }
     return true;
@@ -103,11 +105,11 @@ const useFilter = (
     }
     // reject all impossible cases
     if (isNaN(timePicker1) || isNaN(timePicker2)) {
-      alertError('Please enter both starting time and ending time');
+      alertError(FILTER_MSG.EMPTY_TIME);
       return false;
     }
     if (timePicker1.getTime() > timePicker2.getTime()) {
-      alertError('Starting time cannot be earlier than ending time');
+      alertError(FILTER_MSG.EARLY_TIME_RANGE_ERROR);
       return false;
     }
     // set status as time filtering + update to PrivacyViz-Member DB
@@ -148,13 +150,13 @@ const useFilter = (
     }
     // reject all impossible cases
     if (!radius || !pickedLocation || !pickedLocationDelta) {
-      alertError('Please enter the distance');
+      alertError(FILTER_MSG.EMPTY_RADIUS);
       return false;
     }
 
     const parsed = parseInt(radius);
     if (isNaN(parsed) || parsed < 0 || parsed > 500) {
-      alertError('Please enter an integer between 0 and 500');
+      alertError(FILTER_MSG.INVALID_RADIUS);
       return false;
     }
     setToggleStatus(true);
@@ -164,7 +166,7 @@ const useFilter = (
 
   const getCurrentFilter = () => {
     if (!showLocationSetting && !showTimeSetting) {
-      alertError('Please turn on Location or Time filter');
+      alertError(FILTER_MSG.EMPTY_FILTER);
       return null;
     }
     const isLocationValid = validateLocationSetting();

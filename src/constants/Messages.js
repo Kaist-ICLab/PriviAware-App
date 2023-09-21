@@ -18,3 +18,12 @@ export const PERMISSION_MSG = {
   WARN_LOCATION_PERMISSION:
     'Functions in this application require your location data. Some of the functions might not be accessible if you do not provide location data to this application.\n*You can always update this permission in Setting (Allow all the time).',
 };
+
+export const FILTER_MSG = {
+  EMPTY_TIME: 'Please enter both starting time and ending time',
+  EARLY_TIME_RANGE_ERROR: 'Starting time cannot be earlier than ending time',
+  LATE_TIME_RANGE_ERROR: 'Starting time cannot be later than ending time',
+  EMPTY_RADIUS: 'Please enter the distance',
+  INVALID_RADIUS: 'Please enter an integer between 0 and 500',
+  EMPTY_FILTER: 'Please turn on Location or Time filter',
+};

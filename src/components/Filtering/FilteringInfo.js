@@ -114,17 +114,7 @@ function FilteringInfo({
                 <TouchableOpacity
                   style={{marginHorizontal: 10, alignSelf: 'center'}}
                   onPress={handleShowTimePicker1}>
-                  <View style={styles.textInput}>
-                    {!isNaN(timePicker1) ? (
-                      <Text style={styles.timePlaceholder}>
-                        {timePicker1.getHours().toString().padStart(2, '0') +
-                          ':' +
-                          timePicker1.getMinutes().toString().padStart(2, '0')}
-                      </Text>
-                    ) : (
-                      <Text style={styles.timePlaceholder}>00:00</Text>
-                    )}
-                  </View>
+                  <TimeInput time={timePicker1} />
                   <DateTimePickerModal
                     isVisible={showTimePicker1}
                     mode="time"
@@ -136,17 +126,7 @@ function FilteringInfo({
                 <TouchableOpacity
                   style={{marginHorizontal: 10, alignSelf: 'center'}}
                   onPress={handleShowTimePicker2}>
-                  <View style={styles.textInput}>
-                    {!isNaN(timePicker2) ? (
-                      <Text style={styles.timePlaceholder}>
-                        {timePicker2.getHours().toString().padStart(2, '0') +
-                          ':' +
-                          timePicker2.getMinutes().toString().padStart(2, '0')}
-                      </Text>
-                    ) : (
-                      <Text style={styles.timePlaceholder}>00:00</Text>
-                    )}
-                  </View>
+                  <TimeInput time={timePicker2} />
                   <DateTimePickerModal
                     isVisible={showTimePicker2}
                     mode="time"
@@ -249,6 +229,20 @@ function FilteringInfo({
     </View>
   );
 }
+
+const TimeInput = ({time}) => (
+  <View style={styles.textInput}>
+    {!isNaN(time) ? (
+      <Text style={styles.timePlaceholder}>
+        {time.getHours().toString().padStart(2, '0') +
+          ':' +
+          time.getMinutes().toString().padStart(2, '0')}
+      </Text>
+    ) : (
+      <Text style={styles.timePlaceholder}>00:00</Text>
+    )}
+  </View>
+);
 
 const styles = StyleSheet.create({
   filterDetail: {
