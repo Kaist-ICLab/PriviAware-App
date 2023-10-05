@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import LineGraph from './LineGraph';
 
-export default function NumericGraph({
+export function NumericGraph({
   data,
   dataField,
   dataType,

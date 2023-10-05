@@ -1,106 +1,43 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   SafeAreaView,
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   StyleSheet,
 } from 'react-native';
 import Entypo from 'react-native-vector-icons/Entypo';
-import {useNavigation, useTheme} from '@react-navigation/native';
-import Config from 'react-native-config';
+import {useTheme} from '@react-navigation/native';
+import {useRegister} from './useRegister';
+import {globalStyles} from '../../styles/global';
 
-const SERVER_IP_ADDR = Config.SERVER_IP_ADDR;
-
-export default function RegisterPage() {
+export function RegisterPage() {
   const {colors} = useTheme();
+  const {
+    showPW1,
+    showPW2,
+    emailValidity,
+    loading,
+    handleEmail,
+    handlePassword1,
+    handlePassword2,
+    handleShowPW1,
+    handleShowPW2,
+    cancel,
+    submit,
+  } = useRegister();
 
-  const navigation = useNavigation();
-  const [showPW1, setShowPW1] = useState(false);
-  const [showPW2, setShowPW2] = useState(false);
-  const [emailValidity, setEmailValidity] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password1, setPassword1] = useState('');
-  const [password2, setPassword2] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const handleEmail = value => {
-    if (value.includes('@')) setEmailValidity(true);
-    else setEmailValidity(false);
-    setEmail(value);
-  };
-
-  const handlePassword1 = value => {
-    setPassword1(value);
-  };
-
-  const handlePassword2 = value => {
-    setPassword2(value);
-  };
-
-  const handleShowPW1 = () => {
-    setShowPW1(!showPW1);
-  };
-
-  const handleShowPW2 = () => {
-    setShowPW2(!showPW2);
-  };
-
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
-
-  const cancel = () => {
-    navigation.navigate('Login');
-  };
-
-  const submit = async () => {
-    if (!emailValidity || !password1 || !password2) {
-      AlertBox('Error', 'Please fill in every field correctly');
-      return;
-    }
-    console.log(
-      '[RN LoginPage.js] Email: ' +
-        email +
-        ' Password1: ' +
-        password1 +
-        ' Password2: ' +
-        password2,
-    );
-    if (password1 !== password2) {
-      AlertBox('Error', 'Passwords do not match');
-      return;
-    }
-    setLoading(true);
-    const res = await fetch(SERVER_IP_ADDR + '/createuser', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({email: email, password: password1}),
-    });
-    const data = await res.json();
-    console.log('[RN App.js] Received: ' + JSON.stringify(data));
-    setLoading(false);
-    if (data.result) {
-      AlertBox('Success', 'Account created!');
-      navigation.navigate('Login');
-    } else AlertBox('Error', 'Email is registered');
-  };
-
+  const containerStyle = [
+    styles.container,
+    {
+      backgroundColor: colors.background,
+      opacity: loading ? 0.3 : 1,
+    },
+  ];
   return (
-    <SafeAreaView
-      style={{
-        backgroundColor: colors.background,
-        ...styles.container,
-        opacity: loading ? 0.3 : 1,
-      }}>
+    <SafeAreaView style={containerStyle}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>Sign Up</Text>
       </View>
@@ -121,16 +58,12 @@ export default function RegisterPage() {
         {emailValidity ? (
           <></>
         ) : (
-          <Text style={{color: '#ff0000'}}>Invalid Email</Text>
+          <Text style={styles.invalidText}>Invalid Email</Text>
         )}
         <Text style={styles.textInputTitle}>Password</Text>
 
         <View style={styles.textInputWrapper}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
+          <View style={globalStyles.centeredRow}>
             <TextInput
               style={{...styles.textInput, width: '88%'}}
               secureTextEntry={!showPW1}
@@ -149,11 +82,7 @@ export default function RegisterPage() {
         <Text style={styles.textInputTitle}>Confirm Password</Text>
 
         <View style={styles.textInputWrapper}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
+          <View style={globalStyles.centeredRow}>
             <TextInput
               style={{...styles.textInput, width: '88%'}}
               secureTextEntry={!showPW2}
@@ -172,32 +101,17 @@ export default function RegisterPage() {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={submit}>
-          <Text style={styles.buttonText}> Submit</Text>
+          <Text style={globalStyles.buttonText}> Submit</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{
-            flexDirection: 'row',
-            marginTop: 10,
-            justifyContent: 'center',
-          }}
-          onPress={cancel}>
+        <TouchableOpacity style={styles.signInGuideText} onPress={cancel}>
           <Text> Already have an account?</Text>
           <Text style={styles.signUp}> Sign In</Text>
         </TouchableOpacity>
       </View>
 
       {loading ? (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            top: 0,
-            bottom: 0,
-          }}>
+        <View style={globalStyles.loadingContainer}>
           <ActivityIndicator size="large" />
         </View>
       ) : (
@@ -237,11 +151,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     backgroundColor: '#5A5492',
   },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
   textInput: {
     backgroundColor: '#F3F2F2',
     height: 30,
@@ -263,4 +172,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 17,
   },
+  signInGuideText: {
+    flexDirection: 'row',
+    marginTop: 10,
+    justifyContent: 'center',
+  },
+  invalidText: {color: '#ff0000'},
 });

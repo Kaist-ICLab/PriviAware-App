@@ -8,8 +8,9 @@ import {
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {useNavigation} from '@react-navigation/native';
+import {globalStyles} from '../styles/global';
 
-export default function WelcomePage() {
+export function WelcomePage() {
   const navigation = useNavigation();
 
   const signIn = () => {
@@ -29,7 +30,6 @@ export default function WelcomePage() {
       <SafeAreaView style={styles.innerContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.title}>PriviAware</Text>
-
           <Text style={styles.description}>
             Privacy Data Management with Visualization Support
           </Text>
@@ -37,11 +37,11 @@ export default function WelcomePage() {
 
         <View style={styles.buttonContainer}>
           <TouchableOpacity style={styles.button} onPress={signIn}>
-            <Text style={styles.buttonText}> Sign In </Text>
+            <Text style={globalStyles.buttonText}> Sign In </Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.button} onPress={signUp}>
-            <Text style={styles.buttonText}> Sign Up </Text>
+            <Text style={globalStyles.buttonText}> Sign Up </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -81,11 +81,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 20,
     backgroundColor: '#F2C2B6CC',
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   textContainer: {
     display: 'flex',

@@ -4,8 +4,8 @@ import {LineChart, XAxis, YAxis, Grid} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 import {Circle} from 'react-native-svg';
 
-import {formatNumber, timestampToHoursConverter} from '../utils';
-import {colorSet} from '../constants/Colors';
+import {formatNumber, timestampToHoursConverter} from '@utils/common';
+import {colorSet} from '@constants/Colors';
 import YAxisName from './YAxisName';
 
 const flexRatio = {

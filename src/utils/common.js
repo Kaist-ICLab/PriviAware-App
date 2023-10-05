@@ -3,6 +3,13 @@ import utc from 'dayjs/plugin/utc';
 
 dayjs.extend(utc);
 
+/** get rid of underscore and change first character to upper case
+@example example_name to Example name
+*/
+const convertUpperCaseWithBlank = str => {
+  return `${str.charAt(0).toUpperCase() + str.slice(1).replaceAll('_', ' ')}`;
+};
+
 const timestampToHoursConverter = ts => {
   const date = new Date(ts);
   return (
@@ -24,41 +31,6 @@ const dateToTimeString = date => {
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
   return hours + ':' + minutes;
-};
-
-const convertUTCToLocalDate = date => {
-  if (!date) {
-    return date;
-  }
-
-  const convertedDate = new Date(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate(),
-    date.getUTCHours(),
-    date.getUTCMinutes(),
-    date.getUTCSeconds(),
-  );
-
-  return convertedDate;
-};
-
-const convertLocalToUTCDate = date => {
-  if (!date) {
-    return date;
-  }
-  date = new Date(date);
-  date = new Date(
-    Date.UTC(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds(),
-    ),
-  );
-  return date;
 };
 
 const dateToTimestamp = date => {
@@ -118,9 +90,8 @@ export {
   dateToTimestampWithoutDate,
   dateToString,
   dateToTimeString,
-  convertUTCToLocalDate,
-  convertLocalToUTCDate,
   dateToTimestamp,
   formatNumber,
   convertDataType,
+  convertUpperCaseWithBlank,
 };

@@ -1,5 +1,7 @@
 import {useState} from 'react';
-import {Keyboard, Alert} from 'react-native';
+import {Keyboard} from 'react-native';
+import {alertError} from '@utils/alert';
+import {FILTER_MSG} from '@constants/Messages';
 
 const INITIAL_COORDINATE = {
   latitude: 36.374228,
@@ -11,21 +13,18 @@ const INITIAL_COORDINATE_DELTA = {
   longitudeDelta: 0.0122,
 };
 
+const DEFAULT_RADIUS = '150';
 /**
  * a custom hook for filteringInfo component
  */
 const useFilter = (
   setToggleStatus,
-  updateToDB,
   addFiltering,
   updateFiltering,
   deleteFiltering,
   dt,
-  filterStatus,
   filter,
 ) => {
-  const [status, setStatus] = useState(filterStatus);
-
   let [isLocationOn, isTimeOn] =
     filter !== undefined
       ? [filter.type.indexOf('L') !== -1, filter.type.indexOf('T') !== -1]
@@ -57,20 +56,11 @@ const useFilter = (
   const [pickedLocationDelta, setPickedLocationDelta] = useState(
     isLocationOn ? {latitudeDelta, longitudeDelta} : INITIAL_COORDINATE_DELTA,
   );
-  const [radius, setRadius] = useState(rad ?? '150');
+  const [radius, setRadius] = useState(rad ?? DEFAULT_RADIUS);
 
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
-
+  /** toggles time status, and make time setting invisible*/
   const handleTimeToggleStatus = () => {
     if (timeToggleStatus) {
-      setStatus('on');
       setToggleStatus(true);
       setShowTimeSetting(false);
     } else {
@@ -86,12 +76,15 @@ const useFilter = (
 
   const validateTimeRange = (startDate, endDate) => {
     if (startDate.getTime() > endDate.getTime()) {
-      AlertBox('Error', 'Starting time cannot be later than ending time');
+      alertError(FILTER_MSG.LATE_TIME_RANGE_ERROR);
       return false;
     }
     return true;
   };
 
+  /**
+   * If the time range is valid, update timePicker1 and hide the modal
+   */
   const handleTimePicker1Confirm = date => {
     if (validateTimeRange(date, timePicker2)) {
       setTimePicker1(date);
@@ -116,22 +109,20 @@ const useFilter = (
     }
     // reject all impossible cases
     if (isNaN(timePicker1) || isNaN(timePicker2)) {
-      AlertBox('Error', 'Please enter both starting time and ending time');
+      alertError(FILTER_MSG.EMPTY_TIME);
       return false;
     }
     if (timePicker1.getTime() > timePicker2.getTime()) {
-      AlertBox('Error', 'Starting time cannot be earlier than ending time');
+      alertError(FILTER_MSG.EARLY_TIME_RANGE_ERROR);
       return false;
     }
     // set status as time filtering + update to PrivacyViz-Member DB
-    setStatus('time');
     setToggleStatus(true);
     return true;
   };
 
   const handleLocationToggleStatus = () => {
     if (locationToggleStatus) {
-      setStatus('on');
       setToggleStatus(true);
       setShowLocationSetting(false);
     } else {
@@ -163,16 +154,15 @@ const useFilter = (
     }
     // reject all impossible cases
     if (!radius || !pickedLocation || !pickedLocationDelta) {
-      AlertBox('Error', 'Please enter the distance');
+      alertError(FILTER_MSG.EMPTY_RADIUS);
       return false;
     }
 
     const parsed = parseInt(radius);
     if (isNaN(parsed) || parsed < 0 || parsed > 500) {
-      AlertBox('Error', 'Please enter an integer between 0 and 500');
+      alertError(FILTER_MSG.INVALID_RADIUS);
       return false;
     }
-    setStatus('location');
     setToggleStatus(true);
 
     return true;
@@ -180,7 +170,7 @@ const useFilter = (
 
   const getCurrentFilter = () => {
     if (!showLocationSetting && !showTimeSetting) {
-      AlertBox('Error', 'Please turn on Location or Time filter');
+      alertError(FILTER_MSG.EMPTY_FILTER);
       return null;
     }
     const isLocationValid = validateLocationSetting();
@@ -204,6 +194,7 @@ const useFilter = (
           longitudeDelta: pickedLocationDelta.longitudeDelta,
         }
       : {};
+    // if both are valid, filter type is LT, else L or T
     const filterType =
       isLocationValid && isTimeValid ? 'LT' : isLocationValid ? 'L' : 'T';
     const timeStamp = Date.now();

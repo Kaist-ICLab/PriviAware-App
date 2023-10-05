@@ -1,5 +1,3 @@
-import colors from '../utils/colors';
-
 const DATATYPE = [
   {
     name: 'app_usage_event',
@@ -86,15 +84,4 @@ const DATATYPE = [
 const SENSITIVE_DATATYPE = DATATYPE.filter(dt => dt.sensitivity);
 const NORMAL_DATATYPE = DATATYPE.filter(dt => !dt.sensitivity);
 
-const D3_SCHEME_PASTEL1 = colors(
-  'fbb4aeb3cde3ccebc5decbe4fed9a6ffffcce5d8bdfddaecf2f2f2fbb4aeb3cde3ccebc5decbe4fed9a6ffffcce5d8bdfddaecf2f2f2',
-);
-
-const D3_SCHEME_SET1 = colors(
-  'e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999e41a1c377eb84daf4a984ea3ff7f00ffff33a65628f781bf999999',
-);
-
-const COLOURS = D3_SCHEME_PASTEL1.concat(D3_SCHEME_PASTEL1); // double the colorset, considering not enough color case
-const COLORS_SET1 = D3_SCHEME_SET1.concat(D3_SCHEME_SET1);
-
-export {DATATYPE, SENSITIVE_DATATYPE, NORMAL_DATATYPE, COLOURS, COLORS_SET1};
+export {DATATYPE, SENSITIVE_DATATYPE, NORMAL_DATATYPE};

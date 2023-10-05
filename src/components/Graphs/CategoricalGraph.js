@@ -4,14 +4,12 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   useColorScheme,
 } from 'react-native';
 import {StackedBarChart, Grid, XAxis, YAxis} from 'react-native-svg-charts';
 import * as scale from 'd3-scale';
 
-import {COLORS_SET1, COLOURS} from '../constants/Constant';
 import YAxisName from './YAxisName';
 import {
   convertDataType,
@@ -19,12 +17,14 @@ import {
   dateToTimestampWithoutDate,
   timestampToFullHoursConverter,
   timestampToHoursWithUnitConverter,
-} from '../utils';
+} from '@utils/common';
+import {PASTEL_COLORS, BRIGHT_COLORS} from '@constants/Colors';
+import {AlertBox} from '@utils/alert';
 
 const CORRECTION_VALUE = 5;
 const HOUR_MILLISECONDS = 60 * 60 * 1000;
 
-export default function CategoricalGraph({
+export function CategoricalGraph({
   data,
   dataField,
   dataType,
@@ -40,7 +40,7 @@ export default function CategoricalGraph({
   const colorScheme = useColorScheme();
 
   const theme = colorScheme !== 'dark' ? '#AEAEAE' : '#DEDDE966';
-  const graphColorSet = colorScheme === 'dark' ? COLORS_SET1 : COLOURS;
+  const graphColorSet = colorScheme === 'dark' ? BRIGHT_COLORS : PASTEL_COLORS;
 
   useEffect(() => {
     if (data.length > 0 && dataField) {
@@ -133,15 +133,6 @@ export default function CategoricalGraph({
   useEffect(() => {
     if (data.length > 0 || zeroFlag) setLoading(false);
   }, [data, processedData, zeroFlag]);
-
-  const AlertBox = (title, msg) => {
-    Alert.alert(title, msg, [
-      {
-        text: 'OK',
-        style: 'cancel',
-      },
-    ]);
-  };
 
   const showFewEntries = key => {
     let description = '';
