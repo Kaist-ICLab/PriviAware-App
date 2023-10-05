@@ -26,6 +26,13 @@ import {
 } from '@components/Graphs';
 import {useSetting} from './useSetting';
 
+const GRAPH_STYLE = {
+  LOCATION: 'location',
+  NUMERIC: 'num',
+  CATEGORICAL: 'cat',
+  COUNT: 'count',
+};
+
 export function SettingPage({route}) {
   const {colors} = useTheme();
   const {dt, email, status: savedStatus} = route.params;
@@ -147,24 +154,8 @@ export function SettingPage({route}) {
 
           {route.params.dt.field.length > 1 ? (
             <View style={{flexDirection: 'row'}}>
-              <Text
-                style={{
-                  flex: 3,
-                  alignSelf: 'center',
-                  fontSize: 15,
-                  color: '#000000',
-                }}>
-                Data Type
-              </Text>
-              <View
-                style={{
-                  height: 30,
-                  width: '80%',
-                  borderWidth: 1,
-                  borderRadius: 10,
-                  justifyContent: 'center',
-                  flex: 7,
-                }}>
+              <Text style={styles.dataTypeText}>Data Type</Text>
+              <View style={styles.dataTypePicker}>
                 <Picker
                   style={{width: '100%'}}
                   selectedValue={dataField}
@@ -186,14 +177,14 @@ export function SettingPage({route}) {
                   No Data
                 </Text>
               </View>
-            ) : route.params.dt.name === 'location' ? (
+            ) : route.params.dt.name === GRAPH_STYLE.LOCATION ? (
               <LocationGraph
                 data={data}
                 timeRange={timeRange}
                 date={date}
                 zeroFlag={zeroFlag}
               />
-            ) : dataField.type === 'num' ? (
+            ) : dataField.type === GRAPH_STYLE.NUMERIC ? (
               <NumericGraph
                 data={data}
                 dataType={dataType}
@@ -202,7 +193,7 @@ export function SettingPage({route}) {
                 date={date}
                 zeroFlag={zeroFlag}
               />
-            ) : dataField.type === 'cat' ? (
+            ) : dataField.type === GRAPH_STYLE.CATEGORICAL ? (
               <CategoricalGraph
                 data={data}
                 dataField={dataField}
@@ -302,5 +293,19 @@ const styles = StyleSheet.create({
   dateTimePickerText: {
     color: colorSet.gray,
     paddingStart: 10,
+  },
+  dataTypeText: {
+    flex: 3,
+    alignSelf: 'center',
+    fontSize: 15,
+    color: '#000000',
+  },
+  dataTypePicker: {
+    height: 30,
+    width: '80%',
+    borderWidth: 1,
+    borderRadius: 10,
+    justifyContent: 'center',
+    flex: 7,
   },
 });

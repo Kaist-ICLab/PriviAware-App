@@ -86,6 +86,9 @@ export const useSetting = (email, dt, savedStatus) => {
   }, [dt]);
 
   useEffect(() => {
+    /**
+     * Fetch collected data from DB
+     */
     const fetchDataFromDB = async () => {
       if (email && dt.name && date && timeRange) {
         const startDate = new Date(dayjs(date).startOf('day'));
@@ -205,6 +208,11 @@ export const useSetting = (email, dt, savedStatus) => {
     ]);
   };
 
+  /**
+   * Handle time range change
+   * index is 0 or 1
+   * 0 for starting time, 1 for ending time
+   */
   const handleTimeRange = (value, index) => {
     if (index === 0) {
       if (validateTimeRange(value, timeRange[1])) {

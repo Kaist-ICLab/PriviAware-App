@@ -58,6 +58,7 @@ const useFilter = (
   );
   const [radius, setRadius] = useState(rad ?? DEFAULT_RADIUS);
 
+  /** toggles time status, and make time setting invisible*/
   const handleTimeToggleStatus = () => {
     if (timeToggleStatus) {
       setToggleStatus(true);
@@ -81,6 +82,9 @@ const useFilter = (
     return true;
   };
 
+  /**
+   * If the time range is valid, update timePicker1 and hide the modal
+   */
   const handleTimePicker1Confirm = date => {
     if (validateTimeRange(date, timePicker2)) {
       setTimePicker1(date);
@@ -190,6 +194,7 @@ const useFilter = (
           longitudeDelta: pickedLocationDelta.longitudeDelta,
         }
       : {};
+    // if both are valid, filter type is LT, else L or T
     const filterType =
       isLocationValid && isTimeValid ? 'LT' : isLocationValid ? 'L' : 'T';
     const timeStamp = Date.now();
